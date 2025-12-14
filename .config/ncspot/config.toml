@@ -1,0 +1,9 @@
+[theme]
+highlight_bg = "blue"
+highlight = "black"
+
+[track_format]
+default = "%title | %artists | %album | %duration"
+
+[tui]
+album_column = true

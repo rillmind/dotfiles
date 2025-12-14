@@ -1,0 +1,149 @@
+{
+  "height": 20,
+  "layer": "top",
+  "position": "top",
+  "spacing": 7,
+  "modules-left": ["custom/launcher", "hyprland/workspaces", "hyprland/window"],
+  "modules-center": ["clock"],
+  "modules-right": ["custom/updates", "cpu", "memory", "network", "pulseaudio", "battery", "custom/powermenu"],
+
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": true,
+        "on-click": "activate",
+        "on-scroll-up": "hyprctl dispatch workspace e+1",
+        "on-scroll-down": "hyprctl dispatch workspace e-1",
+        "persistent_workspaces": {
+             "1": [],
+             "2": [],
+             "3": [],
+             "4": [],
+             "5": [],
+             "6": [],
+             "7": [],
+             "8": [],
+             "9": [],
+            "10": []
+        }
+    },
+
+    "custom/updates": {
+        "format": " {}",
+        "exec": "sh ~/.config/waybar/scripts/check-updates.sh",
+        "interval": 1800,
+        "on-click": "ghostty -e 'sudo dnf upgrade'",
+        "tooltip": false
+    },
+
+    "hyprland/window": {
+        "format": "{title}",
+        "max-length": 55,
+        "separate-outputs": true
+    },
+
+    "custom/launcher": {
+        "interval": "once",
+        "format": "",
+        "on-click": "wofi --show drun --columns 1 -I -s ~/.config/wofi/style.css",
+        "tooltip": false
+      },
+
+    "cpu": {
+      "interval": 10,
+      "format": " {usage}%",
+      "max-length": 10
+    },
+
+    "temperature": {
+      "hwmon-path-abs": "/sys/devices/platform/coretemp.0/hwmon",
+     	"input-filename": "temp1_input",
+     	"format": " {temperatureC}°C",
+     	"on-click": "psensor"
+    },
+
+    "backlight": {
+        "device": "nvidia_0",
+	"max-length": "4",
+        "format": "{icon}  {percent}%",
+        "format-icons": ["", "", "", "", "", "", "", "", ""],
+        "on-click": "",
+        "on-scroll-up": "brightnessctl set 10%-",
+        "on-scroll-down": "brightnessctl set +10%"
+    },
+
+    "custom/dunst": {
+        "exec": "~/.config/waybar/scripts/dunst.sh",
+        "on-click": "dunstctl set-paused toggle",
+        "restart-interval": 1,
+        "tooltip": false
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-bluetooth": "{icon} {volume}% {format_source}",
+        "format-bluetooth-muted": " {icon} {format_source}",
+        "format-muted": "",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        },
+        "on-click-right": "pavucontrol",
+	    "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+    },
+
+    "custom/ssid-display": {
+    "format": "  {}%",
+    "exec": "~/.config/waybar/wifiName.sh"
+    },
+
+    "network": {
+      "format-wifi": " {}",
+      "exec": "~/.config/waybar/wifiName.sh",
+      "format-ethernet": " ",
+      "format-disconnected": "󰕑",
+      "interval": 5,
+      "tooltip": true,
+      "on-click": "sh ~/.config/wofi/wifimenu.sh"
+    },
+
+    "battery": {
+      "bat": "BAT0",
+      "adapter": "ADP0",
+      "interval": 60,
+      "states": {
+          "warning": 30,
+          "critical": 15
+      },
+      "max-length": 20,
+      "format": "{icon}{capacity}%",
+      "format-warning": "{icon} {capacity}%",
+      "format-critical": "{icon} {capacity}%",
+      "format-charging": " {capacity}%",
+      "format-plugged": " {capacity}%",
+      "format-alt": "{icon} {time}",
+      "format-full": " {capacity}%",
+      "format-icons": [" ", " ", " ", " ", " "]
+    },
+
+    "clock": {
+        "format": "Dia {:%d | %H:%M}"
+    },
+
+  "memory": {
+    "interval": 30,
+    "format": " {}%",
+    "format-alt":" {used:0.1f}G",
+    "max-length": 10
+},
+
+    "custom/powermenu": {
+        "format": "",
+        "on-click": "bash ~/.config/wofi/powermenu.sh",
+        "tooltip": false
+    }
+}

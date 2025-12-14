@@ -1,0 +1,84 @@
+/* Definição de Cores do seu Conky */
+$color0: #C9CBFF;
+$color1: #D9E0EE;
+$color2: #89DCEB; /* Cyan - Barras */
+$color3: #F2CDCD; /* Pink */
+$color4: #C3BAC6;
+$color5: #ABE9B3; /* Green */
+$color6: #FAE3B0; /* Yellow */
+$bg: #1e1e2e;     /* Preto conforme own_window_colour */
+
+* {
+  all: unset;
+  font-family: "JetBrainsMono Nerd Font";
+}
+
+.container {
+  background-color: $bg;
+  padding: 150px;
+  border-radius: 0px; /* Conky é quadrado por padrão */
+}
+
+/* Header */
+.session-text {
+  font-family: "Raleway";
+  font-weight: bold;
+  font-size: 30px;
+  color: $color0;
+  margin-bottom: 5px;
+}
+
+.date-text {
+  font-family: "Ubuntu";
+  font-size: 14px;
+  color: $color0;
+  margin-bottom: 20px;
+}
+
+/* Seções Gerais */
+.section {
+  margin-bottom: 15px;
+}
+
+.section-title {
+  font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  color: $color1;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+/* Cores específicas */
+.color-green { color: $color5; }
+.color-yellow { color: $color6; }
+.color-pink { color: $color3; }
+.color-white { color: $color1; }
+
+/* Barras de Progresso */
+progress {
+  background-color: #333333; /* Fundo da barra */
+  min-height: 8px;
+  border-radius: 0px; 
+}
+
+/* A parte preenchida da barra (o "trough" no GTK) */
+.bar-cpu trough highlight { background-color: $color2; }
+.bar-ram trough highlight { background-color: $color2; }
+.bar-fs  trough highlight { background-color: $color2; }
+
+/* Lista de Processos */
+.proc-list {
+  margin-top: 5px;
+}
+.proc-name {
+  font-weight: bold;
+  font-size: 11px;
+}
+.proc-value {
+  color: $color4;
+  font-size: 11px;
+}

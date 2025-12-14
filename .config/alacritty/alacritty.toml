@@ -1,0 +1,40 @@
+[env]
+TERM = "xterm-256color"
+
+[font]
+size = 18
+
+[font.bold]
+family = "JetbrainsMono Nerd Font"
+style = "Bold"
+
+[font.bold_italic]
+family = "JetbrainsMono Nerd Font"
+style = "Bold Italic"
+
+[font.italic]
+family = "JetbrainsMono Nerd Font"
+style = "Italic"
+
+[font.normal]
+family = "JetbrainsMono Nerd Font"
+style = "Regular"
+
+[window]
+startup_mode = "Windowed" #'Windowed' 'Maximized' 'Fullscreen' 'SimpleFullscreen'
+decorations = "none"
+dynamic_title = true
+
+[window.padding]
+x = 0
+y = 0
+
+[general]
+import = [
+  "~/.config/alacritty/catppuccin-mocha.toml"
+]
+
+[terminal]
+
+[terminal.shell]
+program = "/usr/bin/zsh"

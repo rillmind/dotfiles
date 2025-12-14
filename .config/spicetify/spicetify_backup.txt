@@ -1,0 +1,4 @@
+current_theme          = marketplace
+color_scheme           = 
+extensions            = fullAppDisplay.js
+custom_apps           = reddit|lyrics-plus|marketplace

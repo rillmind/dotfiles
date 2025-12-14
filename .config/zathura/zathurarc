@@ -1,0 +1,13 @@
+include catppuccin-mocha
+
+set default-bg "#313244"
+set statusbar-bg "#1e1e2e"
+set statusbar-fg "#cdd6f4"
+
+set pages-per-row-spacing 1
+
+# Isso faz com que selecionar um texto mande direto 
+# para a área de transferência em sistemas wayland
+# usando o wl-copy, pacote que faz justamente o que
+# eu expliquei acima.
+set selection-clipboard clipboard
