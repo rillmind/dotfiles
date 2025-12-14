@@ -1,0 +1,63 @@
+;; Variáveis (Polls)
+(defpoll time :interval "1s" "date '+%b %d, %Y'")
+(defpoll session :interval "24h" "echo $DESKTOP_SESSION")
+(defpoll top_cpu :interval "2s" "~/.config/eww/scripts/get_procs.sh cpu")
+(defpoll top_mem :interval "2s" "~/.config/eww/scripts/get_procs.sh mem")
+
+;; Janela Principal
+(defwindow main
+  :monitor 0
+  :geometry (geometry :x "50px"
+                      :y "70px"
+                      :width "350px"
+                      :height "0px" ;; Altura automática
+                      :anchor "top right")
+  :stacking "bg"
+  :exclusive false
+  (system_widget))
+
+;; Widget Principal
+(defwidget system_widget []
+  (box :orientation "v" :space-evenly false :class "container"
+    
+    ;; Cabeçalho (Sessão e Data)
+    (box :orientation "v" :space-evenly false :class "header"
+      (label :text "${session}" :class "session-text")
+      (label :text "${time}" :class "date-text"))
+
+    ;; CPU Section
+    (box :orientation "v" :space-evenly false :class "section"
+      (label :halign "start" :text "CPU" :class "section-title color-green")
+      (label :halign "start" :text "${round(EWW_CPU.avg, 0)}%" :class "stat-value")
+      (progress :value {EWW_CPU.avg} :class "bar-cpu")
+      
+      ;; Lista de Processos CPU
+      (box :orientation "v" :space-evenly false :class "proc-list"
+        (for p in top_cpu
+          (box :orientation "h" :space-evenly true
+            (label :halign "start" :text {p.name} :class "proc-name color-white")
+            (label :halign "end"   :text {p.value} :class "proc-value")))))
+
+    ;; RAM Section
+    (box :orientation "v" :space-evenly false :class "section"
+      (label :halign "start" :text "RAM" :class "section-title color-yellow")
+      (label :halign "start" 
+             :text "${round(EWW_RAM.used_mem / 1024 / 1024, 0)} MiB / ${round(EWW_RAM.total_mem / 1024 / 1024, 0)} MiB" 
+             :class "stat-value")
+      (progress :value {EWW_RAM.used_mem_perc} :class "bar-ram")
+      
+      ;; Lista de Processos RAM
+      (box :orientation "v" :space-evenly false :class "proc-list"
+        (for p in top_mem
+          (box :orientation "h" :space-evenly true
+            (label :halign "start" :text {p.name} :class "proc-name color-white")
+            (label :halign "end"   :text {p.value} :class "proc-value")))))
+
+    ;; File System Section
+    (box :orientation "v" :space-evenly false :class "section"
+      (label :halign "start" :text "File System" :class "section-title color-pink")
+      (label :halign "start" 
+             :text "${round(EWW_DISK["/"].used / 1024 / 1024 / 1024, 1)} GiB / ${round(EWW_DISK["/"].total / 1024 / 1024 / 1024, 1)} GiB"
+             :class "stat-value")
+      (progress :value {EWW_DISK["/"].used_perc} :class "bar-fs"))
+    ))

@@ -1,0 +1,8 @@
+[credential]
+  helper = store
+  path = ~/.git-credentials
+
+[user]
+  name = Raul Holanda Lopes
+  email = raulzc00@gmail.com
+

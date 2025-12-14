@@ -1,0 +1,113 @@
+console_title_template = '{{if .Root}}(Admin){{end}} {{.PWD}}'
+version = 3
+
+[transient_prompt]
+  template = '❯ '
+  foreground = '#80ff00'
+  foreground_templates = ['{{ if gt .Code 0 }}#BF616A{{ end }}']
+
+[[blocks]]
+  type = 'prompt'
+  alignment = 'left'
+
+  [[blocks.segments]]
+    template = ' {{.UserName}} '
+    foreground = '#ffd900'
+    type = 'session'
+    style = 'plain'
+
+  [[blocks.segments]]
+    template = ' {{.Path}} '
+    foreground = '#00ffc8'
+    type = 'path'
+    style = 'plain'
+
+    [blocks.segments.properties]
+      style = 'full'
+
+[[blocks]]
+  type = 'prompt'
+  alignment = 'left'
+
+  [[blocks.segments]]
+    template = ' {{ .UpstreamIcon }}{{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }}<#FFAFD7>*</>{{ .Working.String }}{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }}  {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0 }}  {{ .StashCount }}{{ end }} '
+    foreground = '#ee6935'
+    type = 'git'
+    style = 'plain'
+
+    [blocks.segments.properties]
+      branch_ahead_icon = '<#88C0D0>⇡ </>'
+      branch_behind_icon = '<#88C0D0>⇣ </>'
+      branch_icon = ''
+      fetch_stash_count = true
+      fetch_status = true
+      fetch_upstream_icon = true
+      github_icon = ''
+
+[[blocks]]
+  type = 'prompt'
+  alignment = 'left'
+
+  [[blocks.segments]]
+    template = ' {{ .FormattedMs }} '
+    foreground = '#A3BE8C'
+    type = 'executiontime'
+    style = 'plain'
+
+    [blocks.segments.properties]
+      style = 'austin'
+
+[[blocks]]
+  type = 'prompt'
+  alignment = 'right'
+  overflow = 'hide'
+
+  [[blocks.segments]]
+    foreground = 'p:os'
+    type = 'os'
+    style = 'plain'
+
+  [[blocks.segments]]
+    template = ' {{ .Name }}'
+    foreground = '#ffd900'
+    type = 'shell'
+    style = 'plain'
+
+  [[blocks.segments]]
+    template = ' 󰎙 {{ .Full }} '
+    foreground = '#45bf17'
+    type = 'node'
+    style = 'powerline'
+
+  [[blocks.segments]]
+    template = '  {{ .Full }} '
+    foreground = '#ff5521'
+    type = 'rust'
+    style = 'powerline'
+
+  [[blocks.segments]]
+    template = '  {{ .Full }} '
+    foreground = '#ffdd00'
+    type = 'python'
+    style = 'powerline'
+
+  [[blocks.segments]]
+    template = '<#F3EFF5>and</>  {{ .Full }} '
+    foreground = '#FE4A49'
+    type = 'npm'
+    style = 'powerline'
+
+[[blocks]]
+  type = 'prompt'
+  alignment = 'left'
+  newline = true
+
+  [[blocks.segments]]
+    template = '❯ '
+    foreground = '#80ff00'
+    type = 'status'
+    style = 'plain'
+    foreground_templates = ['{{ if gt .Code 0 }}#BF616A{{ end }}']
+
+    [blocks.segments.properties]
+      always_enabled = true

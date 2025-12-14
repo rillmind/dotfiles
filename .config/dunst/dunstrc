@@ -1,0 +1,33 @@
+[global]
+  font = MesloLGlDZ Nerd Font Mono 13
+  frame_width = 2
+  separator_height = 2
+  padding = 10
+  corner_radius = 8
+  transparency = 5
+  min_icon_size = 50
+  max_icon_size = 110
+  width = (400, 600)
+  height = (0, 150)
+  icon_position = left
+  alignment = left
+  vertical_alignment = top
+  show_indicators = false
+
+[urgency_low]
+  timeout = 5
+  background = "#1e1e2e"  # Base
+  foreground = "#cdd6f4"  # Text
+  frame_color = "#cba6f7"  # Mauve
+
+[urgency_normal]
+  timeout = 10
+  background = "#181825"  # Mantle
+  foreground = "#cdd6f4"  # Text
+  frame_color = "#cba6f7"  # Mauve
+
+[urgency_critical]
+  timeout = 0
+  background = "#11111b"  # Crust
+  foreground = "#f38ba8"  # Red
+  frame_color = "#f38ba8"  # Rosewater

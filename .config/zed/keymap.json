@@ -1,0 +1,93 @@
+[
+  {
+    "context": "Pane",
+    "bindings": {
+      "ctrl-1": ["pane::ActivateItem", 0],
+      "ctrl-2": ["pane::ActivateItem", 1],
+      "ctrl-3": ["pane::ActivateItem", 2],
+      "ctrl-4": ["pane::ActivateItem", 3],
+      "ctrl-5": ["pane::ActivateItem", 4],
+      "ctrl-6": ["pane::ActivateItem", 5],
+      "ctrl-7": ["pane::ActivateItem", 6],
+      "ctrl-8": ["pane::ActivateItem", 7],
+      "ctrl-9": ["pane::ActivateItem", 8],
+      "ctrl-0": "pane::ActivateLastItem"
+    }
+  },
+  {
+    "context": "Pane",
+    "bindings": {
+      "alt-q": "pane::CloseActiveItem"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "alt-e": "project_panel::ToggleFocus"
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-alt-e": "workspace::ToggleRightDock"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-alt-e": "workspace::ToggleRightDock"
+    }
+  },
+  {
+    "context": "ProjectPanel && not_editing",
+    "bindings": {
+      "a": "project_panel::NewFile",
+      "d": "project_panel::Trash"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-i": "agent::ToggleFocus"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-t": "terminal_panel::Toggle"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-'": "terminal_panel::Toggle"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-`": "terminal_panel::Toggle"
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-.": "editor::ToggleCodeActions"
+    }
+  },
+  {
+    "bindings": {
+      "ctrl-alt-<": "zed::OpenKeymapFile"
+    }
+  },
+  {
+    "bindings": {
+      "ctrl-alt-shift-v": "workspace::ClearAllNotifications"
+    }
+  },
+  {
+    "bindings": {
+      "ctrl-alt-v": "notification_panel::ToggleFocus"
+    }
+  }
+]

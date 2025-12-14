@@ -1,0 +1,10 @@
+mode=drun
+allow_images=true
+image_size=30
+term=kitty
+insensitive=true
+location=center
+show_actions=false
+prompt=Search
+layout=list
+num_columns=1

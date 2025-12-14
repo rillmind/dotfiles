@@ -1,0 +1,6 @@
+antfu.icons-carbon
+catppuccin.catppuccin-vsc
+catppuccin.catppuccin-vsc-icons
+dbaeumer.vscode-eslint
+esbenp.prettier-vscode
+vscodevim.vim

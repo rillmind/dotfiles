@@ -1,0 +1,171 @@
+@import "./colors/mocha.css";
+
+/* margin: top right bottom left */
+/* Spacing outside the element */
+
+/* padding: top right bottom left */
+/* Spacing inside the element */
+
+* {
+  font-family: "JetbrainsMono Nerd Font";
+  font-weight: 900;
+  font-size: 16.5px;
+}
+
+window#waybar {
+  background-color: rgba(30, 30, 46, 0.8);
+  color: @text;
+  transition-property: background-color;
+  transition-duration: 0.5s;
+  border-radius: 0px;
+  transition-duration: 0.5s;
+  margin: 1px 16px 0 16px;
+}
+
+window#waybar.hidden {
+  opacity: 0.2;
+}
+
+#window {
+  background-color: rgba(30, 30, 46, 0);
+  background: @text;
+  color: @text;
+  margin: 1px;
+}
+
+#workspaces {
+  font-size: 2px;
+  padding: 7px 0;
+  margin: 1px;
+}
+
+#workspaces button {
+  color: @text;
+  background: @surface0;
+  border-radius: 5px;
+  padding: 1px 6px;
+  margin: 0px 10px 0 0;
+  border: none;
+}
+
+#workspaces button:hover {
+  background: @surface0;
+  color: @text;
+}
+
+#workspaces button.active {
+  font-size: 2px;
+  background: @mauve;
+  color: @surface0;
+  border: none;
+}
+
+#custom-launcher,
+#clock,
+#battery,
+#cpu,
+#memory,
+#temperature,
+#backlight,
+#network,
+#pulseaudio,
+#custom-dunst,
+#custom-powermenu {
+  padding: 0px 5px;
+  margin: 0px 0px 0px 0px;
+  border-radius: 5px;
+  color: @base;
+}
+
+#window {
+  background-color: rgba(30, 30, 46, 0);
+  padding: 0px 10px;
+  margin: 0px 5px 0 0px;
+  color: @text;
+  font-size: 16;
+}
+
+#custom-launcher {
+  margin: 0 8px 0 9px;
+  color: @blue;
+  font-size: 32;
+}
+
+#custom-updates {
+  margin: 0 10px 0 0;
+  font-size: 18px;
+  color: @text;
+}
+
+#cpu {
+  color: @text;
+}
+
+#temperature {
+  color: @text;
+}
+
+#backlight {
+  color: @text;
+}
+
+#custom-dunst {
+  padding: 0px 20px 0px 13px;
+  color: @text;
+}
+
+#pulseaudio {
+  padding: 0px 10px 0px 7px;
+  color: @text;
+}
+
+#network {
+  padding: 0px 0px 0px 5px;
+  color: @text;
+}
+
+#battery {
+  color: @text;
+}
+
+#memory {
+  color: @text;
+}
+
+#clock {
+  color: @text;
+}
+
+#custom-powermenu {
+  padding: 0px 25px 0px 20px;
+  margin: 7px 15px 7px 5px;
+  background-color: rgba(88, 91, 112, 0.5);
+  color: #e64553; /* Catppuccin Latte maroon*/
+}
+
+#custom-powermenu:hover {
+  padding: 0px 25px 0px 20px;
+  margin: 5px 15px 5px 5px;
+  background-color: rgba(88, 91, 112, 0);
+  color: #e64553; /* Catppuccin Latte maroon*/
+}
+
+@keyframes blink {
+  to {
+    background-color: rgba(30, 34, 42, 0.5);
+    color: #abb2bf;
+  }
+}
+
+#battery.critical:not(.charging) {
+  color: #f53c3c;
+  animation-name: blink;
+  animation-duration: 0.5s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+label:focus {
+  background-color: #000000;
+}

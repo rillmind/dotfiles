@@ -1,0 +1,6 @@
+[mgr]
+show_hidden = true
+[opener]
+edit = [
+    { run = '~/.local/bin/lvim "$@"', block = true, desc = "Edit", for = "unix" }
+]

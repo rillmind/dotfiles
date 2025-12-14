@@ -1,0 +1,16 @@
+[
+  {
+    "Name": "Catppuccin Mocha",
+    "Menu_Background_Color": "rgb(30,30,46)",
+    "Menu_Foreground_Color": "rgb(205,214,244)",
+    "Menu_Border_Color": "rgb(203,166,247)",
+    "Menu_Border_Width": "0",
+    "Menu_Border_Radius": "10",
+    "Menu_Font_Size": "14",
+    "Menu_Separator_Color": "rgb(17,17,27)",
+    "Item_Hover_Background_Color": "rgb(49,50,68)",
+    "Item_Hover_Foreground_Color": "rgb(205,214,244)",
+    "Item_Active_Background_Color": "rgb(49,50,68)",
+    "Item_Active_Foreground_Color": "rgb(205,214,244)"
+  }
+]
