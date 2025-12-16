@@ -11,3 +11,17 @@ nmcli device wifi list
 ```sh
 nmcli device wifi connect "nome" password "senha"
 ```
+
+## Mostrar redes conhecidas
+
+```sh
+nmcli connection show
+```
+
+## Excluir rede conhecida
+
+```sh
+nmcli connection delete "nome"
+```
+
+obs: Ou pode usar o UUID sem as aspas
