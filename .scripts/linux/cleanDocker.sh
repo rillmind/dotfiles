@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. ~/.scripts/colors.sh
+. ~/.scripts/linux/colors.sh
 
 psaq=$(docker ps -aq)
 imgaq=$(docker images -aq)
