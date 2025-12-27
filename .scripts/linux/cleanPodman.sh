@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. ~/.scripts/colors.sh
+. ~/.scripts/linux/colors.sh
 
 echo -e "\n${VERDE}>> Limpando podman...${NC}"
 podman rm --all --force
