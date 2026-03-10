@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. ~/.scripts/linux/colors.sh
+. ~/.scripts/linux/clen/colors.sh
 
 echo -e "${AMARELO}Passo 1: Limpeza do Gerenciador de Pacotes DNF${NC}"
 

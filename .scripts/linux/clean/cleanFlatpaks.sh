@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. ~/.scripts/linux/colors.sh
+. ~/.scripts/linux/clen/colors.sh
 
 echo -e "${AMARELO}Passo 2: Limpeza do Flatpak${NC}"
 
