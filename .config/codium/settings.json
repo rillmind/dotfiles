@@ -9,7 +9,7 @@
   "workbench.settings.applyToAllProfiles": ["editor.fontFamily"],
   "editor.fontSize": 15,
   "[html]": {
-    "editor.defaultFormatter": "vscode.html-language-features"
+    "editor.defaultFormatter": "vscode.html-language-features",
   },
   "editor.cursorStyle": "block-outline",
   "editor.formatOnSave": true,
@@ -21,10 +21,10 @@
   "javascript.updateImportsOnFileMove.enabled": "always",
   "typescript.updateImportsOnFileMove.enabled": "always",
   "[javascriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "[css]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "editor.fontLigatures": true,
   "files.autoSave": "afterDelay",
@@ -32,8 +32,8 @@
     {
       "id": "redhat.vscode-community-server-connector",
       "name": "Community Server Connector",
-      "startOnActivation": true
-    }
+      "startOnActivation": true,
+    },
   ],
   "editor.minimap.enabled": false,
   "github.copilot.enable": {
@@ -42,12 +42,12 @@
     "markdown": false,
     "scminput": false,
     "go": false,
-    "sql": false
+    "sql": false,
   },
   "database-client.autoSync": true,
   "editor.largeFileOptimizations": false,
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "chat.instructionsFilesLocations": {
     ".github/instructions": true,
@@ -62,11 +62,11 @@
     "C:\\Users\\sackr\\AppData\\Local\\Temp\\postman-collections-post-response.instructions.md": true,
     "C:\\Users\\sackr\\AppData\\Local\\Temp\\postman-collections-pre-request.instructions.md": true,
     "C:\\Users\\sackr\\AppData\\Local\\Temp\\postman-folder-post-response.instructions.md": true,
-    "C:\\Users\\sackr\\AppData\\Local\\Temp\\postman-folder-pre-request.instructions.md": true
+    "C:\\Users\\sackr\\AppData\\Local\\Temp\\postman-folder-pre-request.instructions.md": true,
   },
   "liveServer.settings.CustomBrowser": "firefox",
   "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "editor.unicodeHighlight.nonBasicASCII": false,
   "workbench.startupEditor": "none",
@@ -83,7 +83,7 @@
     "*.sqlite3": "${capture}.${extname}-*",
     "*.db3": "${capture}.${extname}-*",
     "*.sdb": "${capture}.${extname}-*",
-    "*.s3db": "${capture}.${extname}-*"
+    "*.s3db": "${capture}.${extname}-*",
   },
   "geminicodeassist.project": "oval-smile-472617-r9",
   "testing.resultsView.layout": "treeLeft",
@@ -95,11 +95,11 @@
   "workbench.layoutControl.enabled": false,
   "window.menuBarVisibility": "hidden",
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
   },
   "window.zoomLevel": 2,
-  "window.zoomPerWindow": false
+  "window.zoomPerWindow": false,
 }
