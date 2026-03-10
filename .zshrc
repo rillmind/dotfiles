@@ -138,6 +138,8 @@ alias z='zellij options --theme catppuccin-mocha --pane-frames false'
 #jetbrains-toolbox Aliases
 alias toolbox='jetbrains-toolbox'
 
+alias arch='distrobox enter arch --workdir ~ -- /bin/zsh'
+
 #ncdu Aliases
 #alias ncdu='ncdu --color dark'
 
