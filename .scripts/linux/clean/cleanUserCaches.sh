@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. ~/.scripts/linux/clen/colors.sh
+. ~/.scripts/linux/clean/colors.sh
 
 echo -e "${AMARELO}Passo 3: Limpeza de Caches Diversos${NC}"
 

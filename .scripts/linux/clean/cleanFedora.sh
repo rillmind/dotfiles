@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. ~/.scripts/linux/clen/colors.sh
+. ~/.scripts/linux/clean/colors.sh
 
 echo -e "${CIANO}=====================================================${NC}"
 echo -e "${CIANO}===    Iniciando Script de Limpeza para Fedora    ===${NC}"
