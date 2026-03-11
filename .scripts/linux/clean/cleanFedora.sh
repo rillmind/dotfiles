@@ -24,7 +24,8 @@ sh ~/.scripts/linux/clean/cleanDocker.sh
 
 # --- Seção 5: Limpeza do Podman ---
 
-sh ~/.scripts/linux/clean/cleanPodman.sh
+# Linha comentada pois limparia o Distrobox sempre que limpasse o sistema!
+# sh ~/.scripts/linux/clean/cleanPodman.sh
 
 echo -e "\n${AMARELO}Limpeza de caches diversos concluída!${NC}"
 echo -e "${CIANO}-----------------------------------------------------${NC}\n"
