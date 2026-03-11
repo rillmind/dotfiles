@@ -72,7 +72,7 @@ lvim.plugins = {
   }
 }
 
-lvim.colorscheme = "catppuccin-mocha"
+lvim.colorscheme = "catppuccin-mocchiato"
 lvim.builtin.nvimtree.active = false -- NOTE: false to use neo-tree
 lvim.builtin.terminal.open_mapping = "<C-t>"
 lvim.builtin.which_key.mappings["e"] = { "<cmd>Neotree toggle<CR>", "Explorer" }

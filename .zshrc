@@ -184,3 +184,5 @@ export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
 export EDITOR="~/.local/bin/lvim"
 export PATH="/home/raul/.bun/bin:$PATH"
 export PATH="$HOME/.asdf/shims:$PATH"
+
+. "$HOME/.local/share/../bin/env"
