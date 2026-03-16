@@ -185,4 +185,4 @@ export EDITOR="$HOME/.local/bin/lvim"
 export PATH="$HOME/.bun/bin:$PATH"
 export PATH="$HOME/.asdf/shims:$PATH"
 
-. "$HOME/.local/share/../bin/env"
+# . "$HOME/.local/share/../bin/env"
