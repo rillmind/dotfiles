@@ -1,5 +1,7 @@
 # This is the configuration file for Ghostty.
 
+command = /bin/zsh
+
 confirm-close-surface = false
 
 window-decoration = none
