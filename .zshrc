@@ -179,10 +179,10 @@ GOPATH=$HOME/go  PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 export PATH=$PATH:/home/raul/.spicetify
 export PATH=$HOME/.local/bin:$PATH
 export PATH="$PATH:$HOME/go/bin"
-export PATH=/home/raul/.local/share/bob/nvim-bin:/home/raul/.bun/bin:/home/raul/.local/bin:/home/raul/.asdf/shims:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/raul/raul/.bun/bin:/home/raul/.cargo/bin:/home/raul/.local/bin:/home/raul/.local/share/zinit/polaris/bin:/usr/local/bin:/usr/bin:/home/raul/.spicetify:/usr/local/go/bin:/home/raul/go/bin:/home/raul/.spicetify:/usr/local/go/bin:/home/raul/go/bin:/home/raul/go/bin
+export PATH=$HOME/.local/share/bob/nvim-bin:$HOME/.bun/bin:$HOME/.local/bin:$HOME/.asdf/shims:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/raul/raul/.bun/bin:/home/raul/.cargo/bin:/home/raul/.local/bin:/home/raul/.local/share/zinit/polaris/bin:/usr/local/bin:/usr/bin:/home/raul/.spicetify:/usr/local/go/bin:/home/raul/go/bin:/home/raul/.spicetify:/usr/local/go/bin:/home/raul/go/bin:/home/raul/go/bin
 export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
-export EDITOR="~/.local/bin/lvim"
-export PATH="/home/raul/.bun/bin:$PATH"
+export EDITOR="$HOME/.local/bin/lvim"
+export PATH="$HOME/.bun/bin:$PATH"
 export PATH="$HOME/.asdf/shims:$PATH"
 
 . "$HOME/.local/share/../bin/env"
