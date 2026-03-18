@@ -1,6 +1,2 @@
-" Mapear movimentos do Vim no Project View
-let g:IdeaVimInventory_project_view = 1
-nnoremap <Plug>(ideavim-project-view-up) k
-nnoremap <Plug>(ideavim-project-view-down) j
-nnoremap <Plug>(ideavim-project-view-left) h
-nnoremap <Plug>(ideavim-project-view-right) l
+nnoremap j :action EditorDown<CR>
+nnoremap k :action EditorUp<CR>
