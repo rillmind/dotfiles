@@ -8,25 +8,13 @@ fi
 
 sudo pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si && cd ~
 
-yay -S stow zsh zoxide fzf exa bat oh-my-posh neovim zed cargo bun python-pynvim xdg-utils perl-file-mimeinfo yazi
-
-sudo rm ~/.bashrc
-
-git clone https://github.com/rillmind/dotfiles.git
-
-cd dotfiles
-
-stow .
-
-cd ~
+yay -S zsh zoxide fzf exa bat oh-my-posh neovim zed python-pynvim xdg-utils perl-file-mimeinfo yazi
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 brew tap oven-sh/bun
 
 brew install gcc rust bun
-
-curl -fsSL https://bun.sh/install | bash
 
 bun -g install neovim tree-sitter-cli
 

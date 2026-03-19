@@ -184,6 +184,7 @@ export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
 export EDITOR="$HOME/.local/bin/lvim"
 export PATH="$HOME/.bun/bin:$PATH"
 export PATH="$HOME/.asdf/shims:$PATH"
+export PATH="$HOME/../linuxbrew/.linuxbrew/bin/:$PATH"
 export BROWSER="distrobox-host-exec google-chrome-canary"
 export PATH="$HOME/.local/bin:$PATH"
 

@@ -13,25 +13,11 @@ gpgcheck=1
 gpgkey=https://dl.google.com/linux/linux_signing_key.pub
 EOF
 
-sudo dnf install -y git stow vim ghostty google-chrome-canary
+sudo dnf install -y vim ghostty google-chrome-canary
 
 echo "Pacotes essenciais instalados!!!"
 
-echo "Instalando dotfiles!!!"
-
 cd ~
-
-sudo rm ~/.bashrc
-
-git clone https://github.com/rillmind/dotfiles.git
-
-cd dotfiles
-
-stow .
-
-cd ~
-
-echo "Dotfiles instalado!!!"
 
 sudo cat ~/.config/dnf/dnf.conf > /etc/dnf/dnf.conf
 
