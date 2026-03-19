@@ -185,5 +185,6 @@ export EDITOR="$HOME/.local/bin/lvim"
 export PATH="$HOME/.bun/bin:$PATH"
 export PATH="$HOME/.asdf/shims:$PATH"
 export BROWSER="distrobox-host-exec google-chrome-canary"
+export PATH="$HOME/.local/bin:$PATH"
 
 # . "$HOME/.local/share/../bin/env"

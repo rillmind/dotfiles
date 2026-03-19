@@ -1,24 +1,77 @@
-printf "Já alterou o parallel downloads? (s/n): "
-read confirma
-if [ "$confirma" = "s" ]; then
+read -p "Já alterou o parallel downloads? (s/n): " confirm1
+if [[ "$confirm1" == "s" || "$confirm1" == "S" ]]; then
   echo "Continuando..."
 else
   echo "Abortado."
   exit 1
 fi
 
+sudo pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si && cd ~
+
+yay -S stow zsh zoxide fzf exa bat oh-my-posh neovim zed cargo bun python-pynvim xdg-utils perl-file-mimeinfo yazi
+
+sudo rm ~/.bashrc
+
+git clone https://github.com/rillmind/dotfiles ~/
+
+cd dotfiles
+
+stow .
+
+cd ~
+
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-sudo pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si
+brew tap oven-sh/bun
 
-cd
+brew install gcc rust bun
 
-yay -S zsh zoxide fzf exa bat oh-my-posh neovim zed cargo bun python-pynvim
+curl -fsSL https://bun.sh/install | bash
 
 bun -g install neovim tree-sitter-cli
 
 cargo install fd-find ripgrep
 
-LV_BRANCH='release-1.4/neovim-0.9' bash <(curl -s https://raw.githubusercontent.com/LunarVim/LunarVim/release-1.4/neovim-0.9/utils/installer/install.sh)
+LV_BRANCH='release-1.4/neovim-0.9' bash <(curl -s https://raw.githubusercontent.com/LunarVim/LunarVim/release-1.4/neovim-0.9/utils/installer/install.sh) --no-install-dependencies
+
+read -p "É distrobox? (s/n): " confirm2
+if [[ "$confirm2" == "s" || "$confirm2" == "S" ]]; then
+  sudo pacman -S --noconfirm xdg-utils perl-file-mimeinfo
+  sudo ln -sf /usr/bin/distrobox-host-exec /usr/local/bin/xdg-open
+  mkdir -p ~/.config
+  cat <<EOF > ~/.config/mimeapps.list
+[Default Applications]
+text/html=browser.desktop
+x-scheme-handler/http=browser.desktop
+x-scheme-handler/https=browser.desktop
+x-scheme-handler/about=browser.desktop
+x-scheme-handler/unknown=browser.desktop
+EOF
+
+  mkdir -p ~/.local/share/applications
+  cat <<EOF > ~/.local/share/applications/browser.desktop
+[Desktop Entry]
+Type=Application
+Name=Host Browser
+Exec=distrobox-host-exec google-chrome-canary %u
+Icon=google-chrome-canary
+Terminal=false
+MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;
+EOF
+
+  update-desktop-database ~/.local/share/applications
+  echo "Configuração para Distrobox aplicada com sucesso."
+else
+  echo "Pulando configuração de Distrobox."
+
+  yay -S google-chrome-canary ghostty
+
+  timedatectl set-local-rtc 1 --adjust-system-clock
+  timedatectl
+  sudo timedatectl set-ntp true
+  sudo timedatectl set-time "YYYY-MM-DD HH:MM:SS"
+
+  curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sudo sh
+fi
 
 zsh
