@@ -19,9 +19,11 @@ echo "Pacotes essenciais instalados!!!"
 
 echo "Instalando dotfiles!!!"
 
+cd ~
+
 sudo rm ~/.bashrc
 
-git clone https://github.com/rillmind/dotfiles ~/
+git clone https://github.com/rillmind/dotfiles
 
 cd dotfiles
 
