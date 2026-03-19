@@ -40,6 +40,13 @@ eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/oh-my-pure.omp.toml)"
 
 eval "$(zoxide init --cmd cd zsh)"
 
+gacp() {
+  message="$1"
+  shift
+
+  git add -A && git commit -m "$message" && git push -u origin main
+}
+
 #Tmux Aliases
 alias t="tmux"
 alias tn="tmux new -s"
@@ -63,24 +70,6 @@ alias gaa="git add -A"
 alias gc="git commit -m"
 alias gp="git push"
 
-gacp() {
-  message="$1"
-  shift
-
-  git add -A && git commit -m "$message" && git push -u origin main
-}
-
-#docker-lang Aliases
-docker-lang() {
-  local lang="$1"
-  shift
-
-  docker run -it --rm -v "$PWD":/app -w /app "$lang"
-}
-
-#tmux Aliases
-#alias tmux='tmux new /bin/zsh'
-
 #asdf Aliases
 alias e='asdf exec'
 
@@ -103,9 +92,6 @@ alias ll='eza --icons --color always -l'
 alias lla='eza --icons --color always -la'
 alias lsa='eza --icons --color always -a'
 
-#nvim Aliases
-#alias nvim='~/.local/bin/nvim-linux-x86_64/bin/nvim'
-
 #Lunarvim Aliases
 alias l='~/.local/bin/lvim'
 alias lvim='~/.local/bin/lvim'
@@ -116,9 +102,6 @@ alias c='/usr/bin/clear'
 
 #cat Aliases
 alias cat='bat --paging=always --color=always'
-
-#Python Aliases
-#alias py='python3'
 
 #fzf Aliases
 alias fzf='fzf --preview="bat --color=always {}'
@@ -138,10 +121,8 @@ alias z='zellij options --theme catppuccin-mocha --pane-frames false'
 #jetbrains-toolbox Aliases
 alias toolbox='jetbrains-toolbox'
 
+#distrobox Aliases
 alias arch='distrobox-enter -n arch --no-workdir -- /usr/bin/zsh'
-
-#ncdu Aliases
-#alias ncdu='ncdu --color dark'
 
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
