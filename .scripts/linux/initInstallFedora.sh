@@ -23,7 +23,7 @@ cd ~
 
 sudo rm ~/.bashrc
 
-git clone https://github.com/rillmind/dotfiles
+git clone https://github.com/rillmind/dotfiles.git
 
 cd dotfiles
 

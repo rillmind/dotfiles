@@ -12,7 +12,7 @@ yay -S stow zsh zoxide fzf exa bat oh-my-posh neovim zed cargo bun python-pynvim
 
 sudo rm ~/.bashrc
 
-git clone https://github.com/rillmind/dotfiles
+git clone https://github.com/rillmind/dotfiles.git
 
 cd dotfiles
 
