@@ -52,7 +52,7 @@ EOF
 else
   echo "Pulando configuração de Distrobox."
 
-  yay -S google-chrome-canary ghostty
+  yay -S google-chrome-canary ghostty brave-bin
 
   timedatectl set-local-rtc 1 --adjust-system-clock
   timedatectl

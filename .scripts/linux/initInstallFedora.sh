@@ -15,6 +15,8 @@ EOF
 
 sudo dnf install -y vim ghostty google-chrome-canary
 
+curl -fsS https://dl.brave.com/install.sh | sh
+
 echo "Pacotes essenciais instalados!!!"
 
 cd ~
