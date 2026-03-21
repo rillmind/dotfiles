@@ -33,8 +33,6 @@ echo "Instalando Homebrew!!!"
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-source .bashrc
-
 brew tap oven-sh/bun
 
 brew install gcc rust neovim bun oh-my-posh eza bat zoxide yazi
