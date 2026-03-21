@@ -1,4 +1,12 @@
-sudo cat ~/.config/dnf/dnf.conf > /etc/dnf/dnf.conf
+read -p "Já alterou o parallel downloads? (s/n): " confirm1
+if [[ "$confirm1" == "s" || "$confirm1" == "S" ]]; then
+  echo "Continuando..."
+else
+  echo "Abortado."
+  exit 1
+fi
+
+source .bashrc
 
 echo "Instalando pacotes essenciais!!!"
 
@@ -23,8 +31,6 @@ echo "Pacotes essenciais instalados!!!"
 
 cd ~
 
-zsh
-
 echo "Instalando Homebrew!!!"
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -32,8 +38,6 @@ echo "Instalando Homebrew!!!"
 brew tap oven-sh/bun
 
 brew install gcc rust neovim bun oh-my-posh eza bat zoxide yazi
-
-zsh
 
 echo "Homebrew instalado!!!"
 
