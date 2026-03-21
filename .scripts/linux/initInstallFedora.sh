@@ -1,3 +1,5 @@
+sudo cat ~/.config/dnf/dnf.conf > /etc/dnf/dnf.conf
+
 echo "Instalando pacotes essenciais!!!"
 
 sudo dnf copr enable scottames/ghostty
@@ -13,7 +15,7 @@ gpgcheck=1
 gpgkey=https://dl.google.com/linux/linux_signing_key.pub
 EOF
 
-sudo dnf install -y vim ghostty google-chrome-canary
+sudo dnf install -y vim ghostty google-chrome-canary zsh
 
 curl -fsS https://dl.brave.com/install.sh | sh
 
@@ -21,7 +23,7 @@ echo "Pacotes essenciais instalados!!!"
 
 cd ~
 
-sudo cat ~/.config/dnf/dnf.conf > /etc/dnf/dnf.conf
+zsh
 
 echo "Instalando Homebrew!!!"
 
@@ -30,6 +32,8 @@ echo "Instalando Homebrew!!!"
 brew tap oven-sh/bun
 
 brew install gcc rust neovim bun oh-my-posh eza bat zoxide yazi
+
+zsh
 
 echo "Homebrew instalado!!!"
 
