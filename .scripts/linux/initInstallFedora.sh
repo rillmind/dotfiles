@@ -6,8 +6,6 @@ else
   exit 1
 fi
 
-source .bashrc
-
 echo "Instalando pacotes essenciais!!!"
 
 sudo dnf copr enable scottames/ghostty
@@ -34,6 +32,8 @@ cd ~
 echo "Instalando Homebrew!!!"
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+source .bashrc
 
 brew tap oven-sh/bun
 
