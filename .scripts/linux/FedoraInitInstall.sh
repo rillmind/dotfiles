@@ -1,3 +1,4 @@
+echo "Lembre-se de reiniciar o bash!!!"
 read -p "Já alterou o parallel downloads? (s/n): " confirm1
 if [[ "$confirm1" == "s" || "$confirm1" == "S" ]]; then
   echo "Continuando..."
@@ -35,7 +36,9 @@ echo "Instalando Homebrew!!!"
 
 brew tap oven-sh/bun
 
-brew install gcc rust neovim bun oh-my-posh eza bat zoxide yazi
+brew install gcc
+
+brew install rust neovim bun oh-my-posh eza bat zoxide yazi
 
 echo "Homebrew instalado!!!"
 
@@ -54,8 +57,9 @@ echo "Lunarvim instalado!!!"
 timedatectl set-local-rtc 1 --adjust-system-clock
 timedatectl
 sudo timedatectl set-ntp true
-sudo timedatectl set-time "YYYY-MM-DD HH:MM:SS"
 
 curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sudo sh
+
+chsh -s $(which zsh)
 
 zsh
