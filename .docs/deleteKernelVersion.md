@@ -43,3 +43,9 @@ sudo dnf remove kernel-core-VERSAO
 ```sh
 sudo dnf remove --oldinstallonly --setopt installonly_limit=2
 ```
+
+### Atualizar o grub
+
+```sh
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+```
