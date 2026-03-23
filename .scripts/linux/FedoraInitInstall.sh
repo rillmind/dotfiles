@@ -22,7 +22,7 @@ gpgcheck=1
 gpgkey=https://dl.google.com/linux/linux_signing_key.pub
 EOF
 
-sudo dnf install -y vim ghostty google-chrome-canary zsh gcc gcc-c++ util-linux-user pipx
+sudo dnf install -y vim ghostty google-chrome-canary zsh gcc gcc-c++ util-linux-user pipx xdg-desktop-portal-gnome
 
 echo "Pacotes essenciais instalados!!!"
 

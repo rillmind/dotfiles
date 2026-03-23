@@ -9,7 +9,7 @@ fi
 sudo pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si && cd ~
 hash -r
 
-yay -S zsh zed python-pynvim xdg-utils perl-file-mimeinfo yazi gcc gcc-c++
+yay -S zsh zed python-pynvim xdg-utils perl-file-mimeinfo yazi gcc gcc-c++ xdg-desktop-portal-gnome
 hash -r
 
 NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
