@@ -1,0 +1,27 @@
+window, .view, .navigation-sidebar, headerbar, .dialog-stack, .adw-status-page, statuspage {
+  background-color: #1e1e2e;
+  color: #cdd6f4;
+}
+
+window.dialog, window.dialog > box, window.dialog headerbar, window.dialog list {
+  background-color: #181825;
+}
+
+window.dialog row {
+  background-color: #313244;
+}
+
+popover contents, popover arrow {
+  background-color: #181825;
+  border: 1px solid #313244;
+}
+
+row:hover, list > row:selected {
+  background-color: #313244;
+  color: #cdd6f4;
+  border-radius: 5px;
+}
+
+.navigation-sidebar {
+  background-color: #232634;
+}
