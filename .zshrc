@@ -124,6 +124,11 @@ alias toolbox='jetbrains-toolbox'
 #distrobox Aliases
 alias arch='distrobox-enter -n arch --no-workdir -- /usr/bin/zsh'
 
+#brew Aliases
+alias b='brew'
+alias bi='brew install'
+alias bu='brew update && brew upgrade'
+
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
