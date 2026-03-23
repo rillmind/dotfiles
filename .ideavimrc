@@ -1,2 +1,0 @@
-nnoremap j :action EditorDown<CR>
-nnoremap k :action EditorUp<CR>
