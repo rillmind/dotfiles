@@ -7,21 +7,31 @@ else
 fi
 
 sudo pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si && cd ~
+hash -r
 
-yay -S zsh zoxide fzf exa bat oh-my-posh neovim zed python-pynvim xdg-utils perl-file-mimeinfo yazi
+yay -S zsh zed python-pynvim xdg-utils perl-file-mimeinfo yazi gcc gcc-c++
+hash -r
 
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 brew tap oven-sh/bun
 
-brew install gcc rust bun
+brew install gcc
+hash -r
 
-bun -g install neovim tree-sitter-cli
+brew install rust neovim oh-my-posh eza bat zoxide yazi
+hash -r
+
+bun add -g neovim tree-sitter-cli
 
 cargo install fd-find ripgrep
+hash -r
 
 LV_BRANCH='release-1.4/neovim-0.9' bash <(curl -s https://raw.githubusercontent.com/LunarVim/LunarVim/release-1.4/neovim-0.9/utils/installer/install.sh) --no-install-dependencies
 
+# Corrige problemas em distrobox reconhecer navegadores do sistema original
 read -p "É distrobox? (s/n): " confirm2
 if [[ "$confirm2" == "s" || "$confirm2" == "S" ]]; then
   sudo pacman -S --noconfirm xdg-utils perl-file-mimeinfo
@@ -52,12 +62,10 @@ EOF
 else
   echo "Pulando configuração de Distrobox."
 
-  yay -S google-chrome-canary ghostty brave-bin
+  yay -S google-chrome-canary ghostty brave-bin zen-browser-bin
 
-  timedatectl set-local-rtc 1 --adjust-system-clock
-  timedatectl
-  sudo timedatectl set-ntp true
-  sudo timedatectl set-time "YYYY-MM-DD HH:MM:SS"
+  timedatectl set-local-rtc 1 --adjust-system-clock > /dev/null 2>&1
+  sudo timedatectl set-ntp true > /dev/null 2>&1
 
   curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sudo sh
 fi

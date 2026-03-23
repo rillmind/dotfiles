@@ -22,7 +22,7 @@ gpgcheck=1
 gpgkey=https://dl.google.com/linux/linux_signing_key.pub
 EOF
 
-sudo dnf install -y vim ghostty google-chrome-canary zsh gcc
+sudo dnf install -y vim ghostty google-chrome-canary zsh gcc gcc-c++ util-linux-user pipx
 
 echo "Pacotes essenciais instalados!!!"
 
@@ -39,16 +39,20 @@ brew tap oven-sh/bun
 brew install gcc
 hash -r
 
-brew install rust bun neovim oh-my-posh eza bat zoxide yazi
+brew install rust neovim oh-my-posh eza bat zoxide yazi
 hash -r
 
 echo "Homebrew instalado!!!"
 
 echo "Instalando dependências do lunarvim!!!"
 
+sudo pipx install pynvim
+
 curl -fsSL https://bun.sh/install | bash
+hash -r
 
 bun add -g neovim tree-sitter-cli
+hash -r
 
 cargo install fd-find ripgrep
 hash -r
@@ -57,14 +61,13 @@ LV_BRANCH='release-1.4/neovim-0.9' bash <(curl -s https://raw.githubusercontent.
 
 echo "Lunarvim instalado!!!"
 
-timedatectl set-local-rtc 1 --adjust-system-clock
-timedatectl
-sudo timedatectl set-ntp true
+timedatectl set-local-rtc 1 --adjust-system-clock > /dev/null 2>&1
+sudo timedatectl set-ntp true > /dev/null 2>&1
 
 curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sudo sh
 
-chsh -s $(which zsh)
-
-clear
+sudo chsh -s $(which zsh)
 
 zsh
+
+clear

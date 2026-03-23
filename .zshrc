@@ -170,3 +170,6 @@ export BROWSER="distrobox-host-exec google-chrome-canary"
 export PATH="$HOME/.local/bin:$PATH"
 
 # . "$HOME/.local/share/../bin/env"
+
+# Created by `pipx` on 2026-03-23 03:04:59
+export PATH="$PATH:/home/raul/.local/bin"
