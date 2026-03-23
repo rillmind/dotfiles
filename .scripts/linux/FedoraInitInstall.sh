@@ -1,9 +1,4 @@
-#!/bin/sh
-
-echo " "
-echo "/n Lembre-se de instalar o zsh!!! /n"
-echo " "
-
+#!/bin/bash
 read -p "Já alterou o parallel downloads? (s/n): " confirm1
 if [[ "$confirm1" == "s" || "$confirm1" == "S" ]]; then
   echo "Continuando..."
@@ -35,13 +30,32 @@ cd ~
 
 echo "Instalando Homebrew!!!"
 
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 brew tap oven-sh/bun
 
 brew install gcc
+hash -r
+
+brew install rust bun neovim oh-my-posh eza bat zoxide yazi
+hash -r
 
 echo "Homebrew instalado!!!"
+
+echo "Instalando dependências do lunarvim!!!"
+
+curl -fsSL https://bun.sh/install | bash
+
+bun add -g neovim tree-sitter-cli
+
+cargo install fd-find ripgrep
+hash -r
+
+LV_BRANCH='release-1.4/neovim-0.9' bash <(curl -s https://raw.githubusercontent.com/LunarVim/LunarVim/release-1.4/neovim-0.9/utils/installer/install.sh) --no-install-dependencies
+
+echo "Lunarvim instalado!!!"
 
 timedatectl set-local-rtc 1 --adjust-system-clock
 timedatectl
@@ -50,3 +64,7 @@ sudo timedatectl set-ntp true
 curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sudo sh
 
 chsh -s $(which zsh)
+
+clear
+
+zsh
