@@ -39,7 +39,7 @@ brew tap oven-sh/bun
 brew install gcc
 hash -r
 
-brew install rust neovim oh-my-posh eza bat zoxide yazi
+brew install bun rust neovim oh-my-posh eza bat zoxide yazi
 hash -r
 
 echo "Homebrew instalado!!!"
@@ -47,9 +47,6 @@ echo "Homebrew instalado!!!"
 echo "Instalando dependências do lunarvim!!!"
 
 sudo pipx install pynvim
-
-curl -fsSL https://bun.sh/install | bash
-hash -r
 
 bun add -g neovim tree-sitter-cli
 hash -r
