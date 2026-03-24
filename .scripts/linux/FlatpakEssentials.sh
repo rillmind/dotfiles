@@ -16,4 +16,5 @@ flatpak install flathub com.discordapp.Discord \
   com.rustdesk.RustDesk \
   io.github.giantpinkrobots.flatsweep \
   org.gnome.eog \
-  io.github.realmazharhussain.GdmSettings
+  io.github.realmazharhussain.GdmSettings \
+  md.obsidian.Obsidian

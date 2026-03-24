@@ -174,6 +174,12 @@ export PATH="$HOME/../linuxbrew/.linuxbrew/bin/:$PATH"
 export BROWSER="distrobox-host-exec google-chrome-canary"
 export PATH="$HOME/.local/bin:$PATH"
 
+export ANDROID_HOME=$HOME/Android/Sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH=$PATH:$ANDROID_HOME/tools
+export PATH=$PATH:$ANDROID_HOME/tools/bin
+
 # . "$HOME/.local/share/../bin/env"
 
 # Created by `pipx` on 2026-03-23 03:04:59
