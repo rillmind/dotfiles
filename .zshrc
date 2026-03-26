@@ -190,4 +190,4 @@ export PATH=$PATH:$ANDROID_HOME/tools/bin
 # Created by `pipx` on 2026-03-23 03:04:59
 export PATH="$PATH:/home/raul/.local/bin"
 
-glow ~/Nextcloud/Documentos/tasks.md
+glow /home/raul/Nextcloud/Documentos/tasks.md

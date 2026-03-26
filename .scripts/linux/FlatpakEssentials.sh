@@ -17,4 +17,5 @@ flatpak install flathub com.discordapp.Discord \
   io.github.giantpinkrobots.flatsweep \
   org.gnome.eog \
   io.github.realmazharhussain.GdmSettings \
-  md.obsidian.Obsidian
+  md.obsidian.Obsidian \
+  com.github.wwmm.easyeffects

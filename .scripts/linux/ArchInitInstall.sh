@@ -21,7 +21,7 @@ brew tap oven-sh/bun
 brew install gcc
 hash -r
 
-brew install bun rust neovim oh-my-posh eza bat zoxide yazi
+brew install bun rust neovim oh-my-posh eza bat zoxide yazi glow gum
 hash -r
 
 bun add -g neovim tree-sitter-cli
