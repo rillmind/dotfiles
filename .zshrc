@@ -1,3 +1,5 @@
+/bin/clear
+
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 
 if [ ! -d "$ZINIT_HOME" ]; then
@@ -118,6 +120,9 @@ alias conky='conky -c ~/.config/conky/mocha.conf'
 #Zellij Aliases
 alias z='zellij options --theme catppuccin-mocha --pane-frames false'
 
+#Zeditor Aliases
+alias zed='zeditor'
+
 #jetbrains-toolbox Aliases
 alias toolbox='jetbrains-toolbox'
 
@@ -185,3 +190,5 @@ export PATH=$PATH:$ANDROID_HOME/tools/bin
 # Created by `pipx` on 2026-03-23 03:04:59
 export PATH="$PATH:/home/raul/.local/bin"
 source ~/.config/frankmd/fed.sh
+
+glow ~/Nextcloud/Documentos/tasks.md
