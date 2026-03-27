@@ -192,7 +192,5 @@ export PATH="$PATH:/home/raul/.local/bin"
 
 export PATH="/home/raul/arch/.cache/.bun/bin:$PATH"
 
-glow /home/raul/Nextcloud/Documentos/tasks.md
-
 # opencode
 export PATH=/home/raul/arch/.opencode/bin:$PATH
