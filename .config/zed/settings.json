@@ -55,6 +55,7 @@
   "gutter": {
     "min_line_number_digits": 2
   },
+  "graphics_backend": "opengl",
   "file_scan_exclusions": [],
   "lsp": {
     "gopls": {
