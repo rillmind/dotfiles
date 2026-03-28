@@ -1,4 +1,5 @@
 #!/bin/bash
+
 read -p "Já alterou o parallel downloads? (s/n): " confirm1
 if [[ "$confirm1" == "s" || "$confirm1" == "S" ]]; then
   echo "Continuando..."
@@ -62,6 +63,8 @@ hash -r
 cargo install fd-find ripgrep
 hash -r
 
+echo "Instalando LunarVim!!!"
+
 LV_BRANCH='release-1.4/neovim-0.9' bash <(curl -s https://raw.githubusercontent.com/LunarVim/LunarVim/release-1.4/neovim-0.9/utils/installer/install.sh) --no-install-dependencies
 
 echo "Lunarvim instalado!!!"
@@ -72,3 +75,4 @@ sudo timedatectl set-ntp true > /dev/null 2>&1
 curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sudo sh
 
 sudo chsh -s $(which zsh)
+

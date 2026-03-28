@@ -1,3 +1,5 @@
+#!/bin/bash
+
 read -p "Já alterou o parallel downloads? (s/n): " confirm1
 if [[ "$confirm1" == "s" || "$confirm1" == "S" ]]; then
   echo "Continuando..."
@@ -6,11 +8,28 @@ else
   exit 1
 fi
 
+echo "Instalando pacotes essenciais!!!"
+
 sudo pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si && cd ~
 hash -r
 
-yay -S zsh zed python-pynvim xdg-utils perl-file-mimeinfo yazi gcc gcc-c++ xdg-desktop-portal-gnome
+yay -S zsh \
+  zed \
+  python-pynvim \
+  xdg-utils \
+  perl-file-mimeinfo \
+  yazi \
+  gcc \
+  gcc-c++ \
+  xdg-desktop-portal-gnome
+
 hash -r
+
+echo "Pacotes essenciais instalados!!!"
+
+cd ~
+
+echo "Instalando Homebrew!!!"
 
 NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
@@ -24,12 +43,20 @@ hash -r
 brew install bun rust neovim oh-my-posh eza bat zoxide yazi glow gum
 hash -r
 
+echo "Homebrew instalado!!!"
+
+echo "Instalando dependências do lunarvim!!!"
+
 bun add -g neovim tree-sitter-cli
 
 cargo install fd-find ripgrep
 hash -r
 
+echo "Instalando LunarVim!!!"
+
 LV_BRANCH='release-1.4/neovim-0.9' bash <(curl -s https://raw.githubusercontent.com/LunarVim/LunarVim/release-1.4/neovim-0.9/utils/installer/install.sh) --no-install-dependencies
+
+echo "LunarVim Instalado!!!"
 
 # Corrige problemas em distrobox reconhecer navegadores do sistema original
 read -p "É distrobox? (s/n): " confirm2
@@ -69,3 +96,6 @@ else
 
   curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sudo sh
 fi
+
+sudo chsh -s $(which zsh)
+
