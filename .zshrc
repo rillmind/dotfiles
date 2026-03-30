@@ -38,7 +38,7 @@ setopt hist_ignore_dups
 autoload -Uz compinit
 compinit
 
-eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/oh-my-pure.omp.toml)"
+eval "$(/home/linuxbrew/.linuxbrew/bin/oh-my-posh init zsh --config ~/.config/oh-my-posh/oh-my-pure.omp.toml)"
 
 eval "$(zoxide init --cmd cd zsh)"
 
