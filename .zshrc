@@ -86,7 +86,7 @@ alias sdnf='sudo dnf'
 alias dnfs='sudo dnf search'
 alias dnfi='sudo dnf install'
 alias dnfr='sudo dnf remove'
-alias dnfu='sudo dnf upgrade'
+alias dnfu='sudo dnf upgrade && flatpak update && brew upgrade'
 
 #ls Aliases
 alias ls='eza --icons --color always'
