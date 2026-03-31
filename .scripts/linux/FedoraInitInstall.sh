@@ -33,6 +33,8 @@ sudo dnf install -y vim \
   pipx \
   xdg-desktop-portal-gnome
 
+bash $HOME/.scripts/linux/ZenInstall.sh
+
 echo "Pacotes essenciais instalados!!!"
 
 cd ~

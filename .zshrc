@@ -134,6 +134,9 @@ alias b='brew'
 alias bi='brew install'
 alias bu='brew update && brew upgrade'
 
+#Helix Aliases
+alias helix='flatpak run com.helix_editor.Helix'
+
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
