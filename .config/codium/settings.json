@@ -102,4 +102,8 @@
   },
   "window.zoomLevel": 2,
   "window.zoomPerWindow": false,
+  "mdb.mcp.server": "autoStartEnabled",
+  "http.systemCertificatesNode": true,
+  "geminicodeassist.inlineSuggestions.enableAuto": false,
+  "diffEditor.codeLens": true,
 }

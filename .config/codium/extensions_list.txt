@@ -4,5 +4,10 @@ catppuccin.catppuccin-vsc-icons
 dbaeumer.vscode-eslint
 esbenp.prettier-vscode
 expo.vscode-expo-tools
+google.geminicodeassist
+humao.rest-client
+mikestead.dotenv
+mongodb.mongodb-vscode
+postman.postman-for-vscode
 redhat.vscode-yaml
 vscodevim.vim
