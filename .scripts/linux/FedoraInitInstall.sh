@@ -50,7 +50,18 @@ brew tap oven-sh/bun
 brew install gcc
 hash -r
 
-brew install bun rust neovim oh-my-posh eza bat zoxide yazi glow gum
+brew install bun \
+  rust \
+  neovim \
+  oh-my-posh \
+  eza \
+  bat \
+  zoxide \
+  yazi \
+  glow \
+  gum \
+  helix
+
 hash -r
 
 echo "Homebrew instalado!!!"

@@ -1,1 +1,32 @@
 theme = "catppuccin_mocha"
+
+[editor.file-picker]
+hidden = false
+
+[keys.normal]
+"G" = "goto_file_end"
+"C-s" = ":w"
+"A-e" = "file_picker"
+"C-A-e" = "file_picker"
+"C-A-s" = ":wa"
+"0" = "goto_line_start"
+"$" = "goto_line_end"
+"A-j" = "move_line_down"
+"V" = ["select_mode", "extend_line"]
+"esc" = ["keep_primary_selection", "collapse_selection"]
+"C-r" = "redo"
+"C-A-k" = "move_line_up"
+
+[keys.normal.space]
+"w" = ":w"
+"q" = ":q!"
+
+[keys.insert]
+"C-A-j" = "move_line_down"
+"A-k" = "move_line_up"
+
+[keys.select]
+"s" = "change_selection"
+"0" = "goto_line_start"
+"$" = "goto_line_end"
+"esc" = ["keep_primary_selection", "collapse_selection", "normal_mode"]
