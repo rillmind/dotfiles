@@ -1,10 +1,10 @@
 #!/bin/sh
 
 # Caminhos do Flatpak
-FLATPAK_CONFIG="$HOME/arch/.var/app/com.vscodium.codium/config/VSCodium/User"
+FLATPAK_CONFIG="$HOME/.var/app/com.vscodium.codium/config/VSCodium/User"
 EXT_LIST="$HOME/.config/codium/extensions_list.txt"
 
-if [ -d "$HOME/arch/.var/app/com.vscodium.codium" ]; then
+if [ -d "$HOME/.var/app/com.vscodium.codium" ]; then
     echo "Instalando configurações para VSCodium (Flatpak)..."
 
     # Instalação de extensões via Flatpak
@@ -26,5 +26,5 @@ if [ -d "$HOME/arch/.var/app/com.vscodium.codium" ]; then
     sleep 0.5
     echo "Configurações instaladas!"
 else
-    echo "VSCodium Flatpak não encontrado em ~/arch/.var/app/com.vscodium.codium"
+    echo "VSCodium Flatpak não encontrado em ~/.var/app/com.vscodium.codium"
 fi

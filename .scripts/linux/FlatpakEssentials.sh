@@ -19,4 +19,6 @@ flatpak install flathub com.discordapp.Discord \
   io.github.realmazharhussain.GdmSettings \
   md.obsidian.Obsidian \
   com.github.wwmm.easyeffects \
-  com.parsecgaming.parsec
+  com.parsecgaming.parsec \
+  dev.zed.Zed \
+  com.vscodium.codium

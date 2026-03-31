@@ -62,7 +62,7 @@ alias p="podman"
 alias pc="podman-compose"
 
 #VSCodium Aliases
-alias codi="codium"
+alias codi="flatpak run com.vscodium.codium"
 
 #git Aliases
 alias g="git"
@@ -121,7 +121,7 @@ alias conky='conky -c ~/.config/conky/mocha.conf'
 alias z='zellij options --theme catppuccin-mocha --pane-frames false'
 
 #Zeditor Aliases
-alias zed='zeditor'
+alias zed='flatpak run dev.zed.Zed'
 
 #jetbrains-toolbox Aliases
 alias toolbox='jetbrains-toolbox'
