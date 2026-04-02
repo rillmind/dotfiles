@@ -35,6 +35,8 @@ sudo dnf install -y vim \
 
 bash $HOME/.scripts/linux/ZenInstall.sh
 
+curl -fsSL https://opencode.ai/install | bash
+
 echo "Pacotes essenciais instalados!!!"
 
 cd ~
@@ -60,7 +62,8 @@ brew install bun \
   yazi \
   glow \
   gum \
-  helix
+  helix \
+  anomalyco/tap/opencode
 
 hash -r
 

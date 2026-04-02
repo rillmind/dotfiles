@@ -137,6 +137,10 @@ alias bu='brew update && brew upgrade'
 #Helix Aliases
 alias helix='flatpak run com.helix_editor.Helix'
 
+#Update all package-managers Aliase
+alias update='sudo dnf upgrade && flatpak update && brew upgrade'
+alias up='sudo dnf upgrade && flatpak update && brew upgrade'
+
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
@@ -197,3 +201,7 @@ export PATH="/home/raul/arch/.cache/.bun/bin:$PATH"
 
 # opencode
 export PATH=/home/raul/arch/.opencode/bin:$PATH
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

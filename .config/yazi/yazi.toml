@@ -2,5 +2,5 @@
 show_hidden = true
 [opener]
 edit = [
-    { run = '~/.local/bin/lvim "$@"', block = true, desc = "Edit", for = "unix" }
+    { run = 'hx "$@"', block = true, desc = "Edit", for = "unix" }
 ]

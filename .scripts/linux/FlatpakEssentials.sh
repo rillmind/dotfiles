@@ -1,5 +1,4 @@
-flatpak install flathub com.discordapp.Discord \
-  com.github.tchx84.Flatseal \
+flatpak install flathub com.github.tchx84.Flatseal \
   com.mattjakeman.ExtensionManager \
   com.nextcloud.desktopclient.nextcloud \
   com.spotify.Client \
@@ -21,4 +20,5 @@ flatpak install flathub com.discordapp.Discord \
   com.github.wwmm.easyeffects \
   com.parsecgaming.parsec \
   dev.zed.Zed \
-  com.vscodium.codium
+  com.vscodium.codium \
+  org.equicord.equibop

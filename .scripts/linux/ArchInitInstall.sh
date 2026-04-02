@@ -25,6 +25,8 @@ yay -S zsh \
 
 hash -r
 
+curl -fsSL https://opencode.ai/install | bash
+
 echo "Pacotes essenciais instalados!!!"
 
 cd ~
@@ -40,7 +42,20 @@ brew tap oven-sh/bun
 brew install gcc
 hash -r
 
-brew install bun rust neovim oh-my-posh eza bat zoxide yazi glow gum
+brew install \
+  bun \
+  rust \
+  neovim \
+  oh-my-posh \
+  eza \
+  bat \
+  zoxide \
+  yazi \
+  glow \
+  gum \
+  anomalyco/tap/opencode \
+  helix
+
 hash -r
 
 echo "Homebrew instalado!!!"
