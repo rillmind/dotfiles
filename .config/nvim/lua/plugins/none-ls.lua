@@ -1,20 +1,50 @@
 return {
 	"nvimtools/none-ls.nvim",
+	event = { "BufReadPre", "BufNewFile" },
+	dependencies = {
+		"nvim-lua/plenary.nvim",
+	},
 	config = function()
 		local null_ls = require("null-ls")
+
 		null_ls.setup({
 			sources = {
+				-- Lua
 				null_ls.builtins.formatting.stylua,
+
+				-- Python
 				null_ls.builtins.formatting.black,
 				null_ls.builtins.formatting.isort,
+
+				-- JavaScript / TypeScript
 				null_ls.builtins.formatting.prettier,
-				--null_ls.builtins.formatting.beautysh,
-				--null_ls.builtins.diagnostics.shellcheck,
-				--null_ls.builtins.formatting.pyre,
-				--null_ls.builtins.diagnostics.ts_standard,
+
+				-- Go
+				null_ls.builtins.formatting.gofumpt,
+				null_ls.builtins.formatting.goimports,
+
+				-- Rust
+				null_ls.builtins.formatting.rustfmt,
+
+				-- TOML
+				null_ls.builtins.formatting.taplo,
+
+				-- JSON (via prettier)
+				null_ls.builtins.formatting.prettier,
 			},
+			on_attach = function(client, bufnr)
+				if client.supports_method("textDocument/formatting") then
+					vim.api.nvim_create_autocmd("BufWritePre", {
+						group = vim.api.nvim_create_augroup("FormatOnSave", { clear = true }),
+						buffer = bufnr,
+						callback = function()
+							vim.lsp.buf.format({ bufnr = bufnr })
+						end,
+					})
+				end
+			end,
 		})
 
-		vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, {})
+		vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, { desc = "Format" })
 	end,
 }

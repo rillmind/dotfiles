@@ -2,49 +2,60 @@ return {
 	"nvimdev/dashboard-nvim",
 	event = "VimEnter",
 	config = function()
+		local logo = {
+			[[                                                                       ]],
+			[[                                                                     ]],
+			[[       ████ ██████           █████      ██                     ]],
+			[[      ███████████             █████                             ]],
+			[[      █████████ ███████████████████ ███   ███████████   ]],
+			[[     █████████  ███    █████████████ █████ ██████████████   ]],
+			[[    █████████ ██████████ █████████ █████ █████ ████ █████   ]],
+			[[  ███████████ ███    ███ █████████ █████ █████ ████ █████  ]],
+			[[ ██████  █████████████████████ ████ █████ █████ ████ ██████ ]],
+			[[                                                                       ]],
+		}
+
+		local opts = {}
+		opts.footer_margin = 0
+		opts.autocenter = true
+
 		require("dashboard").setup({
 			config = {
-				header = {
-					[[                                                                       ]],
-					[[                                                                     ]],
-					[[       ████ ██████           █████      ██                     ]],
-					[[      ███████████             █████                             ]],
-					[[      █████████ ███████████████████ ███   ███████████   ]],
-					[[     █████████  ███    █████████████ █████ ██████████████   ]],
-					[[    █████████ ██████████ █████████ █████ █████ ████ █████   ]],
-					[[  ███████████ ███    ███ █████████ █████ █████ ████ █████  ]],
-					[[ ██████  █████████████████████ ████ █████ █████ ████ ██████ ]],
-					[[                                                                       ]],
-				},
-				project = {
-					limit = 8,
-					icon = " ",
-					label = " Recent projects:",
-					action = "Telescope find_files cwd=",
-				},
-				mru = {
-					limit = 12,
-					icon = " ",
-					label = " Most recent files:",
-					cwd_only = false,
-				},
-				shortcut = {
+				header = logo,
+				center = {
 					{
-						desc = "󰊳 Update",
-						group = "@property",
-						action = "Lazy update",
+						icon = "󰊳 ",
+						desc = "Update",
+						action = "Lazy sync",
 						key = "u",
 					},
 					{
 						icon = " ",
-						icon_hl = "@variable",
-						desc = "Files",
-						group = "Label",
+						desc = "Find File",
 						action = "Telescope find_files",
 						key = "f",
 					},
+					{
+						icon = " ",
+						desc = "New File",
+						action = "enew",
+						key = "n",
+					},
+					{
+						icon = " ",
+						desc = "Recent Files",
+						action = "Telescope oldfiles",
+						key = "r",
+					},
+					{
+						icon = "󰈭 ",
+						desc = "Find Word",
+						action = "Telescope live_grep",
+						key = "g",
+					},
 				},
-				footer = {},
+				footer = { "" },
+				project = { enable = false },
 			},
 		})
 	end,
