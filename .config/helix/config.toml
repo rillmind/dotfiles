@@ -9,8 +9,14 @@ hidden = false
 [keys.normal]
 "G" = "goto_file_end"
 "C-s" = ":w"
-"A-e" = "file_picker_in_current_buffer_directory"
-"C-A-e" = "file_picker_in_current_directory"
+"A-e" = [
+  ':sh rm -f /tmp/unique-file',
+  ':insert-output yazi "%{buffer_name}" --chooser-file=/tmp/unique-file',
+  ':sh printf "\x1b[?1049h\x1b[?2004h" > /dev/tty',
+  ':open %sh{cat /tmp/unique-file}',
+  ':redraw',
+]
+"C-A-e" = "buffer_picker"
 "C-A-s" = ":wa"
 "0" = "goto_line_start"
 "$" = "goto_line_end"
@@ -45,3 +51,5 @@ hidden = false
 "Y" = "yank_main_selection_to_clipboard"
 "x" = "delete_selection"
 "d" = "delete_selection"
+"G" = "goto_file_end"
+
