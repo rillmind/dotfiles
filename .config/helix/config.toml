@@ -8,7 +8,7 @@ hidden = false
 
 [keys.normal]
 "G" = "goto_file_end"
-"C-s" = [":w", ":format"]
+"C-s" = [":wa", ":format"]
 "A-e" = [
   ':sh rm -f /tmp/unique-file',
   ':insert-output yazi "%{buffer_name}" --chooser-file=/tmp/unique-file',
@@ -31,7 +31,7 @@ hidden = false
 "d" = "delete_selection"
 
 [keys.normal.space]
-"w" = [":w", ":format"]
+"w" = [":wa", ":format"]
 "a" = ":wa"
 "q" = ":q!"
 "l" = "goto_next_buffer"

@@ -18,14 +18,13 @@ vim.opt.rtp:prepend(lazypath)
 require("vim-options")
 require("lazy").setup("plugins")
 
-vim.keymap.set("n", "<leader>q", ":q<CR>", {})
 vim.keymap.set("n", "<leader>w", ":wa<CR>", {})
-vim.keymap.set("n", "<leader>t", ":term<CR>", {})
 
-vim.keymap.set("i", "(", "()<Esc>i", {})
-vim.keymap.set("i", "{", "{}<Esc>i", {})
-vim.keymap.set("i", "{<CR>", "{<CR>}<Esc>O", {})
-vim.keymap.set("i", "[", "[]<Esc>i", {})
-vim.keymap.set("i", "<", "<><Esc>i", {})
-vim.keymap.set("i", "'", "''<Esc>i", {})
-vim.keymap.set("i", '"', '""<Esc>i', {})
+vim.keymap.set("n", "<leader>q", function()
+	-- Fecha o NeoTree se estiver aberto
+	pcall(function()
+		vim.cmd("Neotree close")
+	end)
+	-- Sai do Neovim
+	vim.cmd("q")
+end, { desc = "Fechar NeoTree e sair do Neovim" })

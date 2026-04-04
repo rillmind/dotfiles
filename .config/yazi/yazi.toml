@@ -1,14 +1,13 @@
 [mgr]
-show_hidden = true
 ratio = [1, 1, 2]
+show_hidden = true
 sort_dir_first = true
 
-[opener]
-edit = [
-    { run = 'hx "$@"', block = true, desc = "Edit", for = "unix" }
-]
-
-[plugin]
+[[opener.edit]]
+run = 'hx "$@"'
+block = true
+desc = "Edit"
+for = "unix"
 
 [[plugin.prepend_fetchers]]
 id = "git"
@@ -19,4 +18,3 @@ run = "git"
 id = "git"
 url = "*/"
 run = "git"
-

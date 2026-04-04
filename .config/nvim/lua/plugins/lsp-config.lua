@@ -119,6 +119,29 @@ return {
 			vim.keymap.set("n", "]e", function()
 				vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
 			end, { desc = "Next Error" })
+
+			-- Diagnostic config: mostra popup ao passar o cursor
+			vim.diagnostic.config({
+				virtual_text = true,
+				signs = true,
+				underline = true,
+				update_in_insert = false,
+				severity_sort = true,
+				float = {
+					source = "always",
+					header = { "", "" },
+					prefix = "",
+				},
+			})
+
+			-- Auto-show diagnostic popup quando o cursor estiver na linha
+			local diagnostic_popup = vim.api.nvim_create_augroup("DiagnosticPopup", { clear = true })
+			vim.api.nvim_create_autocmd("CursorHold", {
+				group = diagnostic_popup,
+				callback = function()
+					vim.diagnostic.open_float(nil, { focus = false })
+				end,
+			})
 		end,
 	},
 	-- schemastore para JSON schemas
