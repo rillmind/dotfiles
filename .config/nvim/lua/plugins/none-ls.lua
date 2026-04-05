@@ -3,6 +3,7 @@ return {
 	event = { "BufReadPre", "BufNewFile" },
 	dependencies = {
 		"nvim-lua/plenary.nvim",
+		"nvimtools/none-ls-extras.nvim",
 	},
 	config = function()
 		local null_ls = require("null-ls")
@@ -23,17 +24,17 @@ return {
 				null_ls.builtins.formatting.gofumpt,
 				null_ls.builtins.formatting.goimports,
 
-				-- Rust
-				null_ls.builtins.formatting.rustfmt,
+				-- -- Rust
+				-- null_ls.builtins.formatting.rustfmt,
 
-				-- TOML
-				null_ls.builtins.formatting.taplo,
+				-- TOML (via none-ls-extras)
+				require("none-ls.formatting.taplo"),
 
 				-- JSON (via prettier)
 				null_ls.builtins.formatting.prettier,
 			},
 			on_attach = function(client, bufnr)
-				if client.supports_method("textDocument/formatting") then
+				if client:supports_method("textDocument/formatting") then
 					vim.api.nvim_create_autocmd("BufWritePre", {
 						group = vim.api.nvim_create_augroup("FormatOnSave", { clear = true }),
 						buffer = bufnr,

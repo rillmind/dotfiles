@@ -1,11 +1,15 @@
+vim.g.mapleader = " "
+
 vim.opt.scrolloff = 5
 vim.opt.termguicolors = true
 vim.opt.mouse = "a"
-
-vim.cmd("set expandtab")
-vim.cmd("set tabstop=2")
-vim.cmd("set softtabstop=2")
-vim.cmd("set shiftwidth=2")
-vim.g.mapleader = " "
+vim.opt.expandtab = true
+vim.opt.tabstop = 2
+vim.opt.softtabstop = 2
+vim.opt.shiftwidth = 2
 
 vim.opt.fillchars:append({ eob = " " })
+
+-- Pular linhas visuais em vez de lógicas
+vim.keymap.set("n", "j", "gj", { desc = "Move down (visual lines)" })
+vim.keymap.set("n", "k", "gk", { desc = "Move up (visual lines)" })

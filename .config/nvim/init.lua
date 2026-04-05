@@ -11,14 +11,14 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 
 vim.wo.number = true
-vim.cmd [[highlight LineNr guifg=#FFFFFF guibg=#000000 gui=bold]]
+vim.cmd([[highlight LineNr guifg=#FFFFFF guibg=#000000 gui=bold]])
 
 vim.opt.rtp:prepend(lazypath)
 
 require("vim-options")
 require("lazy").setup("plugins")
 
-vim.keymap.set("n", "<leader>w", ":wa<CR>", {})
+vim.keymap.set("n", "<leader>w", ":wa<CR>", { desc = "Salvar todos os buffers" })
 
 vim.keymap.set("n", "<leader>q", function()
 	-- Fecha o NeoTree se estiver aberto

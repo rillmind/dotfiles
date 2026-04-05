@@ -1,10 +1,10 @@
 [mgr]
-ratio = [1, 1, 2]
+ratio = [1, 1, 1]
 show_hidden = true
 sort_dir_first = true
 
 [[opener.edit]]
-run = 'hx "$@"'
+run = 'nvim "$@"'
 block = true
 desc = "Edit"
 for = "unix"

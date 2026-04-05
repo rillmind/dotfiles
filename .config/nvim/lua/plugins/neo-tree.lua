@@ -64,7 +64,7 @@ return {
 						["svg"] = "",
 						["lock"] = "",
 					},
-					provider = function(icon, node, state)
+					provider = function(icon, node)
 						local name = node.name
 						local ext = name:match("^.+%.(.+)$")
 						local custom_icons = {
