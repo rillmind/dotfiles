@@ -12,6 +12,8 @@ echo "Instalando pacotes essenciais!!!"
 
 sudo dnf copr enable scottames/ghostty
 
+sudo dnf copr enable sdegler/hyprland
+
 sudo rpm --import https://dl.google.com/linux/linux_signing_key.pub
 
 sudo tee /etc/yum.repos.d/google-chrome.repo <<EOF
@@ -31,9 +33,12 @@ sudo dnf install -y vim \
   gcc-c++ \
   util-linux-user \
   pipx \
-  xdg-desktop-portal-gnome
-
-bash $HOME/.scripts/linux/ZenInstall.sh
+  xdg-desktop-portal-gnome \
+  hyprland \
+  hyprpaper \
+  hyprland-qtutils \
+  gammastep \
+  sway 
 
 curl -fsSL https://opencode.ai/install | bash
 
