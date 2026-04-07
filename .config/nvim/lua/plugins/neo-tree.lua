@@ -116,6 +116,11 @@ return {
 			},
 		})
 
-		vim.keymap.set("n", "<M-e>", ":Neotree filesystem position=right reveal toggle<CR>", { desc = "File Explorer" })
+		vim.keymap.set(
+			"n",
+			"<C-M-e>",
+			":Neotree filesystem position=right reveal toggle<CR>",
+			{ desc = "File Explorer" }
+		)
 	end,
 }

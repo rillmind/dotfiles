@@ -13,3 +13,4 @@ vim.opt.fillchars:append({ eob = " " })
 -- Pular linhas visuais em vez de lógicas
 vim.keymap.set("n", "j", "gj", { desc = "Move down (visual lines)" })
 vim.keymap.set("n", "k", "gk", { desc = "Move up (visual lines)" })
+vim.keymap.set("n", "<M-e>", "<c-w>w")
