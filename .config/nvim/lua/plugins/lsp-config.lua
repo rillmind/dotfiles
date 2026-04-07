@@ -105,14 +105,15 @@ return {
 			})
 
 			-- Keymaps
+			vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename, { desc = "Rename" })
+			vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
+
 			vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "LSP Hover" })
 			vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
-			vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { desc = "Go to Declaration" })
-			vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to Implementation" })
-			vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
-			vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename" })
 			vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Prev Diagnostic" })
 			vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next Diagnostic" })
+			vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { desc = "Go to Declaration" })
+			vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to Implementation" })
 			vim.keymap.set("n", "[e", function()
 				vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
 			end, { desc = "Prev Error" })

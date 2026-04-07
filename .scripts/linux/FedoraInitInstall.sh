@@ -38,7 +38,7 @@ sudo dnf install -y vim \
   hyprpaper \
   hyprland-qtutils \
   gammastep \
-  sway 
+  sway
 
 curl -fsSL https://opencode.ai/install | bash
 
@@ -74,21 +74,7 @@ hash -r
 
 echo "Homebrew instalado!!!"
 
-echo "Instalando dependências do lunarvim!!!"
-
-sudo pipx install pynvim
-
-bun add -g neovim tree-sitter-cli
-hash -r
-
-cargo install fd-find ripgrep
-hash -r
-
-echo "Instalando LunarVim!!!"
-
-LV_BRANCH='release-1.4/neovim-0.9' bash <(curl -s https://raw.githubusercontent.com/LunarVim/LunarVim/release-1.4/neovim-0.9/utils/installer/install.sh) --no-install-dependencies
-
-echo "Lunarvim instalado!!!"
+# bash $HOME/dotfiles/.scripts/linux/LunarVimInstall.sh
 
 timedatectl set-local-rtc 1 --adjust-system-clock > /dev/null 2>&1
 sudo timedatectl set-ntp true > /dev/null 2>&1
