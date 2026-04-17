@@ -74,6 +74,8 @@ hash -r
 
 echo "Homebrew instalado!!!"
 
+cargo install bluetui
+
 # bash $HOME/dotfiles/.scripts/linux/LunarVimInstall.sh
 
 timedatectl set-local-rtc 1 --adjust-system-clock > /dev/null 2>&1
