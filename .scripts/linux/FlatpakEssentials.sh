@@ -21,4 +21,5 @@ flatpak install flathub com.github.tchx84.Flatseal \
   com.parsecgaming.parsec \
   dev.zed.Zed \
   com.vscodium.codium \
-  org.equicord.equibop
+  org.equicord.equibop \
+  org.pulseaudio.pavucontrol

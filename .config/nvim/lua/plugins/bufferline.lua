@@ -94,5 +94,6 @@ return {
 		vim.keymap.set("n", "<leader>bb", "<cmd>BufferLinePick<cr>", { desc = "Selecionar buffer" })
 		vim.keymap.set("n", "<leader>bl", "<cmd>BufferLineCloseRight<cr>", { desc = "Fechar abas a direita" })
 		vim.keymap.set("n", "<leader>bh", "<cmd>BufferLineCloseLeft<cr>", { desc = "Fechar abas a direita" })
+		vim.keymap.set("n", "<leader>bo", "<cmd>BufferLineCloseOthers<cr>", { desc = "Fechar abas a direita" })
 	end,
 }

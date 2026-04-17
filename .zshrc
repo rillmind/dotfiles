@@ -141,6 +141,9 @@ alias helix='flatpak run com.helix_editor.Helix'
 alias update='sudo dnf upgrade && flatpak update && brew upgrade'
 alias up='sudo dnf upgrade && flatpak update && brew upgrade'
 
+#Walker Aliases
+alias walker="walker --gapplication-service"
+
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
