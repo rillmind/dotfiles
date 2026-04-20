@@ -16,7 +16,7 @@ mouse-hide-while-typing
 
 shell-integration-features = no-cursor
 
-cursor-style = bar
+cursor-style = block_hollow
 
 cursor-style-blink = true
 

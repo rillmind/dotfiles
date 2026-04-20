@@ -30,8 +30,8 @@
 @define-color rosewater #f5e0dc;
 
 * {
-  font-family: SFPro;
-  font-size: 17px;
+  font-family: JetbrainsMono Nerd Font;
+  font-size: 18px;
   border-radius: 15px;
 }
 
@@ -65,7 +65,7 @@ window {
 
 #scroll {
   margin: 0px 0px;
-  border-radius: 8px;
+  border-radius: 0px;
   border: none;
 }
 

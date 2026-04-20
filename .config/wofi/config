@@ -1,7 +1,7 @@
 mode=drun
 allow_images=true
 image_size=30
-term=kitty
+term=ghotty
 insensitive=true
 location=center
 show_actions=false
