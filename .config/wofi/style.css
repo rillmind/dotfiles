@@ -32,7 +32,6 @@
 * {
   font-family: JetbrainsMono Nerd Font;
   font-size: 18px;
-  border-radius: 15px;
 }
 
 window {
@@ -53,7 +52,7 @@ window {
   background: none;
   color: @subtext1;
   border-radius: 5px;
-  padding: 0px 0px 0px 5px;
+  padding: 0px 10px 0px 10px;
   border: 1px solid @subtext1;
 }
 
@@ -66,7 +65,6 @@ window {
 #scroll {
   margin: 0px 0px;
   border-radius: 0px;
-  border: none;
 }
 
 #text {
@@ -74,11 +72,13 @@ window {
 }
 
 #entry {
-  border: none;
+  color: @text;
+  padding: 5px 0px 5px 5px;
   border-radius: 8px;
 }
 
 #entry:selected {
-  color: @crust;
+  color: @red;
   background-color: @mauve;
+  margin: 0px 250px 0px 0px;
 }

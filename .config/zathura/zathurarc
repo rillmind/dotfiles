@@ -1,8 +1,8 @@
-include catppuccin-mocha
+# set default-bg "#ffffff"
+# set statusbar-bg "#1e1e2e"
+# set statusbar-fg "#cdd6f4"
 
-set default-bg "#313244"
-set statusbar-bg "#1e1e2e"
-set statusbar-fg "#cdd6f4"
+include gruvbox-dark
 
 set pages-per-row-spacing 1
 

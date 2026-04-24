@@ -1,0 +1,42 @@
+/* Gruvbox dark theme for Wofi */
+
+window {
+    background-color: #282828;
+    color: #ebdbb2;
+    border: 1px solid #504945;
+}
+
+entry, entry:focus {
+    background-color: #1d2021;
+    color: #ebdbb2;
+    border: 1px solid #504945;
+}
+
+listview {
+    background-color: #282828;
+}
+
+row {
+    padding: 4px 8px;
+}
+
+row:selected, row:hover {
+    background-color: #3c4036;
+}
+
+row:selected {
+    color: #fabd2f;
+}
+
+scrollbar {
+    background-color: #282828;
+}
+
+scrollbar > slider {
+    background-color: #504945;
+    border-radius: 4px;
+}
+
+scrollbar > slider:hover {
+    background-color: #665c54;
+}

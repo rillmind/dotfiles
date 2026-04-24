@@ -68,13 +68,18 @@ brew install bun \
   glow \
   gum \
   helix \
-  anomalyco/tap/opencode
+  anomalyco/tap/opencode \
+  uv
 
 hash -r
 
 echo "Homebrew instalado!!!"
 
+uv tool install nvibrant
+
 cargo install bluetui
+
+hash -r
 
 # bash $HOME/dotfiles/.scripts/linux/LunarVimInstall.sh
 
