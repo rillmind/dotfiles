@@ -39,7 +39,7 @@ bars:
       center:
         - clock
       right:
-        - systray
+        # - systray
         - cpu
         - memory
         - open_meteo
@@ -91,8 +91,8 @@ widgets:
   volume:
     type: yasb.volume.VolumeWidget
     options:
-      label: <span>{icon}</span>
-      label_alt: <span>{icon}</span>{level}
+      label: 
+      label_alt: 
       tooltip: true
       volume_icons:
         - "\uE74F"
@@ -120,9 +120,9 @@ widgets:
   notifications:
     type: yasb.notifications.NotificationsWidget
     options:
-      label: "<span>\uF2A5</span>"
-      label_alt: "{count} notifications"
-      hide_empty: true
+      label: ""
+      label_alt: ""
+      hide_empty: false
       tooltip: false
       callbacks:
         on_left: toggle_notification
@@ -131,7 +131,7 @@ widgets:
   power_menu:
     type: yasb.power_menu.PowerMenuWidget
     options:
-      label: "<span>\uE712</span>"
+      label: "⏻"
       uptime: true
       show_user: true
       menu_style: popup
