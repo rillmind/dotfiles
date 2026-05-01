@@ -69,7 +69,7 @@
 
 /* Global Defaults */
 * {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   font-family: var(--icons-font-fallback);
   color: var(--ctp-text);
@@ -197,12 +197,13 @@
 }
 .home-menu {
   background-color: var(--yasb-popup-bg);
-  font-size: 28px;
+  font-size: 48px;
 }
 .home-menu .menu-item {
   color: var(--ctp-text);
   padding: 8px 48px 8px 16px;
   font-family: var(--system-font);
+  font-size: 30px;
   font-weight: 600;
 }
 .home-menu .menu-item:hover {
@@ -412,6 +413,7 @@
 .power-menu-compact {
   min-width: 260px;
   background-color: var(--yasb-popup-bg);
+  color: var(--ctp-red);
 }
 .power-menu-compact .profile-info {
   padding: 24px 0 24px 0;
@@ -556,15 +558,15 @@
 .komorebi-workspaces .ws-btn {
   color: var(--ctp-text);
   border: none;
-  margin: 0 4px;
-  padding: 3px 6px 5px 6px;
+  margin: 0 3px;
+  padding: 2px 7px 5px 7px;
   outline: none;
   font-family: var(--system-font);
-  font-weight: 800;
+  font-weight: 700;
   border-radius: 3px;
 }
 .komorebi-workspaces .ws-btn.populated {
-  background-color: var(--yasb-surface-alt);
+  background-color: var(--ctp-base);
 }
 .komorebi-workspaces .ws-btn.active {
   color: var(--yasb-accent-fg);

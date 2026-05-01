@@ -25,7 +25,7 @@ bars:
       windows_app_bar: true
     dimensions:
       width: 100%
-      height: 30
+      height: 35
     padding:
       top: 0
       left: 0
@@ -44,6 +44,7 @@ bars:
         - memory
         - open_meteo
         - microphone
+        - wifi
         - volume
         - notifications
         - power_menu
@@ -62,7 +63,7 @@ widgets:
         - title: Pictures
           path: ~\Pictures
       system_menu: true
-      power_menu: true
+      power_menu: false
       blur: true
       round_corners: true
       round_corners_type: normal
@@ -286,7 +287,7 @@ widgets:
   microphone:
     type: yasb.microphone.MicrophoneWidget
     options:
-      label: <span>{icon}</span>
+      label: 
       label_alt: <span>{icon}</span> {level}
       mute_text: mute
       icons:
@@ -303,3 +304,19 @@ widgets:
         on_left: toggle_mic_menu
         on_middle: toggle_label
         on_right: toggle_mute
+  wifi:
+    type: yasb.wifi.WifiWidget
+    options:
+      label: 
+      label_alt: " {wifi_name}"
+      update_interval: 5000
+      wifi_icons:
+        - "\uDB82\uDD2F" # Disconnected
+        - "\uDB82\uDD2B" # Weak signal
+        - "\uDB82\uDD28" # Fair signal
+        - "\uDB82\uDD25" # Good signal
+        - "\uDB82\uDD22" # Excellent signal
+      callbacks:
+        on_left: toggle_wifi_menu
+        on_middle: do_nothing
+        on_right: toggle_label
