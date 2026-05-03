@@ -43,8 +43,10 @@ bars:
         - cpu
         - memory
         - open_meteo
+        - space
         - microphone
         - wifi
+        - battery
         - volume
         - notifications
         - power_menu
@@ -320,3 +322,32 @@ widgets:
         on_left: toggle_wifi_menu
         on_middle: do_nothing
         on_right: toggle_label
+  battery:
+    type: "yasb.battery.BatteryWidget"
+    options:
+      label: "{icon}" # {percent}%
+      label_alt: "{icon} {percent}% | {power}W | {time_remaining}"
+      update_interval: 5000 # Atualiza a cada 5 segundos
+      time_remaining_natural: False
+      hide_unsupported: True # Oculta campos sem suporte de hardware
+      charging_options:
+        icon_format: "{charging_icon}"
+        blink_charging_icon: true
+        blink_interval: 500
+      status_thresholds:
+        critical: 10
+        low: 25
+        medium: 75
+        high: 95
+        full: 100
+      status_icons:
+        icon_charging: ""
+        icon_critical: ""
+        icon_low: ""
+        icon_medium: ""
+        icon_high: ""
+        icon_full: ""
+  space:
+    type: "yasb.battery.BatteryWidget" # Só botei esse 'type' pra o YASB aceitar o widget customizado.
+    options:
+      label: "   |   "
