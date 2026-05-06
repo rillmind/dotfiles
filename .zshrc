@@ -14,12 +14,14 @@ source "${ZINIT_HOME}/zinit.zsh"
 autoload -Uz promptinit
 promptinit
 prompt adam1
-
-setopt histignorealldups sharehistory
+autoload -Uz compinit
+compinit
 
 # Use emacs keybindings even if our EDITOR is set to vi
 
 bindkey -e
+bindkey '^p' history-search-backward
+bindkey '^n' history-search-forward
 
 # Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
 HISTSIZE=1000
@@ -33,14 +35,65 @@ setopt hist_ignore_all_dups
 setopt hist_save_no_dups
 setopt hist_find_no_dups
 setopt hist_ignore_dups
+setopt histignorealldups sharehistory
 
 # Use modern completion system
-autoload -Uz compinit
-compinit
 
 eval "$(/home/linuxbrew/.linuxbrew/bin/oh-my-posh init zsh --config ~/.config/oh-my-posh/oh-my-pure.omp.toml)"
-
+eval "$(dircolors -b)"
 eval "$(zoxide init --cmd cd zsh)"
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+zinit light zsh-users/zsh-syntax-highlighting
+zinit light zsh-users/zsh-completions
+zinit light zsh-users/zsh-autosuggestions
+zinit light Aloxaf/fzf-tab
+
+zstyle ':completion:*' auto-description 'specify: %d'
+zstyle ':completion:*' completer _expand _complete _correct _approximate
+zstyle ':completion:*' format 'Completing %d'
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
+zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=* l:|=*'
+zstyle ':completion:*' menu no
+zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
+zstyle ':completion:*' use-compctl false
+zstyle ':completion:*' verbose true
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
+zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
+zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
+
+GOPATH=$HOME/go  PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+export PATH=$PATH:/home/raul/.spicetify
+export PATH=$HOME/.local/bin:$PATH
+export PATH="$PATH:$HOME/go/bin"
+export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
+export EDITOR="$HOME/.local/bin/lvim"
+export PATH="$HOME/.bun/bin:$PATH"
+export PATH="$HOME/.asdf/shims:$PATH"
+export PATH="$HOME/../linuxbrew/.linuxbrew/bin/:$PATH"
+export BROWSER="distrobox-host-exec google-chrome-canary"
+export PATH="$HOME/.local/bin:$PATH"
+export ANDROID_HOME=$HOME/Android/Sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH=$PATH:$ANDROID_HOME/tools
+export PATH=$PATH:$ANDROID_HOME/tools/bin
+export PATH="$PATH:/home/raul/.local/bin"
+export PATH="/home/raul/arch/.cache/.bun/bin:$PATH"
+export PATH=/home/raul/arch/.opencode/bin:$PATH
+export NVM_DIR="$HOME/.nvm"
+export PATH=$HOME/.local/share/bob/nvim-bin:$HOME/.bun/bin:$HOME/.local/bin:$HOME/.asdf/shims:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/raul/raul/.bun/bin:/home/raul/.cargo/bin:/home/raul/.local/bin:/home/raul/.local/share/zinit/polaris/bin:/usr/local/bin:/usr/bin:/home/raul/.spicetify:/usr/local/go/bin:/home/raul/go/bin:/home/raul/.spicetify:/usr/local/go/bin:/home/raul/go/bin:/home/raul/go/bin
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Comands
+nvibrant -v 700 >> ~/nohup.out
+
+# Aliases
 
 gacp() {
   message="$1"
@@ -144,71 +197,7 @@ alias up='sudo dnf upgrade && flatpak update && brew upgrade'
 #Walker Aliases
 alias walker="walker --gapplication-service"
 
-zinit light zsh-users/zsh-syntax-highlighting
-zinit light zsh-users/zsh-completions
-zinit light zsh-users/zsh-autosuggestions
-zinit light Aloxaf/fzf-tab
-
-zstyle ':completion:*' auto-description 'specify: %d'
-zstyle ':completion:*' completer _expand _complete _correct _approximate
-zstyle ':completion:*' format 'Completing %d'
-zstyle ':completion:*' group-name ''
-eval "$(dircolors -b)"
-zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
-zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=* l:|=*'
-zstyle ':completion:*' menu no
-zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
-zstyle ':completion:*' use-compctl false
-zstyle ':completion:*' verbose true
-
-zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
-zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
-
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
-zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
-
-bindkey '^p' history-search-backward
-bindkey '^n' history-search-forward
-
-source ~/.config/antigen.zsh
-
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-[ -s "/home/raul/.bun/_bun" ] && source "/home/raul/.bun/_bun"
-GOPATH=$HOME/go  PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
-export PATH=$PATH:/home/raul/.spicetify
-export PATH=$HOME/.local/bin:$PATH
-export PATH="$PATH:$HOME/go/bin"
-export PATH=$HOME/.local/share/bob/nvim-bin:$HOME/.bun/bin:$HOME/.local/bin:$HOME/.asdf/shims:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/raul/raul/.bun/bin:/home/raul/.cargo/bin:/home/raul/.local/bin:/home/raul/.local/share/zinit/polaris/bin:/usr/local/bin:/usr/bin:/home/raul/.spicetify:/usr/local/go/bin:/home/raul/go/bin:/home/raul/.spicetify:/usr/local/go/bin:/home/raul/go/bin:/home/raul/go/bin
-export PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
-export EDITOR="$HOME/.local/bin/lvim"
-export PATH="$HOME/.bun/bin:$PATH"
-export PATH="$HOME/.asdf/shims:$PATH"
-export PATH="$HOME/../linuxbrew/.linuxbrew/bin/:$PATH"
-export BROWSER="distrobox-host-exec google-chrome-canary"
-export PATH="$HOME/.local/bin:$PATH"
-
-export ANDROID_HOME=$HOME/Android/Sdk
-export PATH=$PATH:$ANDROID_HOME/emulator
-export PATH=$PATH:$ANDROID_HOME/platform-tools
-export PATH=$PATH:$ANDROID_HOME/tools
-export PATH=$PATH:$ANDROID_HOME/tools/bin
-
-# . "$HOME/.local/share/../bin/env"
-
-# Created by `pipx` on 2026-03-23 03:04:59
-export PATH="$PATH:/home/raul/.local/bin"
-
-export PATH="/home/raul/arch/.cache/.bun/bin:$PATH"
-
-# opencode
-export PATH=/home/raul/arch/.opencode/bin:$PATH
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
+# sources
 source <(kubectl completion zsh)
-source /home/raul/.config/frankmd/fed.sh
-export FRANKMD_ENV=~/.config/frankmd/env
+source ~/.config/antigen.zsh
+[ -s "/home/raul/.bun/_bun" ] && source "/home/raul/.bun/_bun"

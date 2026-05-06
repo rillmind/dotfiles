@@ -1,41 +1,70 @@
-/* Definição de Cores do seu Conky */
-$color0: #C9CBFF;
-$color1: #D9E0EE;
-$color2: #89DCEB; /* Cyan - Barras */
-$color3: #F2CDCD; /* Pink */
-$color4: #C3BAC6;
-$color5: #ABE9B3; /* Green */
-$color6: #FAE3B0; /* Yellow */
-$bg: #1e1e2e;     /* Preto conforme own_window_colour */
+* {
+  background-color: red;
+} /* ============================================================
+   Catppuccin Mocha Palette
+   ============================================================ */
+$rosewater: #f5e0dc;
+$flamingo: #f2cdcd;
+$pink: #f5c2e7;
+$mauve: #cba6f7;
+$red: #f38ba8;
+$maroon: #eba0ac;
+$peach: #fab387;
+$yellow: #f9e2af;
+$green: #a6e3a1;
+$teal: #94e2d5;
+$sky: #89dceb;
+$sapphire: #74c7ec;
+$blue: #89b4fa;
+$lavender: #b4befe;
+$text: #cdd6f4;
+$subtext1: #bac2de;
+$subtext0: #a6adc8;
+$overlay2: #9399b2;
+$overlay1: #7f849c;
+$overlay0: #6c7086;
+$surface2: #585b70;
+$surface1: #45475a;
+$surface0: #313244;
+$base: #1e1e2e;
+$mantle: #181825;
+$crust: #11111b;
 
 * {
   all: unset;
   font-family: "JetBrainsMono Nerd Font";
 }
 
+/* ============================================================
+   Container Geral
+   ============================================================ */
 .container {
-  background-color: $bg;
-  padding: 150px;
-  border-radius: 0px; /* Conky é quadrado por padrão */
+  background-color: $base;
+  padding: 20px;
+  border-radius: 0px;
 }
 
-/* Header */
+/* ============================================================
+   Header
+   ============================================================ */
 .session-text {
   font-family: "Raleway";
   font-weight: bold;
   font-size: 30px;
-  color: $color0;
+  color: $lavender;
   margin-bottom: 5px;
 }
 
 .date-text {
   font-family: "Ubuntu";
   font-size: 14px;
-  color: $color0;
+  color: $subtext1;
   margin-bottom: 20px;
 }
 
-/* Seções Gerais */
+/* ============================================================
+   Seções
+   ============================================================ */
 .section {
   margin-bottom: 15px;
 }
@@ -47,38 +76,148 @@ $bg: #1e1e2e;     /* Preto conforme own_window_colour */
 }
 
 .stat-value {
-  color: $color1;
+  color: $text;
   font-size: 12px;
   margin-bottom: 5px;
 }
 
-/* Cores específicas */
-.color-green { color: $color5; }
-.color-yellow { color: $color6; }
-.color-pink { color: $color3; }
-.color-white { color: $color1; }
-
-/* Barras de Progresso */
-progress {
-  background-color: #333333; /* Fundo da barra */
-  min-height: 8px;
-  border-radius: 0px; 
+.color-green {
+  color: $green;
+}
+.color-yellow {
+  color: $yellow;
+}
+.color-pink {
+  color: $pink;
+}
+.color-white {
+  color: $text;
 }
 
-/* A parte preenchida da barra (o "trough" no GTK) */
-.bar-cpu trough highlight { background-color: $color2; }
-.bar-ram trough highlight { background-color: $color2; }
-.bar-fs  trough highlight { background-color: $color2; }
+/* ============================================================
+   Barras de Progresso
+   ============================================================ */
+progress {
+  background-color: $surface0;
+  min-height: 8px;
+  border-radius: 4px;
+}
 
-/* Lista de Processos */
+.bar-cpu trough highlight {
+  background-color: $green;
+}
+.bar-ram trough highlight {
+  background-color: $mauve;
+}
+.bar-fs trough highlight {
+  background-color: $peach;
+}
+
+/* ============================================================
+   Lista de Processos
+   ============================================================ */
 .proc-list {
   margin-top: 5px;
 }
+
 .proc-name {
   font-weight: bold;
   font-size: 11px;
+  color: $text;
 }
+
 .proc-value {
-  color: $color4;
+  color: $subtext0;
   font-size: 11px;
+}
+
+/* ============================================================
+   Calendário
+   ============================================================ */
+.cal-container {
+  background-color: $base;
+  padding: 15px;
+  border: 1px solid $mauve;
+  border-radius: 12px;
+}
+
+calendar {
+  color: $text;
+  font-size: 14px;
+
+  &:header {
+    color: $lavender;
+    font-weight: bold;
+  }
+
+  &:button {
+    color: $sapphire;
+  }
+
+  &:selected {
+    color: $base;
+    background-color: $green;
+    border-radius: 4px;
+  }
+
+  &.other-month {
+    color: $overlay0;
+  }
+}
+
+calendar:active {
+  color: $yellow;
+}
+
+/* ============================================================
+   Powermenu (Catppuccin Mocha Refinado)
+   ============================================================ */
+.powermenu-container {
+  background-color: rgba(30, 30, 46, 0.95);
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid $surface1;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Botões */
+.pm-btn {
+  background-color: $surface0;
+  color: $text;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+/* Hover geral */
+.pm-btn:hover {
+  background-color: $surface1;
+  transform: translateY(-1px);
+}
+
+/* Estados coloridos */
+.pm-shutdown:hover {
+  background-color: rgba(243, 139, 168, 0.15);
+  color: $red;
+}
+
+.pm-reboot:hover {
+  background-color: rgba(250, 179, 135, 0.15);
+  color: $peach;
+}
+
+.pm-suspend:hover {
+  background-color: rgba(137, 220, 235, 0.15);
+  color: $sky;
+}
+
+.pm-lock:hover {
+  background-color: rgba(137, 180, 250, 0.15);
+  color: $blue;
+}
+
+.pm-logout:hover {
+  background-color: rgba(249, 226, 175, 0.15);
+  color: $yellow;
 }

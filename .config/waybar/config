@@ -153,7 +153,8 @@
     ]
   },
   "clock": {
-    "format": "Dia {:%d | %H:%M}"
+    "format": "Dia {:%d | %H:%M}",
+    "on-click": "eww open calendar"
   },
   "memory": {
     "interval": 30,
@@ -163,7 +164,7 @@
   },
   "custom/powermenu": {
     "format": "",
-    "on-click": "~/.config/wofi/powermenu",
+    "on-click": "eww open --toggle powermenu",
     "tooltip": false
   }
 }
