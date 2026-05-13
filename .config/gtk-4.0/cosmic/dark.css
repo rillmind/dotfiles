@@ -39,24 +39,24 @@
 @define-color accent_bg_color rgba(203, 166, 247, 1.00);
 @define-color accent_fg_color rgba(0, 0, 0, 1.00);
 
-@define-color destructive_color rgba(253, 161, 160, 1.00);
-@define-color destructive_bg_color rgba(253, 161, 160, 1.00);
+@define-color destructive_color rgba(255, 160, 154, 1.00);
+@define-color destructive_bg_color rgba(255, 160, 154, 1.00);
 @define-color destructive_fg_color rgba(0, 0, 0, 1.00);
 
-@define-color warning_color rgba(247, 224, 98, 1.00);
-@define-color warning_bg_color rgba(247, 224, 98, 1.00);
+@define-color warning_color rgba(255, 163, 125, 1.00);
+@define-color warning_bg_color rgba(255, 163, 125, 1.00);
 @define-color warning_fg_color rgba(0, 0, 0, 1.00);
 
-@define-color success_color rgba(146, 207, 156, 1.00);
-@define-color success_bg_color rgba(146, 207, 156, 1.00);
+@define-color success_color rgba(94, 219, 140, 1.00);
+@define-color success_bg_color rgba(94, 219, 140, 1.00);
 @define-color success_fg_color rgba(0, 0, 0, 1.00);
 
 @define-color accent_color rgba(203, 166, 247, 1.00);
 @define-color accent_bg_color rgba(203, 166, 247, 1.00);
 @define-color accent_fg_color rgba(0, 0, 0, 1.00);
 
-@define-color error_color rgba(253, 161, 160, 1.00);
-@define-color error_bg_color rgba(253, 161, 160, 1.00);
+@define-color error_color rgba(255, 160, 154, 1.00);
+@define-color error_bg_color rgba(255, 160, 154, 1.00);
 @define-color error_fg_color rgba(0, 0, 0, 1.00);
 
 @define-color blue_1 rgba(113, 221, 236, 1.00);
