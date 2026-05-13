@@ -16,21 +16,21 @@
 @define-color sidebar_backdrop_color rgba(59, 59, 75, 1.00);
 
 @define-color secondary_sidebar_bg_color rgba(55, 55, 72, 1.00);
-@define-color secondary_sidebar_fg_color rgba(195, 204, 234, 1.00);
+@define-color secondary_sidebar_fg_color rgba(200, 205, 221, 1.00);
 @define-color secondary_sidebar_shade_color rgba(0, 0, 0, 0.08);
 @define-color secondary_sidebar_backdrop_color rgba(71, 71, 87, 1.00);
 
 @define-color card_bg_color rgba(49, 50, 67, 1.00);
-@define-color card_fg_color rgba(189, 198, 227, 1.00);
+@define-color card_fg_color rgba(193, 198, 215, 1.00);
 
 @define-color thumbnail_bg_color rgba(49, 50, 67, 1.00);
-@define-color thumbnail_fg_color rgba(189, 198, 227, 1.00);
+@define-color thumbnail_fg_color rgba(193, 198, 215, 1.00);
 
 @define-color dialog_bg_color rgba(42, 42, 59, 1.00);
 @define-color dialog_fg_color rgba(255, 255, 255, 1.00);
 
 @define-color popover_bg_color rgba(49, 50, 67, 1.00);
-@define-color popover_fg_color rgba(189, 198, 227, 1.00);
+@define-color popover_fg_color rgba(193, 198, 215, 1.00);
 
 @define-color shade_color rgba(0, 0, 0, 0.32);
 @define-color scrollbar_outline_color rgba(30, 30, 46, 0.50);
