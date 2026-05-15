@@ -78,7 +78,7 @@ window {
 }
 
 #entry:selected {
-  color: @red;
+  color: @base;
   background-color: @mauve;
   margin: 0px;
 }

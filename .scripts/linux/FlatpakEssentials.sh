@@ -24,4 +24,5 @@ flatpak install flathub com.github.tchx84.Flatseal \
   dev.zed.Zed \
   com.vscodium.codium \
   org.equicord.equibop \
-  org.pulseaudio.pavucontrol
+  org.pulseaudio.pavucontrol \
+  org.onlyoffice.desktopeditors

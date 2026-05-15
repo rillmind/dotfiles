@@ -6,7 +6,7 @@
     "show_user_picture": true,
     "show_sign_in": false,
     "show_menus": false,
-    "show_branch_icon": true
+    "show_branch_icon": true,
   },
   "ui_font_weight": 500.0,
   "ui_font_family": "JetBrains Mono NL",
@@ -14,12 +14,12 @@
   "show_completion_documentation": true,
   "show_completions_on_input": true,
   "buffer_font_features": {
-    "calt": true
+    "calt": true,
   },
   "tab_size": 2,
   "icon_theme": "Catppuccin Mocha",
   "telemetry": {
-    "metrics": false
+    "metrics": false,
   },
   "vim_mode": true,
   "ui_font_size": 20,
@@ -29,31 +29,34 @@
   "tab_bar": {
     "show": true,
     "show_nav_history_buttons": false,
-    "show_tab_bar_buttons": false
+    "show_tab_bar_buttons": false,
   },
   "project_panel": {
     "dock": "right",
     "button": true,
     "auto_fold_dirs": false,
-    "default_width": 250
+    "default_width": 250,
   },
   "diagnostics": {
-    "button": false
+    "button": false,
   },
   "git_panel": {
-    "button": false
+    "button": false,
   },
   "terminal": {
-    "button": true
+    "button": true,
+    "shell": {
+      "program": "/usr/bin/zsh",
+    },
   },
   "collaboration_panel": {
-    "button": false
+    "button": false,
   },
   "outline_panel": {
-    "button": false
+    "button": false,
   },
   "gutter": {
-    "min_line_number_digits": 2
+    "min_line_number_digits": 2,
   },
   "graphics_backend": "opengl",
   "file_scan_exclusions": [],
@@ -67,9 +70,9 @@
           "constantValues": true,
           "functionTypeParameters": true,
           "parameterNames": true,
-          "rangeVariableTypes": true
-        }
-      }
-    }
-  }
+          "rangeVariableTypes": true,
+        },
+      },
+    },
+  },
 }

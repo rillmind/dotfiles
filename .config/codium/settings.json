@@ -112,5 +112,57 @@
     "args": ["--host", "--env=TERM=xterm-256color", "zsh"]
   }
   },
-  "terminal.integrated.defaultProfile.linux": "host-shell"
+  "terminal.integrated.defaultProfile.linux": "host-shell",
+  "vim.normalModeKeyBindingsNonRecursive": [
+  {
+    "before": ["j"],
+    "after": ["g", "j"]
+  },
+  {
+    "before": ["k"],
+    "after": ["g", "k"]
+  },
+  {
+    "before": ["$"],
+    "after": ["g", "$"]
+  },
+  {
+    "before": ["0"],
+    "after": ["g", "0"]
+  },
+  {
+    "before": ["<down>"],
+    "after": ["g", "j"]
+  },
+  {
+    "before": ["<up>"],
+    "after": ["g", "k"]
+  }
+],
+"vim.visualModeKeyBindingsNonRecursive": [
+  {
+    "before": ["j"],
+    "after": ["g", "j"]
+  },
+  {
+    "before": ["k"],
+    "after": ["g", "k"]
+  },
+  {
+    "before": ["$"],
+    "after": ["g", "$"]
+  },
+  {
+    "before": ["0"],
+    "after": ["g", "0"]
+  },
+  {
+    "before": ["<down>"],
+    "after": ["g", "j"]
+  },
+  {
+    "before": ["<up>"],
+    "after": ["g", "k"]
+  }
+]
 }

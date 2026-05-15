@@ -14,7 +14,7 @@ sudo dnf copr enable scottames/ghostty
 
 sudo dnf copr enable sdegler/hyprland
 
-sudo dnf install -y vim ghostty zsh gcc gcc-c++ util-linux-user pipx xdg-desktop-portal-gnome hyprland hyprpaper hyprland-qtutils gammastep sway dbus-devel pkgconf-pkg-config @cosmic-desktop-environment
+sudo dnf install -y vim ghostty zsh gcc gcc-c++ util-linux-user pipx xdg-desktop-portal-gnome hyprland hyprpaper hyprland-qtutils gammastep sway dbus-devel pkgconf-pkg-config @cosmic-desktop-environment zathura
 
 curl -fsSL https://opencode.ai/install | bash
 
@@ -53,4 +53,3 @@ sudo timedatectl set-ntp true > /dev/null 2>&1
 curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sudo sh
 
 sudo chsh -s $(which zsh)
-

@@ -1,5 +1,3 @@
-/bin/clear
-
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 
 if [ ! -d "$ZINIT_HOME" ]; then
@@ -199,7 +197,12 @@ alias up='sudo dnf upgrade && flatpak update && brew upgrade'
 #Walker Aliases
 alias walker="walker --gapplication-service"
 
+#ZSH Aliases
+alias zsh="/home/linuxbrew/.linuxbrew/bin/zsh -l"
+
 # sources
 # source <(kubectl completion zsh)
 source ~/.config/antigen.zsh
 [ -s "/home/raul/.bun/_bun" ] && source "/home/raul/.bun/_bun"
+
+/bin/clear
