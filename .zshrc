@@ -41,7 +41,7 @@ setopt histignorealldups sharehistory
 
 eval "$(/home/linuxbrew/.linuxbrew/bin/oh-my-posh init zsh --config ~/.config/oh-my-posh/oh-my-pure.omp.toml)"
 eval "$(dircolors -b)"
-eval "$(zoxide init --cmd cd zsh)"
+eval "$(/home/linuxbrew/.linuxbrew/bin/zoxide init --cmd cd zsh)"
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 zinit light zsh-users/zsh-syntax-highlighting
@@ -67,6 +67,8 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
 GOPATH=$HOME/go  PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+export PKG_CONFIG_PATH=/usr/lib64/pkgconfig:$PKG_CONFIG_PATH
+export GTK_THEME=Adwaita:dark
 export PATH=$PATH:/home/raul/.spicetify
 export PATH=$HOME/.local/bin:$PATH
 export PATH="$PATH:$HOME/go/bin"
@@ -198,6 +200,6 @@ alias up='sudo dnf upgrade && flatpak update && brew upgrade'
 alias walker="walker --gapplication-service"
 
 # sources
-source <(kubectl completion zsh)
+# source <(kubectl completion zsh)
 source ~/.config/antigen.zsh
 [ -s "/home/raul/.bun/_bun" ] && source "/home/raul/.bun/_bun"

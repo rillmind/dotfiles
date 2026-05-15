@@ -15,8 +15,10 @@
     "custom/updates",
     "cpu",
     "memory",
-    "network",
     "pulseaudio",
+    "custom/bar",
+    "custom/bluetooth",
+    "network",
     "battery",
     "custom/powermenu"
   ],
@@ -93,6 +95,9 @@
     "restart-interval": 1,
     "tooltip": false
   },
+    "custom/bar": {
+      "format": "|"
+  },
   "pulseaudio": {
     "format": "{icon} {volume}%",
     "format-bluetooth": "{icon} {volume}% {format_source}",
@@ -120,7 +125,7 @@
     "exec": "~/.config/waybar/wifiName.sh"
   },
   "network": {
-    "format-wifi": " {}",
+    "format-wifi": " ", // {}
     "exec": "~/.config/waybar/wifiName.sh",
     "format-ethernet": " ",
     "format-disconnected": "󰕑",
@@ -137,13 +142,13 @@
       "critical": 15
     },
     "max-length": 20,
-    "format": "{icon}{capacity}%",
+    "format": "{icon}", // {capacity}%
     "format-warning": "{icon} {capacity}%",
     "format-critical": "{icon} {capacity}%",
     "format-charging": " {capacity}%",
     "format-plugged": " {capacity}%",
     "format-alt": "{icon} {time}",
-    "format-full": " {capacity}%",
+    "format-full": "", // {capacity}%
     "format-icons": [
       " ",
       " ",
@@ -163,8 +168,12 @@
     "max-length": 10
   },
   "custom/powermenu": {
-    "format": "",
+    "format": "  ",
     "on-click": "eww open --toggle powermenu",
     "tooltip": false
+  },
+  "custom/bluetooth": {
+    "format": "󰂯",
+    "on-click": "ghostty -e zsh -c bluetui"
   }
 }

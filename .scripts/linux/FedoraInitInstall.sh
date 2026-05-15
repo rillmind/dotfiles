@@ -14,31 +14,7 @@ sudo dnf copr enable scottames/ghostty
 
 sudo dnf copr enable sdegler/hyprland
 
-sudo rpm --import https://dl.google.com/linux/linux_signing_key.pub
-
-sudo tee /etc/yum.repos.d/google-chrome.repo <<EOF
-[google-chrome]
-name=google-chrome
-baseurl=http://dl.google.com/linux/chrome/rpm/stable/x86_64
-enabled=1
-gpgcheck=1
-gpgkey=https://dl.google.com/linux/linux_signing_key.pub
-EOF
-
-sudo dnf install -y vim \
-  ghostty \
-  google-chrome-canary \
-  zsh \
-  gcc \
-  gcc-c++ \
-  util-linux-user \
-  pipx \
-  xdg-desktop-portal-gnome \
-  hyprland \
-  hyprpaper \
-  hyprland-qtutils \
-  gammastep \
-  sway
+sudo dnf install -y vim ghostty zsh gcc gcc-c++ util-linux-user pipx xdg-desktop-portal-gnome hyprland hyprpaper hyprland-qtutils gammastep sway dbus-devel pkgconf-pkg-config @cosmic-desktop-environment
 
 curl -fsSL https://opencode.ai/install | bash
 
@@ -57,19 +33,7 @@ brew tap oven-sh/bun
 brew install gcc
 hash -r
 
-brew install bun \
-  rust \
-  neovim \
-  oh-my-posh \
-  eza \
-  bat \
-  zoxide \
-  yazi \
-  glow \
-  gum \
-  helix \
-  anomalyco/tap/opencode \
-  uv
+brew install bun rust neovim oh-my-posh eza bat zoxide yazi glow gum helix anomalyco/tap/opencode uv
 
 hash -r
 
