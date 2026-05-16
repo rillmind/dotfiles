@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Terminal=false
+Exec="/home/raul/AppImages/RPCS3.AppImage" 
+Name=RPCS3
+Categories=Application;Game
+Comment=RPCS3
+Icon=/home/raul/.cache/rpcs3/shortcut.png

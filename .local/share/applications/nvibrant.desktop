@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=nvibrant
+Exec=/home/raul/.local/bin/nvibrant -v 600
+Terminal=false
+Categories=Utility;GTK;

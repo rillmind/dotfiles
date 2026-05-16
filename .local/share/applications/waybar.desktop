@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=waybar
+Exec=waybar
+Terminal=false
+Categories=Utility;GTK;

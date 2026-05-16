@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=shutdown
+Exec=shutdown now
+Terminal=false
+Categories=Utility;GTK;

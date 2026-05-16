@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=btop
+Exec=ghostty -e /bin/zsh -c btop
+Terminal=false
+Categories=Utility;GTK;
