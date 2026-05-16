@@ -198,7 +198,7 @@ alias up='sudo dnf upgrade && flatpak update && brew upgrade'
 alias walker="walker --gapplication-service"
 
 #ZSH Aliases
-alias zsh="/home/linuxbrew/.linuxbrew/bin/zsh -l"
+alias zsh="zsh -l"
 
 # sources
 # source <(kubectl completion zsh)

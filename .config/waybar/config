@@ -175,6 +175,6 @@
   },
   "custom/bluetooth": {
     "format": "󰂯",
-    "on-click": "ghostty -e zsh -c bluetui"
+    "on-click": "ghostty -e /bin/zsh -c $(which bluetui)"
   }
 }
