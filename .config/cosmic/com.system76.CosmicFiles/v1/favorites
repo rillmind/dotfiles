@@ -6,4 +6,5 @@
     Path("/home/raul/Nextcloud/Música"),
     Path("/home/raul/Nextcloud/Vídeos"),
     Path("/home/raul/Nextcloud"),
+    Path("/"),
 ]

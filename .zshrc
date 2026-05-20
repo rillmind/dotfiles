@@ -91,7 +91,7 @@ export PATH=$HOME/.local/share/bob/nvim-bin:$HOME/.bun/bin:$HOME/.local/bin:$HOM
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # Comands
-nvibrant -v 700 >> ~/nohup.out
+nvibrant -v 600 >> ~/nohup.out
 
 # Aliases
 

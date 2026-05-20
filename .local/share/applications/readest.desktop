@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=btop
-Exec=ghostty -e /bin/zsh -c btop
+Name=Readest
+Exec=/home/raul/AppImages/Readest.AppImage
 Terminal=false
 Categories=Utility;GTK;

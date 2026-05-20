@@ -25,6 +25,7 @@ hyprland=(
   sway
   dbus-devel
   pkgconf-pkg-config
+  nwg-dock-hyprland
 )
 
 #Importação dos repositórios
@@ -43,6 +44,8 @@ EOF
 sudo dnf copr enable scottames/ghostty
 
 sudo dnf copr enable sdegler/hyprland
+
+sudo dnf copr enable tofik/nwg-shell
 
 # Instalação dos pacotes do DNF
 sudo dnf install -y "${environment[@]}" "${dev[@]}" "${hyprland[@]}"

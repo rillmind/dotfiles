@@ -16,8 +16,8 @@
     "cpu",
     "memory",
     "custom/bar",
-    "custom/bluetooth",
     "network",
+    "custom/bluetooth",
     "pulseaudio",
     "battery",
     "custom/powermenu"
@@ -105,7 +105,7 @@
     "format-bluetooth-muted": " {icon} {format_source}",
     "format-muted": "",
     "format-icons": {
-      "headphone": "",
+      "headphone": " ",
       "hands-free": "",
       "headset": "",
       "phone": "",
@@ -154,8 +154,7 @@
       " ",
       " ",
       " ",
-      " ",
-      ""
+      " "
     ]
   },
   "clock": {
@@ -175,6 +174,6 @@
   },
   "custom/bluetooth": {
     "format": "󰂯",
-    "on-click": "ghostty -e /bin/zsh -c $(which bluetui)"
+    "on-click": "gtk-launch btop"
   }
 }
