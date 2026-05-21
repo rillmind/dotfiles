@@ -108,13 +108,13 @@
       "headphone": " ",
       "hands-free": "",
       "headset": "",
-      "phone": "",
-      "portable": "",
-      "car": "",
+      "phone": " ",
+      "portable": " ",
+      "car": " ",
       "default": [
-        "",
-        "",
-        ""
+        " ",
+        " ",
+        " "
       ]
     },
     "on-click-right": "{icon} {volume}%",
@@ -128,7 +128,7 @@
     "format-wifi": " ", // {}
     "exec": "~/.config/waybar/wifiName.sh",
     "format-ethernet": " ",
-    "format-disconnected": "󰕑",
+    "format-disconnected": "󰕑 ",
     "interval": 5,
     "tooltip": true,
     "on-click": "sh ~/.config/wofi/wifimenu.sh"
