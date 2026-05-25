@@ -9,7 +9,7 @@
 * {
   font-family: "JetbrainsMono Nerd Font";
   font-weight: 700;
-  font-size: 17px;
+  font-size: 20px;
 }
 
 window#waybar {
@@ -19,7 +19,7 @@ window#waybar {
   transition-duration: 0.5s;
   border-radius: 0px;
   transition-duration: 0.5s;
-  margin: 1px 16px 0 16px;
+  margin: 0px 10px;
 }
 
 window#waybar.hidden {
@@ -43,8 +43,8 @@ window#waybar.hidden {
   color: @text;
   background: @surface0;
   border-radius: 5px;
-  padding: 1px 6px;
-  margin: 0px 10px 0 0;
+  padding: 1px 5px;
+  margin: 0px 5px;
   border: none;
 }
 
@@ -72,7 +72,7 @@ window#waybar.hidden {
 #custom-dunst,
 #custom-powermenu,
 #custom-bluetooth {
-  padding: 0px 5px;
+  padding: 0px 0px;
   margin: 0px 0px 0px 0px;
   border-radius: 5px;
   color: @base;
@@ -80,27 +80,27 @@ window#waybar.hidden {
 
 #window {
   background-color: rgba(30, 30, 46, 0);
-  padding: 0px 10px;
-  margin: 0px 5px 0 0px;
+  padding: 0px 2px;
+  margin: 0px 0px 0 0px;
   color: @text;
   font-size: 16;
 }
 
 #custom-launcher {
-  margin: 0 8px 0 9px;
+  margin: 0px -10px 0px 10px;
   color: @text;
-  font-size: 26px;
+  font-size: 28px;
 }
 
 #custom-bluetooth {
-  margin: 0;
+  margin: 0px -4px 0px 0px;
   padding: 0;
   color: @text;
-  font-size: 20px;
+  font-size: 22px;
 }
 
 #custom-updates {
-  margin: 0 10px 0 0;
+  margin: 0 0px 0 0;
   font-size: 18px;
   color: @text;
 }
@@ -123,7 +123,8 @@ window#waybar.hidden {
 }
 
 #pulseaudio {
-  padding: 0px 0px 0px 7px;
+  padding: 0px 0px 0px 0px;
+  margin: 0px 0px 0px -3px;
   color: @text;
 }
 
@@ -133,7 +134,8 @@ window#waybar.hidden {
 }
 
 #battery {
-  padding-left: 0;
+  padding: 0px;
+  margin: 0px;
   color: @text;
 }
 

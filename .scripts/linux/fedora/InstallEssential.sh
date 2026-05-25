@@ -2,6 +2,8 @@ environment=(
   @cosmic-desktop-environment
   zathura
   zathura-pdf-mupdf
+  gdu
+  duf
 )
 
 dev=(

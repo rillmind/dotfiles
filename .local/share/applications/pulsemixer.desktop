@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Pulsemixer
+Exec=ghostty -e /bin/zsh -c ~/.local/bin/pulsemixer
+Terminal=false
+Categories=Utility;GTK;

@@ -75,7 +75,7 @@ export EDITOR="$HOME/.local/bin/lvim"
 export PATH="$HOME/.bun/bin:$PATH"
 export PATH="$HOME/.asdf/shims:$PATH"
 export PATH="$HOME/../linuxbrew/.linuxbrew/bin/:$PATH"
-export BROWSER="distrobox-host-exec google-chrome-canary"
+export BROWSER=app.zen_browser.zen
 export PATH="$HOME/.local/bin:$PATH"
 export ANDROID_HOME=$HOME/Android/Sdk
 export PATH=$PATH:$ANDROID_HOME/emulator
@@ -196,6 +196,9 @@ alias walker="walker --gapplication-service"
 
 #ZSH Aliases
 alias zsh="zsh -l"
+
+#GDU Aliases
+alias gdu="gdu -c -H"
 
 # sources
 # source <(kubectl completion zsh)

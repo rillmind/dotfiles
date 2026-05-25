@@ -16,9 +16,9 @@
     "cpu",
     "memory",
     "custom/bar",
-    "network",
     "custom/bluetooth",
     "pulseaudio",
+    "network",
     "battery",
     "custom/powermenu"
   ],
@@ -42,7 +42,7 @@
     }
   },
   "custom/updates": {
-    "format": " {}",
+    "format": " {} ",
     "exec": "sh ~/.config/waybar/scripts/check-updates.sh",
     "interval": 1800,
     "on-click": "ghostty -e 'sudo dnf upgrade'",
@@ -53,15 +53,21 @@
     "max-length": 55,
     "separate-outputs": true
   },
+  "custom/window": {
+    "exec": "~/.config/waybar/scripts/app_icons.sh",
+    "format": "{}",
+    "max-length": 55,
+    "separate-outputs": true
+  },
   "custom/launcher": {
     "interval": "once",
-    "format": "",
+    "format": " ",
     "on-click": "wofi --show drun --columns 1 -I -s ~/.config/wofi/style.css",
     "tooltip": false
   },
   "cpu": {
     "interval": 10,
-    "format": " {usage}%",
+    "format": " {usage}% ",
     "max-length": 10
   },
   "temperature": {
@@ -100,10 +106,10 @@
   },
   "pulseaudio": {
     "format": "{icon}",
-    "format-alt": "{icon} {volume}%",
-    "format-bluetooth": "{icon} {volume}% {format_source}",
-    "format-bluetooth-muted": " {icon} {format_source}",
-    "format-muted": "",
+    "format-alt": "{icon}{volume}%",
+    "format-bluetooth": "{icon} {volume}% {format_source} ",
+    "format-bluetooth-muted": " {icon} {format_source} ",
+    "format-muted": " ",
     "format-icons": {
       "headphone": " ",
       "hands-free": "",
@@ -117,18 +123,17 @@
         " "
       ]
     },
-    "on-click-right": "{icon} {volume}%",
-    "on-click": "ghostty -e /bin/zsh -c pulsemixer"
+    "on-click-right": "ghostty -e /bin/zsh -c pulsemixer"
   },
   "custom/ssid-display": {
-    "format": "  {}%",
+    "format": "󰤨  {}%",
     "exec": "~/.config/waybar/wifiName.sh"
   },
   "network": {
-    "format-wifi": " ", // {}
+    "format-wifi": "󰤨 ", // {}
     "exec": "~/.config/waybar/wifiName.sh",
-    "format-ethernet": " ",
-    "format-disconnected": "󰕑 ",
+    "format-ethernet": " ",
+    "format-disconnected": "󰤭 ",
     "interval": 5,
     "tooltip": true,
     "on-click": "sh ~/.config/wofi/wifimenu.sh"
@@ -143,12 +148,12 @@
     },
     "max-length": 20,
     "format": "{icon}", // {capacity}%
-    "format-warning": "{icon} {capacity}%",
-    "format-critical": "{icon} {capacity}%",
-    "format-charging": " {capacity}%",
-    "format-plugged": " {capacity}%",
-    "format-alt": "{icon} {time}",
-    "format-full": "", // {capacity}%
+    "format-warning": "{icon} {capacity}% ",
+    "format-critical": "{icon} {capacity}% ",
+    "format-charging": " {capacity}% ",
+    "format-plugged": " {capacity}% ",
+    "format-alt": "{icon} {time} ",
+    "format-full": " ", // {capacity}%
     "format-icons": [
       " ",
       " ",
@@ -163,7 +168,7 @@
   },
   "memory": {
     "interval": 30,
-    "format": " {}%",
+    "format": " {}% ",
     "format-alt": " {used:0.1f}G",
     "max-length": 10
   },
@@ -173,7 +178,7 @@
     "tooltip": false
   },
   "custom/bluetooth": {
-    "format": "󰂯",
+    "format": "󰂯 ",
     "on-click": "gtk-launch btop"
   }
 }

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=bluetui
+Exec=ghostty -e /bin/zsh -c ~/.cargo/bin/bluetui
+Terminal=false
+Categories=Utility;GTK;
