@@ -102,7 +102,7 @@
     "tooltip": false
   },
     "custom/bar": {
-      "format": "|"
+      "format": "| "
   },
   "pulseaudio": {
     "format": "{icon}",
@@ -125,10 +125,6 @@
     },
     "on-click-right": "ghostty -e /bin/zsh -c pulsemixer"
   },
-  "custom/ssid-display": {
-    "format": "󰤨  {}%",
-    "exec": "~/.config/waybar/wifiName.sh"
-  },
   "network": {
     "format-wifi": "󰤨 ", // {}
     "exec": "~/.config/waybar/wifiName.sh",
@@ -148,11 +144,11 @@
     },
     "max-length": 20,
     "format": "{icon}", // {capacity}%
-    "format-warning": "{icon} {capacity}% ",
-    "format-critical": "{icon} {capacity}% ",
-    "format-charging": " {capacity}% ",
-    "format-plugged": " {capacity}% ",
-    "format-alt": "{icon} {time} ",
+    "format-warning": "{icon} {capacity}%",
+    "format-critical": "{icon} {capacity}%",
+    "format-charging": " {capacity}%",
+    "format-plugged": " {capacity}%",
+    "format-alt": "{icon} {time}",
     "format-full": " ", // {capacity}%
     "format-icons": [
       " ",
@@ -164,7 +160,7 @@
   },
   "clock": {
     "format": "Dia {:%d | %H:%M}",
-    "on-click": "eww open calendar"
+    "on-click": "ags"
   },
   "memory": {
     "interval": 30,

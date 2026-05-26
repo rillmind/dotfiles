@@ -1,11 +1,5 @@
 @import "./colors/mocha.css";
 
-/* margin: top right bottom left */
-/* Spacing outside the element */
-
-/* padding: top right bottom left */
-/* Spacing inside the element */
-
 * {
   font-family: "JetbrainsMono Nerd Font";
   font-weight: 700;
@@ -87,7 +81,7 @@ window#waybar.hidden {
 }
 
 #custom-launcher {
-  margin: 0px -10px 0px 10px;
+  margin: 0px -15px 0px 10px;
   color: @text;
   font-size: 28px;
 }
@@ -124,7 +118,7 @@ window#waybar.hidden {
 
 #pulseaudio {
   padding: 0px 0px 0px 0px;
-  margin: 0px 0px 0px -3px;
+  margin: 0px 0px 0px -2px;
   color: @text;
 }
 
@@ -149,18 +143,8 @@ window#waybar.hidden {
 
 #custom-powermenu {
   padding: 0px;
-  /*background-color: rgba(88, 91, 112, 0.5); */
-  color: @text; /* Catppuccin Latte maroon */
+  color: @text;
 }
-
-/*
-#custom-powermenu:hover {
-  padding: 0px 25px 0px 20px;
-  margin: 5px 15px 5px 5px;
-  background-color: rgba(88, 91, 112, 0);
-  color: #e64553; Catppuccin Latte maroon
-}
-*/
 
 @keyframes blink {
   to {

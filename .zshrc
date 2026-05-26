@@ -198,7 +198,7 @@ alias walker="walker --gapplication-service"
 alias zsh="zsh -l"
 
 #GDU Aliases
-alias gdu="gdu -c -H"
+alias gdu="gdu -c -H=false"
 
 # sources
 # source <(kubectl completion zsh)
