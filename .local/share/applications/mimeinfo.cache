@@ -1,4 +1,5 @@
 [MIME Cache]
+application/x-me3=me3-launch.desktop;
 application/x-zerosize=dev.zed.Zed.desktop;
 text/plain=dev.zed.Zed.desktop;
 x-scheme-handler/discord-424004941485572097=discord-424004941485572097.desktop;

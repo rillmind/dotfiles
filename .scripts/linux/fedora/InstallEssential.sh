@@ -2,8 +2,8 @@ environment=(
   @cosmic-desktop-environment
   zathura
   zathura-pdf-mupdf
-  gdu
-  duf
+  gdu # TUI para analizar armazenamento
+  duf # grafico de discos
 )
 
 dev=(
@@ -56,3 +56,5 @@ sudo dnf install -y "${environment[@]}" "${dev[@]}" "${hyprland[@]}"
 curl -f https://zed.dev/install.sh | sh
 
 curl -fsSL https://opencode.ai/install | bash
+
+bash -c "$(curl -sLo- https://superfile.dev/install.sh)"

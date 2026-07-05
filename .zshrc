@@ -155,8 +155,8 @@ alias lvim='~/.local/bin/lvim'
 alias cls='/usr/bin/clear'
 alias c='/usr/bin/clear'
 
-#cat Aliases
-alias cat='bat --paging=always --color=always'
+#bat Aliases
+alias bat='bat --paging=always --color=always'
 
 #fzf Aliases
 alias fzf='fzf --preview="bat --color=always {}'
@@ -198,7 +198,7 @@ alias walker="walker --gapplication-service"
 alias zsh="zsh -l"
 
 #GDU Aliases
-alias gdu="gdu -c -H=false"
+alias gdu="sudo gdu -c -H=false"
 
 # sources
 # source <(kubectl completion zsh)
@@ -206,3 +206,6 @@ source ~/.config/antigen.zsh
 [ -s "/home/raul/.bun/_bun" ] && source "/home/raul/.bun/_bun"
 
 /bin/clear
+
+# opencode
+export PATH=/home/raul/.opencode/bin:$PATH

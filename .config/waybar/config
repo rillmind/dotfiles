@@ -102,7 +102,7 @@
     "tooltip": false
   },
     "custom/bar": {
-      "format": "| "
+      "format": "|"
   },
   "pulseaudio": {
     "format": "{icon}",
@@ -164,7 +164,7 @@
   },
   "memory": {
     "interval": 30,
-    "format": " {}% ",
+    "format": " {}%",
     "format-alt": " {used:0.1f}G",
     "max-length": 10
   },
