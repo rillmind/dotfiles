@@ -4,7 +4,7 @@ show_hidden = true
 sort_dir_first = true
 
 [[opener.edit]]
-run = 'nvim "$@"'
+run = 'hx "$@"'
 block = true
 desc = "Edit"
 for = "unix"

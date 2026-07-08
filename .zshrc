@@ -200,6 +200,9 @@ alias zsh="zsh -l"
 #GDU Aliases
 alias gdu="sudo gdu -c -H=false"
 
+#UV pip install Aliases
+alias uvpip="uv pip install --system --break-system-packages"
+
 # sources
 # source <(kubectl completion zsh)
 source ~/.config/antigen.zsh

@@ -4,6 +4,7 @@ environment=(
   zathura-pdf-mupdf
   gdu # TUI para analizar armazenamento
   duf # grafico de discos
+  udiskie
 )
 
 dev=(
