@@ -1,5 +1,6 @@
 [mgr]
-ratio = [1, 2, 2]
+layout = "vertical"
+ratio = [0, 1, 2]
 show_hidden = true
 sort_dir_first = true
 

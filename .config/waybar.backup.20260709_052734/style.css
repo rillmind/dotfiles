@@ -81,13 +81,9 @@ window#waybar.hidden {
 }
 
 #custom-launcher {
-  margin: 0px -6px 0px 15px;
+  margin: 0px -15px 0px 10px;
   color: @text;
-  font-size: 20px;
-}
-
-#custom-launcher label {
-  font-size: 24px;
+  font-size: 28px;
 }
 
 #custom-bluetooth {
@@ -99,7 +95,7 @@ window#waybar.hidden {
 
 #custom-updates {
   margin: 0 0px 0 0;
-  font-size: 16px;
+  font-size: 18px;
   color: @text;
 }
 

@@ -3,6 +3,8 @@ theme = "catppuccin_mocha"
 [editor]
 true-color = true
 clipboard-provider = "wayland"
+default-yank-register = "+"
+bufferline = "always"
 
 [editor.file-picker]
 hidden = false
@@ -45,6 +47,7 @@ hidden = false
 "C-S-tab" = "goto_previous_buffer"
 
 [keys.select]
+"C-c" = "yank_main_selection_to_clipboard"
 "s" = "change_selection"
 "0" = "goto_line_start"
 "$" = "goto_line_end"

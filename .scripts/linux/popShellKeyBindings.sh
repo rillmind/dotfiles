@@ -75,10 +75,10 @@ declare -A SETTINGS=(
   [tile-resize-right]="['<Shift>Right', '<Shift>KP_Right', '<Shift>l']"
   [tile-resize-up]="['<Shift>Up', '<Shift>KP_Up', '<Shift>k']"
   [tile-swap-down]="['<Primary>Down', '<Primary>KP_Down', '<Alt><Shift>j']"
-  [tile-swap-left]="['<Primary>Left', '<Primary>KP_Left', '<Alt><Shift>h']"
-  [tile-swap-right]="['<Primary>Right', '<Primary>KP_Right', '<Alt><Shift>l']"
+  [tile-swap-left]="['<Primary>Left', '<Primary>KP_Left']"
+  [tile-swap-right]="['<Primary>Right', '<Primary>KP_Right']"
   [tile-swap-up]="['<Primary>Up', '<Primary>KP_Up', '<Alt><Shift>k']"
-  [toggle-floating]="['<Alt>f']"
+  [toggle-floating]="['<Alt>g']"
   [toggle-stacking]="['s']"
 )
 # ---------------------------------------------------------------------------

@@ -24,12 +24,14 @@ auto-format = true
 
 [[language]]
 name = "go"
+indent = { tab-width = 2 , unit = " " }
 language-servers = ["gopls"]
 formatter = { command = "goimports" }
 auto-format = true
 
 [[language]]
 name = "rust"
+indent = { tab-width = 2 , unit = " " }
 language-servers = ["rust-analyzer"]
 formatter = { command = "rustfmt", args = ["--edition", "2021"] }
 auto-format = true
@@ -51,4 +53,3 @@ name = "toml"
 language-servers = ["taplo"]
 formatter = { command = "taplo", args = ["fmt", "-"] }
 auto-format = true
-
