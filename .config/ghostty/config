@@ -22,9 +22,7 @@ cursor-style-blink = true
 
 adjust-cell-width = 0
 
-window-padding-x = 1
-
-window-padding-y = 1
+window-padding-x = 5
 
 window-padding-balance = true
 
