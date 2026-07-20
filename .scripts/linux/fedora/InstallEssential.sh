@@ -56,6 +56,12 @@ sudo dnf install -y "${environment[@]}" "${dev[@]}" "${hyprland[@]}"
 #Instalção dos pacotes via script de instalação externos
 curl -f https://zed.dev/install.sh | sh
 
+curl -fsSL https://bun.com/install | bash
+
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+uv tool install nvibrant pulsemixer
+
 curl -fsSL https://opencode.ai/install | bash
 
 bash -c "$(curl -sLo- https://superfile.dev/install.sh)"

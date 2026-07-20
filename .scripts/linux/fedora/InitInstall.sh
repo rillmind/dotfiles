@@ -20,10 +20,6 @@ bash $HOME/.scripts/linux/BrewInstall.sh
 
 echo "Homebrew instalado!!!"
 
-uv tool install nvibrant pulsemixer
-
-cargo install bluetui
-
 hash -r
 
 echo "Instalando pacotes essenciais do flatpak"
@@ -45,3 +41,5 @@ sudo journalctl --vacuum-time=7d
 curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sudo sh
 
 sudo chsh -s $(which zsh)
+
+bash ../RustInstall.sh

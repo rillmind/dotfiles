@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Bruno (3.5.2)
+Comment=Opensource API Client for Exploring and Testing APIs
+Icon=/home/raul/AppImages/.icons/bruno
+TryExec=/home/raul/AppImages/bruno.appimage
+Exec=env DESKTOPINTEGRATION=1 /home/raul/AppImages/bruno.appimage --no-sandbox %U
+Terminal=false
+MimeType=x-scheme-handler/bruno;
+Categories=Development;
+StartupWMClass=Bruno
+X-AppImage-Version=3.5.2
+X-AppImage-Name=Bruno

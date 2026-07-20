@@ -1,7 +1,12 @@
 [Desktop Entry]
-Version=1.0
 Type=Application
-Name=Readest
-Exec=/home/raul/AppImages/Readest.AppImage
+Name=Readest (5d8a09)
+Comment=Your online library
+Icon=/home/raul/AppImages/.icons/readest.png
+TryExec=/home/raul/AppImages/readest.appimage
+Exec=env DESKTOPINTEGRATION=1 /home/raul/AppImages/readest.appimage
 Terminal=false
-Categories=Utility;GTK;
+MimeType=application/epub+zip;application/x-mobipocket-ebook;application/vnd.amazon.ebook;application/vnd.amazon.mobi8-ebook;application/x-fictionbook+xml;application/vnd.comicbook+zip;application/pdf;x-scheme-handler/readest;
+Categories=Office;
+StartupWMClass=readest
+X-AppImage-Name=Readest

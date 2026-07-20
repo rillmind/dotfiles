@@ -4,4 +4,4 @@ Name=Readest
 Terminal=false
 NoDisplay=true
 MimeType=x-scheme-handler/readest
-Exec="/home/raul/AppImages/Readest.AppImage" %u
+Exec="/home/raul/AppImages/readest.appimage" %u

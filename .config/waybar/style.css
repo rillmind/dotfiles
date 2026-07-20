@@ -122,7 +122,7 @@ window#waybar.hidden {
 
 #pulseaudio {
   padding: 0px 0px 0px 0px;
-  margin: 0px 0px 0px -2px;
+  margin: 0px 0.5px 0px 0px;
   color: @text;
 }
 
@@ -146,7 +146,8 @@ window#waybar.hidden {
 }
 
 #custom-powermenu {
-  padding: 0px;
+  padding: 0px 0px 0px 1px;
+  margin: 0px 0px 0px 5px;
   color: @text;
 }
 

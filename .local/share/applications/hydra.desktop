@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Hydra
+Comment=Hydra
+Icon=/home/raul/AppImages/.icons/hydra
+TryExec=/home/raul/AppImages/hydra.appimage
+Exec=env DESKTOPINTEGRATION=1 /home/raul/AppImages/hydra.appimage --no-sandbox %U
+Terminal=false
+MimeType=x-scheme-handler/hydralauncher;
+Categories=Game;
+StartupWMClass=Hydra
+X-AppImage-Version=4.0.6
+X-AppImage-Name=Hydra

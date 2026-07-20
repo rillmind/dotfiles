@@ -1,7 +1,15 @@
 [MIME Cache]
+application/epub+zip=readest.desktop;
+application/pdf=readest.desktop;
+application/vnd.amazon.ebook=readest.desktop;
+application/vnd.amazon.mobi8-ebook=readest.desktop;
+application/vnd.comicbook+zip=readest.desktop;
+application/x-fictionbook+xml=readest.desktop;
 application/x-me3=me3-launch.desktop;
+application/x-mobipocket-ebook=readest.desktop;
 application/x-zerosize=dev.zed.Zed.desktop;
 text/plain=dev.zed.Zed.desktop;
+x-scheme-handler/bruno=bruno.desktop;
 x-scheme-handler/discord-424004941485572097=discord-424004941485572097.desktop;
-x-scheme-handler/readest=readest-handler.desktop;
+x-scheme-handler/readest=readest-handler.desktop;readest.desktop;
 x-scheme-handler/zed=dev.zed.Zed.desktop;

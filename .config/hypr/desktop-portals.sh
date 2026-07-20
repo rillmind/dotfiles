@@ -1,10 +1,10 @@
-#!/bin/sh
-echo "amogus" > ~/.config/hypr/portals-log
+#!/bin/bash
+killall xdg-desktop-portal-hyprland xdg-desktop-portal xdg-desktop-portal-gtk 2>/dev/null
 sleep 1
-killall xdg-desktop-portal-hyprland
-killall xdg-desktop-portal-wlr
-killall xdg-desktop-portal
-/usr/lib/xdg-desktop-portal-hyprland &
-sleep 2
-/usr/lib/xdg-desktop-portal &
+
+/usr/libexec/xdg-desktop-portal-hyprland &
+sleep 1
+/usr/libexec/xdg-desktop-portal &
+sleep 1
+/usr/libexec/xdg-desktop-portal-gtk &
 
