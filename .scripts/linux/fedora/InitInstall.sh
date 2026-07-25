@@ -16,7 +16,7 @@ echo "Pacotes essenciais instalados!!!"
 
 echo "Instalando Homebrew!!!"
 
-bash $HOME/.scripts/linux/BrewInstall.sh
+bash $HOME/.scripts/linux/install/Homebrew.sh
 
 echo "Homebrew instalado!!!"
 
@@ -24,7 +24,7 @@ hash -r
 
 echo "Instalando pacotes essenciais do flatpak"
 
-bash $HOME/.scripts/linux/FlatpakEssential.sh
+bash $HOME/.scripts/linux/install/FlatpakEssential.sh
 
 echo "Pacotes flatpak instalados!!!"
 
@@ -42,4 +42,4 @@ curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sudo
 
 sudo chsh -s $(which zsh)
 
-bash ../RustInstall.sh
+bash $HOME/.scripts/linux/install/Rust.sh

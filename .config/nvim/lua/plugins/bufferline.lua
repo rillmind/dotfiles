@@ -89,11 +89,13 @@ return {
 		-- Keymaps
 		vim.keymap.set("n", "<Tab>", "<cmd>BufferLineCycleNext<cr>", { desc = "Próximo buffer" })
 		vim.keymap.set("n", "<S-Tab>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Buffer anterior" })
+		vim.keymap.set("n", "<leader>h", "<cmd>BufferLineCyclePrev<cr>", { desc = "Buffer anterior" })
+		vim.keymap.set("n", "<leader>l", "<cmd>BufferLineCycleNext<cr>", { desc = "Próximo buffer" })
 		vim.keymap.set("n", "<leader>b", ":BufferLine<cr>", {})
 		vim.keymap.set("n", "<leader>bc", "<cmd>BufferLinePickClose<cr>", { desc = "Fechar buffer selecionado" })
 		vim.keymap.set("n", "<leader>bb", "<cmd>BufferLinePick<cr>", { desc = "Selecionar buffer" })
+		vim.keymap.set("n", "<leader>bh", "<cmd>BufferLineCloseLeft<cr>", { desc = "Fechar abas a esquerda" })
 		vim.keymap.set("n", "<leader>bl", "<cmd>BufferLineCloseRight<cr>", { desc = "Fechar abas a direita" })
-		vim.keymap.set("n", "<leader>bh", "<cmd>BufferLineCloseLeft<cr>", { desc = "Fechar abas a direita" })
-		vim.keymap.set("n", "<leader>bo", "<cmd>BufferLineCloseOthers<cr>", { desc = "Fechar abas a direita" })
+		vim.keymap.set("n", "<leader>bo", "<cmd>BufferLineCloseOthers<cr>", { desc = "Fechar as outras abas" })
 	end,
 }

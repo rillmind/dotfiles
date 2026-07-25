@@ -37,7 +37,7 @@ setopt histignorealldups sharehistory
 
 # Use modern completion system
 
-eval "$(/home/linuxbrew/.linuxbrew/bin/oh-my-posh init zsh --config ~/.config/oh-my-posh/oh-my-pure.omp.toml)"
+eval "$($HOME/.local/bin/oh-my-posh init zsh --config ~/.config/oh-my-posh/oh-my-pure.omp.toml)"
 eval "$(dircolors -b)"
 eval "$(/home/linuxbrew/.linuxbrew/bin/zoxide init --cmd cd zsh)"
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
@@ -208,7 +208,8 @@ alias uvpip="uv pip install --system --break-system-packages"
 source ~/.config/antigen.zsh
 [ -s "/home/raul/.bun/_bun" ] && source "/home/raul/.bun/_bun"
 
-/bin/clear
+#/bin/clear
 
 # opencode
 export PATH=/home/raul/.opencode/bin:$PATH
+eval "$(starship init zsh)"

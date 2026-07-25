@@ -1,7 +1,8 @@
+#!/bin/bash
+
 essential=(
   com.github.tchx84.Flatseal
   app.zen_browser.zen
-  com.google.Chrome
   com.mattjakeman.ExtensionManager
   com.nextcloud.desktopclient.nextcloud
   com.spotify.Client

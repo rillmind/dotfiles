@@ -18,6 +18,7 @@
     "network",
     "pulseaudio",
     "battery",
+    "custom/bar",
     "custom/powermenu"
   ],
   "hyprland/workspaces": {
@@ -99,8 +100,8 @@
     "restart-interval": 1,
     "tooltip": false
   },
-    "custom/bar": {
-      "format": "|"
+  "custom/bar": {
+    "format": "|"
   },
   "pulseaudio": {
     "format": "{icon}",
@@ -130,7 +131,7 @@
     "format-disconnected": "󰤭 ",
     "interval": 5,
     "tooltip": true,
-    "on-click": "sh ~/.config/wofi/wifimenu.sh"
+    "on-click": "~/.config/waybar/wifiName.sh"
   },
   "battery": {
     "bat": "BAT0",

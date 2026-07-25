@@ -1,15 +1,15 @@
 return {
   "nvim-treesitter/nvim-treesitter",
+  branch = "master",
   build = ":TSUpdate",
-  event = { "BufReadPost", "BufNewFile" },
+  lazy = false,
   dependencies = {
     "nvim-treesitter/nvim-treesitter-textobjects",
   },
   config = function()
-    ---@diagnostic disable-next-line: missing-fields
     require("nvim-treesitter").setup({
-      auto_install = false,
-      highlight = { enable = true },
+      auto_install = true,
+      ensure_installed = { "go" },
       indent = { enable = true },
       incremental_selection = {
         enable = true,
@@ -52,6 +52,13 @@ return {
           },
         },
       },
+    })
+
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "*",
+      callback = function()
+        pcall(vim.treesitter.start, 0)
+      end,
     })
   end,
 }

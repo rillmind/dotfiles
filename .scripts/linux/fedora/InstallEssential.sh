@@ -65,3 +65,5 @@ uv tool install nvibrant pulsemixer
 curl -fsSL https://opencode.ai/install | bash
 
 bash -c "$(curl -sLo- https://superfile.dev/install.sh)"
+
+curl -s https://ohmyposh.dev/install.sh | bash -s
