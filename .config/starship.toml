@@ -27,18 +27,18 @@ show_always = true
 
 [directory]
 style = "fg:#89dceb"
-format = "[ $path]($style)"
+format = "[ $path ]($style)"
 truncation_length = 0
 truncate_to_repo = false
 
 [git_branch]
 style = "fg:#b4befe"
-format = "[ $symbol$branch]($style)"
+format = "[$symbol$branch ]($style)"
 symbol = ""
 
 [git_status]
 style = "fg:#eba0ac"
-format = '([ 󱖫 {$all_status$ahead_behind}]($style))'
+format = '([󱖫 {$all_status$ahead_behind} ]($style))'
 conflicted = "="
 ahead = "⇡${count}"
 behind = "⇣${count}"
@@ -48,7 +48,7 @@ modified = "!${count}"
 
 [cmd_duration]
 style = "fg:#a6adc8"
-format = "[ $duration ]($style)"
+format = "[$duration ]($style)"
 min_time = 0
 
 [golang]
