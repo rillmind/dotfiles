@@ -9,9 +9,6 @@ source "${ZINIT_HOME}/zinit.zsh"
 
 # Set up the prompt
 
-autoload -Uz promptinit
-promptinit
-prompt adam1
 autoload -Uz compinit
 compinit
 
@@ -37,10 +34,26 @@ setopt histignorealldups sharehistory
 
 # Use modern completion system
 
-eval "$($HOME/.local/bin/oh-my-posh init zsh --config ~/.config/oh-my-posh/oh-my-pure.omp.toml)"
+#eval "$($HOME/.local/bin/oh-my-posh init zsh --config ~/.config/oh-my-posh/oh-my-pure.omp.toml)"
 eval "$(dircolors -b)"
 eval "$(/home/linuxbrew/.linuxbrew/bin/zoxide init --cmd cd zsh)"
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+eval "$(starship init zsh)"
+
+_capturar_ultimo_comando() {
+  ULTIMO_CMD="$1"
+}
+add-zsh-hook preexec _capturar_ultimo_comando
+
+_newline_apos_comando() {
+  if [[ -n "$STARSHIP_DURATION" ]]; then
+    case "$ULTIMO_CMD" in
+      clear|cls|c|/usr/bin/clear) ;;  # não faz nada nesses casos
+      *) print ;;
+    esac
+  fi
+}
+add-zsh-hook precmd _newline_apos_comando
 
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
@@ -212,4 +225,3 @@ source ~/.config/antigen.zsh
 
 # opencode
 export PATH=/home/raul/.opencode/bin:$PATH
-eval "$(starship init zsh)"
