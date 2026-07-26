@@ -27,7 +27,7 @@ show_always = true
 
 [directory]
 style = "fg:#89dceb"
-format = "[ $path ]($style)"
+format = "[ $path]($style)"
 truncation_length = 0
 truncate_to_repo = false
 
