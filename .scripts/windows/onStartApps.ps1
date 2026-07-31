@@ -15,6 +15,8 @@
 # Inicia o GlazeWM solicitando elevação de administrador (UAC)
 # O -Verb RunAs é o equivalente a "Executar como administrador"
 
+Start-Process syncthing -ArgumentList "--no-browser" -WindowStyle Hidden
 komorebic start --whkd
 Start-Process -FilePath "C:\Users\raios\AppData\Local\FlowLauncher\Flow.Launcher.exe"
+Start-Process -FilePath "C:\Program Files\Alienware\Alienware Command Center\AWCC\AWCC.exe"
 yasb
