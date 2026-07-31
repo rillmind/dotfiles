@@ -18,7 +18,7 @@ window#waybar {
   transition-duration: 0.5s;
   border-radius: 0px;
   transition-duration: .5s;
-  margin: 16px 16px;
+  margin: 15px 16px;
 }
 
 window#waybar.hidden {
@@ -30,7 +30,7 @@ window#waybar.hidden {
   background: @background3;
   border-radius: 8px;
   padding: 0px 10px 0px 10px;
-  margin: 7px 5px 10px 5px;
+  margin: 6px 5px 9px 5px;
   border: 1px solid @subtext1;
 }
 
@@ -56,7 +56,7 @@ window#waybar.hidden {
 #custom-dunst,
 #custom-powermenu{
   padding: 0px 20px;
-  margin: 7px 0px 10px 0px;
+  margin: 6px 0px 9px 0px;
 	border-radius: 8px;
   color: @crust;
 }
@@ -65,7 +65,7 @@ window#waybar.hidden {
 
 #custom-launcher {
   padding: 0px 25px 0px 20px;
-  margin: 7px 0px 10px 20px;
+  margin: 6px 0px 9px 20px;
   background-color: @mauve;
 }
 
@@ -106,7 +106,7 @@ window#waybar.hidden {
 
 #custom-powermenu {
   padding: 0px 25px 0px 20px;
-  margin: 7px 20px 10px 0px;
+  margin: 6px 20px 9px 0px;
   background-color: @maroon;
 }
 

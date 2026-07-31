@@ -9,9 +9,6 @@ source "${ZINIT_HOME}/zinit.zsh"
 
 # Set up the prompt
 
-autoload -Uz promptinit
-promptinit
-prompt adam1
 autoload -Uz compinit
 compinit
 
@@ -37,10 +34,26 @@ setopt histignorealldups sharehistory
 
 # Use modern completion system
 
-eval "$(/home/linuxbrew/.linuxbrew/bin/oh-my-posh init zsh --config ~/.config/oh-my-posh/oh-my-pure.omp.toml)"
+#eval "$($HOME/.local/bin/oh-my-posh init zsh --config ~/.config/oh-my-posh/oh-my-pure.omp.toml)"
 eval "$(dircolors -b)"
 eval "$(/home/linuxbrew/.linuxbrew/bin/zoxide init --cmd cd zsh)"
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+eval "$(starship init zsh)"
+
+_capturar_ultimo_comando() {
+  ULTIMO_CMD="$1"
+}
+add-zsh-hook preexec _capturar_ultimo_comando
+
+_newline_apos_comando() {
+  if [[ -n "$STARSHIP_DURATION" ]]; then
+    case "$ULTIMO_CMD" in
+      clear|cls|c|/usr/bin/clear) ;;  # não faz nada nesses casos
+      *) print ;;
+    esac
+  fi
+}
+add-zsh-hook precmd _newline_apos_comando
 
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
@@ -155,8 +168,8 @@ alias lvim='~/.local/bin/lvim'
 alias cls='/usr/bin/clear'
 alias c='/usr/bin/clear'
 
-#cat Aliases
-alias cat='bat --paging=always --color=always'
+#bat Aliases
+alias bat='bat --paging=always --color=always'
 
 #fzf Aliases
 alias fzf='fzf --preview="bat --color=always {}'
@@ -198,11 +211,17 @@ alias walker="walker --gapplication-service"
 alias zsh="zsh -l"
 
 #GDU Aliases
-alias gdu="gdu -c -H=false"
+alias gdu="sudo gdu -c -H=false"
+
+#UV pip install Aliases
+alias uvpip="uv pip install --system --break-system-packages"
 
 # sources
 # source <(kubectl completion zsh)
 source ~/.config/antigen.zsh
 [ -s "/home/raul/.bun/_bun" ] && source "/home/raul/.bun/_bun"
 
-/bin/clear
+#/bin/clear
+
+# opencode
+export PATH=/home/raul/.opencode/bin:$PATH

@@ -2,6 +2,9 @@ theme = "catppuccin_mocha"
 
 [editor]
 true-color = true
+clipboard-provider = "wayland"
+default-yank-register = "+"
+bufferline = "always"
 
 [editor.file-picker]
 hidden = false
@@ -11,7 +14,7 @@ hidden = false
 "C-s" = [":wa", ":format"]
 "A-e" = [
   ':sh rm -f /tmp/unique-file',
-  ':insert-output yazi "%{buffer_name}" --chooser-file=/tmp/unique-file',
+  ':insert-output yazi --chooser-file /tmp/unique-file "%{buffer_name}"',
   ':sh printf "\x1b[?1049h\x1b[?2004h" > /dev/tty',
   ':open %sh{cat /tmp/unique-file}',
   ':redraw',
@@ -33,7 +36,7 @@ hidden = false
 [keys.normal.space]
 "w" = [":wa", ":format"]
 "a" = ":wa"
-"q" = ":q!"
+"q" = ":q"
 "l" = "goto_next_buffer"
 "h" = "goto_previous_buffer"
 
@@ -44,6 +47,7 @@ hidden = false
 "C-S-tab" = "goto_previous_buffer"
 
 [keys.select]
+"C-c" = "yank_main_selection_to_clipboard"
 "s" = "change_selection"
 "0" = "goto_line_start"
 "$" = "goto_line_end"

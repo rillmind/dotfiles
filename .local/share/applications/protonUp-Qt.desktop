@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=ProtonUp-Qt
+Comment=Play this game on Steam
+Exec=~/AppImages/ProtonUp-Qt/AppRun
+Icon=steam_icon_570
+Terminal=false
+Type=Application
+Categories=Game;
+

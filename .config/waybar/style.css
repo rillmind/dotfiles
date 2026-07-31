@@ -3,11 +3,11 @@
 * {
   font-family: "JetbrainsMono Nerd Font";
   font-weight: 700;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 window#waybar {
-  background-color: rgba(30, 30, 46, 0.8);
+  background-color: rgba(30, 30, 46, 0.7);
   color: @text;
   transition-property: background-color;
   transition-duration: 0.5s;
@@ -81,9 +81,13 @@ window#waybar.hidden {
 }
 
 #custom-launcher {
-  margin: 0px -15px 0px 10px;
+  margin: 0px -6px 0px 15px;
   color: @text;
-  font-size: 28px;
+  font-size: 20px;
+}
+
+#custom-launcher label {
+  font-size: 24px;
 }
 
 #custom-bluetooth {
@@ -95,7 +99,7 @@ window#waybar.hidden {
 
 #custom-updates {
   margin: 0 0px 0 0;
-  font-size: 18px;
+  font-size: 16px;
   color: @text;
 }
 
@@ -118,7 +122,7 @@ window#waybar.hidden {
 
 #pulseaudio {
   padding: 0px 0px 0px 0px;
-  margin: 0px 0px 0px -2px;
+  margin: 0px 0.5px 0px 0px;
   color: @text;
 }
 
@@ -142,7 +146,8 @@ window#waybar.hidden {
 }
 
 #custom-powermenu {
-  padding: 0px;
+  padding: 0px 0px 0px 1px;
+  margin: 0px 0px 0px 5px;
   color: @text;
 }
 

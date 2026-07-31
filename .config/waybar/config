@@ -1,5 +1,5 @@
 {
-  "height": 20,
+  "height": 15,
   "layer": "top",
   "position": "top",
   "spacing": 7,
@@ -12,14 +12,13 @@
     "clock"
   ],
   "modules-right": [
-    "custom/updates",
     "cpu",
     "memory",
     "custom/bar",
-    "custom/bluetooth",
-    "pulseaudio",
     "network",
+    "pulseaudio",
     "battery",
+    "custom/bar",
     "custom/powermenu"
   ],
   "hyprland/workspaces": {
@@ -66,7 +65,7 @@
     "tooltip": false
   },
   "cpu": {
-    "interval": 10,
+    "interval": 1,
     "format": " {usage}% ",
     "max-length": 10
   },
@@ -101,8 +100,8 @@
     "restart-interval": 1,
     "tooltip": false
   },
-    "custom/bar": {
-      "format": "| "
+  "custom/bar": {
+    "format": "|"
   },
   "pulseaudio": {
     "format": "{icon}",
@@ -132,24 +131,24 @@
     "format-disconnected": "󰤭 ",
     "interval": 5,
     "tooltip": true,
-    "on-click": "sh ~/.config/wofi/wifimenu.sh"
+    "on-click": "~/.config/waybar/wifiName.sh"
   },
   "battery": {
     "bat": "BAT0",
     "adapter": "ADP0",
-    "interval": 60,
+    "interval": 1,
     "states": {
-      "warning": 30,
-      "critical": 15
+      "warning": 20,
+      "critical": 10
     },
     "max-length": 20,
     "format": "{icon}", // {capacity}%
-    "format-warning": "{icon} {capacity}%",
-    "format-critical": "{icon} {capacity}%",
-    "format-charging": " {capacity}%",
-    "format-plugged": " {capacity}%",
-    "format-alt": "{icon} {time}",
-    "format-full": " ", // {capacity}%
+    "format-warning": "{icon}{capacity}%",
+    "format-critical": "{icon}{capacity}%",
+    "format-charging": "{icon}󱐋{capacity}%",
+    "format-plugged": "{icon}󱐋{capacity}%",
+    "format-alt": "{icon}{capacity}%",
+    "format-full": "{icon}", // {capacity}%
     "format-icons": [
       " ",
       " ",
@@ -163,8 +162,8 @@
     "on-click": "ags"
   },
   "memory": {
-    "interval": 30,
-    "format": " {}% ",
+    "interval": 1,
+    "format": " {}%",
     "format-alt": " {used:0.1f}G",
     "max-length": 10
   },

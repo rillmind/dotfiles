@@ -1,7 +1,5 @@
 [Desktop Entry]
-Version=1.0
 Type=Application
-Name=Bloomee
-Exec=/home/raul/.local/bin/bloomee
+Name=bloomee
+Exec=~/Downloads/bloomee
 Terminal=false
-Categories=Utility;GTK;

@@ -10,29 +10,32 @@ return {
     config = function()
       require("mason-lspconfig").setup({
         ensure_installed = {
-          -- Lua
           "lua_ls",
-          -- Python
-          -- "pyright",
-          -- JavaScript / TypeScript
-          -- "ts_ls",
-          -- Go
+          "pyright",
+          "ts_ls",
           "gopls",
-          -- Rust
           "rust_analyzer",
-          -- TOML
           "taplo",
-          -- JSON
-          -- "jsonls",
+          "jsonls",
         },
       })
     end,
   },
   {
     "neovim/nvim-lspconfig",
+    dependencies = {
+      "b0o/schemastore.nvim",
+    },
     config = function()
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      local ok, cmp_capabilities = pcall(require, "cmp_nvim_lsp")
+      if ok then
+        capabilities = vim.tbl_deep_extend("force", capabilities, cmp_capabilities.default_capabilities())
+      end
+
       -- Lua
       vim.lsp.config.lua_ls = {
+        capabilities = capabilities,
         settings = {
           Lua = {
             diagnostics = { globals = { "vim" } },
@@ -41,10 +44,13 @@ return {
       }
 
       -- Python
-      vim.lsp.config.pyright = {}
+      vim.lsp.config.pyright = {
+        capabilities = capabilities,
+      }
 
       -- JavaScript / TypeScript
       vim.lsp.config.ts_ls = {
+        capabilities = capabilities,
         init_options = {
           plugins = {},
         },
@@ -52,6 +58,7 @@ return {
 
       -- Go
       vim.lsp.config.gopls = {
+        capabilities = capabilities,
         settings = {
           gopls = {
             gofumpt = true,
@@ -71,6 +78,7 @@ return {
 
       -- Rust
       vim.lsp.config.rust_analyzer = {
+        capabilities = capabilities,
         settings = {
           ["rust-analyzer"] = {
             check = {
@@ -81,10 +89,13 @@ return {
       }
 
       -- TOML
-      vim.lsp.config.taplo = {}
+      vim.lsp.config.taplo = {
+        capabilities = capabilities,
+      }
 
       -- JSON
       vim.lsp.config.jsonls = {
+        capabilities = capabilities,
         settings = {
           json = {
             schemas = require("schemastore").json.schemas(),
@@ -93,7 +104,6 @@ return {
         },
       }
 
-      -- Habilitar todos
       vim.lsp.enable({
         "lua_ls",
         "pyright",
@@ -144,10 +154,5 @@ return {
         end,
       })
     end,
-  },
-  -- schemastore para JSON schemas
-  {
-    "b0o/schemastore.nvim",
-    lazy = true,
   },
 }

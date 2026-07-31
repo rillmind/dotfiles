@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Dota 2
+Comment=Play this game on Steam
+Exec=steam -silent -applaunch 570 -novid &
+Icon=steam_icon_570
+Terminal=false
+Type=Application
+Categories=Game;

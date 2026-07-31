@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=RPCS3 (f7e38d)
+GenericName=PlayStation 3 Emulator
+Comment=An open-source PlayStation 3 emulator/debugger written in C++.
+Icon=/home/raul/AppImages/.icons/rpcs3
+TryExec=/home/raul/AppImages/rpcs3.appimage
+Exec=env DESKTOPINTEGRATION=1 /home/raul/AppImages/rpcs3.appimage %f
+Terminal=false
+Categories=Game;Emulator;
+Keywords=PS3;Playstation;
+StartupWMClass=rpcs3
+X-AppImage-Name=RPCS3

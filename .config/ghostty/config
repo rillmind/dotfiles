@@ -24,8 +24,6 @@ adjust-cell-width = 0
 
 window-padding-x = 1
 
-window-padding-y = 1
-
 window-padding-balance = true
 
 # This template file has been automatically created at the following

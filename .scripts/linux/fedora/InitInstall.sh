@@ -16,19 +16,15 @@ echo "Pacotes essenciais instalados!!!"
 
 echo "Instalando Homebrew!!!"
 
-bash $HOME/.scripts/linux/BrewInstall.sh
+bash $HOME/.scripts/linux/install/Homebrew.sh
 
 echo "Homebrew instalado!!!"
-
-uv tool install nvibrant pulsemixer
-
-cargo install bluetui
 
 hash -r
 
 echo "Instalando pacotes essenciais do flatpak"
 
-bash $HOME/.scripts/linux/FlatpakEssential.sh
+bash $HOME/.scripts/linux/install/FlatpakEssential.sh
 
 echo "Pacotes flatpak instalados!!!"
 
@@ -45,3 +41,5 @@ sudo journalctl --vacuum-time=7d
 curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sudo sh
 
 sudo chsh -s $(which zsh)
+
+bash $HOME/.scripts/linux/install/Rust.sh
