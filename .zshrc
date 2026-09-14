@@ -225,3 +225,4 @@ source ~/.config/antigen.zsh
 
 # opencode
 export PATH=/home/raul/.opencode/bin:$PATH
+. "/home/raul/.deno/env"

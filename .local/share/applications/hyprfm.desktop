@@ -1,0 +1,21 @@
+[Desktop Entry]
+Type=Application
+Name=HyprFM
+GenericName=File Manager
+Comment=A lightweight Qt6/QML file manager for Hyprland
+Icon=/home/raul/AppImages/.icons/hyprfm
+TryExec=/home/raul/AppImages/hyprfm.appimage
+Exec=env DESKTOPINTEGRATION=1 /home/raul/AppImages/hyprfm.appimage %F
+Terminal=false
+MimeType=inode/directory;
+Categories=System;FileManager;Qt;
+Keywords=files;explorer;manager;browser;filesystem;
+StartupNotify=true
+StartupWMClass=hyprfm
+Actions=new-window;
+X-AppImage-Name=HyprFM
+
+[Desktop Action new-window]
+Name=New Window
+Icon=/home/raul/AppImages/.icons/hyprfm
+Exec=/home/raul/AppImages/hyprfm.appimage --new-window

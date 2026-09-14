@@ -2,6 +2,6 @@
 Version=1.0
 Type=Application
 Name=waybar
-Exec=waybar
+Exec=/home/raul/.local/share/applications/waybar.sh
 Terminal=false
 Categories=Utility;GTK;

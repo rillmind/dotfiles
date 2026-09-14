@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Dell G15 Control Center
+Exec=g15-controller
+Terminal=false
+Categories=Game;
