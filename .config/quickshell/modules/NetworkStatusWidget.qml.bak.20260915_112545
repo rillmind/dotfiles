@@ -1,0 +1,214 @@
+import QtQuick
+
+// NetworkStatusWidget.qml
+// Widget circular isolado: container + wifi central + fileira de dots em arco
+// Dots representam porcentagem do VOLUME (não sinal) – requisito do usuário.
+// Também suporta estado scanning com animação em onda.
+// Reutilizável na barra (widgetSize pequeno) e no ControlCenter (grande).
+// Catppuccin Mocha default, tudo configurável via props.
+//
+// Uso:
+//   NetworkStatusWidget { widgetSize: 84; volumeLevel: 35; volumeMuted: false; state: "scanning" }
+//   state: "scanning" | "connected" | "disconnected"  (disconnected = wifi off)
+//   volumeLevel 0..100 mapeado em dotCount dots (ex: 10 dots -> cada 10%)
+//
+Item {
+    id: root
+
+    // ── API pública ──────────────────────────────────────────────
+    property int widgetSize: 84                  // diâmetro do círculo externo
+    property color primaryColor: "#cba6f7"       // Catppuccin mauve
+    property color backgroundColor: "#1e1e2e"    // base
+    property color surfaceColor: "#313244"       // surface0 (dots apagados)
+    property color borderColor: "#313244"
+    property color textColor: "#cdd6f4"
+    property int dotCount: 10                    // 10 = cada dot 10% do volume
+    property int animationDuration: 1200         // duração total do ciclo da onda
+    property string state: "connected"           // scanning | connected | disconnected
+    property int volumeLevel: 35                 // 0..100 – usado para acender dots
+    property bool volumeMuted: false
+    property bool showBorder: true
+    property int dotSize: Math.max(4, Math.round(widgetSize * 0.075)) // escala com tamanho
+
+    // compatibilidade: compact = true esconde borda quando widgetSize < 32 (uso na barra)
+    property bool compact: widgetSize < 32
+
+    width: widgetSize
+    height: widgetSize
+
+    // threshold de dots acesos baseado no volume
+    property int litCount: {
+        if (volumeMuted) return 0
+        var c = Math.round(volumeLevel / 100 * dotCount)
+        return Math.max(0, Math.min(dotCount, c))
+    }
+
+    // ── Container circular ───────────────────────────────────────
+    Rectangle {
+        id: circle
+        anchors.centerIn: parent
+        width: root.widgetSize
+        height: root.widgetSize
+        radius: root.widgetSize / 2
+        color: root.backgroundColor
+        border.color: root.compact ? "transparent" : root.borderColor
+        border.width: root.compact ? 0 : 1.5
+        // sombra sutil interna é só cor; vidro fosco vem do PanelWindow pai
+
+        // ── Ícone WiFi centralizado (Canvas puro, sem dependências) ──
+        // Desenha 3 arcos concêntricos + ponto na base, proporcional ao tamanho.
+        Canvas {
+            id: wifiCanvas
+            anchors.centerIn: parent
+            // ocupa ~44% do diâmetro, centralizado verticalmente um pouco acima do centro
+            // para dar espaço ao arco de dots embaixo
+            width: root.widgetSize * 0.46
+            height: root.widgetSize * 0.46
+            anchors.verticalCenterOffset: -root.widgetSize * 0.07
+
+            property color wifiColor: {
+                if (root.state === "disconnected") return "#f38ba8" // red
+                if (root.volumeMuted) return root.surfaceColor
+                return root.primaryColor
+            }
+
+            onWifiColorChanged: requestPaint()
+            onWidthChanged: requestPaint()
+            onHeightChanged: requestPaint()
+
+            onPaint: {
+                var ctx = getContext("2d")
+                ctx.reset()
+                ctx.clearRect(0, 0, width, height)
+
+                var cx = width / 2
+                var cy = height * 0.62 // centro óptico um pouco abaixo
+                var baseR = Math.min(width, height) * 0.18
+                var stroke = Math.max(1.5, root.widgetSize * 0.018)
+
+                ctx.strokeStyle = wifiColor
+                ctx.fillStyle = wifiColor
+                ctx.lineWidth = stroke
+                ctx.lineCap = "round"
+
+                // ponto base do wifi
+                ctx.beginPath()
+                ctx.arc(cx, cy + baseR * 0.85, stroke * 1.1, 0, Math.PI * 2)
+                ctx.fill()
+
+                // 3 arcos – raios crescentes, ângulo ~ 2*60° = 120° total
+                // arco centrado em (cx, cy) abrindo para cima
+                var angles = [
+                    { r: baseR * 1.0, a: 60 },
+                    { r: baseR * 1.65, a: 60 },
+                    { r: baseR * 2.3, a: 60 }
+                ]
+                for (var i = 0; i < angles.length; i++) {
+                    var rad = angles[i].r
+                    var ang = angles[i].a * Math.PI / 180
+                    var start = (Math.PI * 1.5) - ang // 270° - ang
+                    var end   = (Math.PI * 1.5) + ang // 270° + ang
+                    ctx.beginPath()
+                    ctx.arc(cx, cy, rad, start, end, false)
+                    ctx.stroke()
+                }
+            }
+
+            Component.onCompleted: requestPaint()
+            // repinta quando widgetSize muda (via width/height binding já faz, mas garante)
+            Connections {
+                target: root
+                function onWidgetSizeChanged() { wifiCanvas.requestPaint() }
+                function onStateChanged() { wifiCanvas.requestPaint() }
+                function onVolumeMutedChanged() { wifiCanvas.requestPaint() }
+            }
+        }
+
+        // ── Fileira de dots em arco curvo (abaixo do ícone) ──────────
+        // Lógica de posicionamento:
+        //   - Arco de 140° total (-70° a +70°) com centro em (cx, cyArc)
+        //   - Cada dot i em 0..dotCount-1 mapeado para ângulo theta = start + i/(n-1)*span
+        //   - Coordenadas: x = cx + R*cos(theta - 90°), y = cyArc + R*sin(theta - 90°)
+        //     (subtraímos 90° porque 0° em cos/sin é à direita; queremos arco apontando para baixo)
+        //   - Alternativa simples fixa também seria válida, mas trigonometria mantém arco perfeito
+        //     e escala automaticamente com widgetSize/dotCount.
+        //   - Dots acesos = volumeLevel proporcional; apagados ficam dim.
+        //   - Em state==="scanning" + dot aceso, há animação em onda com delay escalonado.
+        Item {
+            id: dotsContainer
+            anchors.fill: parent
+            // centro do arco: ligeiramente abaixo do centro do círculo
+            property real arcCenterX: root.widgetSize / 2
+            property real arcCenterY: root.widgetSize * 0.62
+            property real arcRadius: root.widgetSize * 0.36
+            property real arcStartDeg: -70
+            property real arcSpanDeg: 140
+
+            Repeater {
+                id: dotRepeater
+                model: root.dotCount
+                Rectangle {
+                    id: dot
+                    width: root.dotSize
+                    height: root.dotSize
+                    radius: root.dotSize / 2
+
+                    // índice e se está aceso (lit = dentro da porcentagem de volume)
+                    property int idx: index
+                    property bool lit: index < root.litCount
+                    // para animação: só anima se scanning e lit
+                    property bool animate: root.state === "scanning" && lit && !root.volumeMuted
+
+                    // cor base: lit -> primary, apagado -> surface
+                    color: lit ? root.primaryColor : root.surfaceColor
+                    border.color: lit ? root.primaryColor : "transparent"
+                    border.width: 0
+                    opacity: lit ? 1.0 : 0.35
+                    scale: lit ? 1.0 : 0.78
+
+                    // posição em arco via trigonometria declarativa
+                    // theta em graus -> radianos
+                    property real thetaDeg: dotsContainer.arcStartDeg + (root.dotCount > 1 ? (index / (root.dotCount - 1) * dotsContainer.arcSpanDeg) : dotsContainer.arcSpanDeg/2)
+                    property real thetaRad: (thetaDeg - 90) * Math.PI / 180 // -90 para arco voltar para baixo
+                    x: dotsContainer.arcCenterX + dotsContainer.arcRadius * Math.cos(thetaRad) - width/2
+                    y: dotsContainer.arcCenterY + dotsContainer.arcRadius * Math.sin(thetaRad) - height/2
+
+                    // Animação em onda: cada dot pulsa com delay = index * (duration/dotCount)
+                    // Usa SequentialAnimation com PauseAnimation escalonado – declarativo, sem JS.
+                    SequentialAnimation on opacity {
+                        loops: Animation.Infinite
+                        running: dot.animate
+                        // delay escalonado cria efeito de onda esq->dir
+                        PauseAnimation { duration: dot.idx * (root.animationDuration / root.dotCount * 0.55) }
+                        NumberAnimation { from: 0.55; to: 1.0; duration: 260; easing.type: Easing.OutQuad }
+                        NumberAnimation { from: 1.0; to: 0.55; duration: 260; easing.type: Easing.InQuad }
+                        PauseAnimation { duration: Math.max(0, root.animationDuration - dot.idx * (root.animationDuration / root.dotCount * 0.55) - 520) }
+                    }
+                    SequentialAnimation on scale {
+                        loops: Animation.Infinite
+                        running: dot.animate
+                        PauseAnimation { duration: dot.idx * (root.animationDuration / root.dotCount * 0.55) }
+                        NumberAnimation { from: 0.75; to: 1.18; duration: 260; easing.type: Easing.OutQuad }
+                        NumberAnimation { from: 1.18; to: 0.75; duration: 260; easing.type: Easing.InQuad }
+                        PauseAnimation { duration: Math.max(0, root.animationDuration - dot.idx * (root.animationDuration / root.dotCount * 0.55) - 520) }
+                    }
+
+                    Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutQuad } }
+                    Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutQuad } }
+                    Behavior on color { ColorAnimation { duration: 180 } }
+                }
+            }
+        }
+
+        // overlay de disconnected: pequeno x ou cor já tratada no canvas, só borda vermelha sutil
+        Rectangle {
+            visible: root.state === "disconnected"
+            anchors.fill: parent
+            radius: parent.radius
+            color: "transparent"
+            border.color: "#f38ba8"
+            border.width: 1.2
+            opacity: 0.9
+        }
+    }
+}

@@ -80,7 +80,7 @@ Item {
     }
 
     implicitHeight: 80
-    implicitWidth: Math.max(200, Math.min(900, dockRow.implicitWidth + 16))
+    implicitWidth: sortedToplevels.length === 0 ? 80 : dockRow.implicitWidth + 16
 
     RowLayout {
         id: dockRow
@@ -131,23 +131,22 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
+                    z: 2
                     onEntered: dockItem.hovered = true
                     onExited: dockItem.hovered = false
-                    onClicked: {
-                        var addr = modelData.address
-                        // dockClients address já vem como "0x..." string, HyprlandToplevel address é número
-                        if (typeof addr === "string" && addr.indexOf("0x") === 0) {
-                            // dockClients: dispara via shell signal para garantir
-                            Hyprland.dispatch("focuswindow address:" + addr)
-                            dockRoot.requestFocusClient(addr)
-                        } else if (modelData.activated) {
-                            Hyprland.dispatch("focuswindow address:0x" + addr.toString(16))
-                        } else {
-                            if (modelData.activate) modelData.activate()
-                            else Hyprland.dispatch("focuswindow address:0x" + addr.toString(16))
-                        }
-                    }
                     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                    onClicked: mouse => {
+                        if (mouse.button !== Qt.LeftButton) return
+                        var addr = modelData.address
+                        var addrStr = (typeof addr === "string" && addr.indexOf("0x") === 0) ? addr : "0x" + addr.toString(16)
+                        var ws = modelData.workspace ? (modelData.workspace.id !== undefined ? modelData.workspace.id : modelData.workspace) : null
+                        // se janela está em outro workspace, troca antes de focar
+                        if (ws) Hyprland.dispatch("workspace " + ws)
+                        Hyprland.dispatch("focuswindow address:" + addrStr)
+                        dockRoot.requestFocusClient(addrStr)
+                        // fallback via activate para toplevels
+                        if (modelData.activate && typeof addr !== "string") { try { modelData.activate() } catch(e) {} }
+                    }
                     onPressed: mouse => {
                         var addr = modelData.address
                         var addrStr = (typeof addr === "string" && addr.indexOf("0x") === 0) ? addr : "0x" + addr.toString(16)

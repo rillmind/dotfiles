@@ -266,8 +266,8 @@ ShellRoot {
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
             anchors { top: true; right: true }
             margins { top: 44; right: 8 }
-            implicitWidth: 320
-            implicitHeight: 208
+            implicitWidth: 560
+            implicitHeight: 175
             color: "transparent"
             MouseArea {
                 anchors.fill: parent
@@ -279,7 +279,7 @@ ShellRoot {
                 Loader {
                     id: ccLoader
                     anchors.centerIn: parent
-                    width: 300; height: 188
+                    width: 540; height: 155
                     source: Qt.resolvedUrl("modules/ControlCenter.qml")
                     onLoaded: {
                         item.volumeLevel = Qt.binding(function() { return root.volumeLevel })
