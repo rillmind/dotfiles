@@ -18,8 +18,8 @@
     "network",
     "pulseaudio",
     "battery",
-    "custom/bar",
-    "custom/powermenu"
+    "custom/blankSpace"
+    //"custom/powermenu"
   ],
   "hyprland/workspaces": {
     "disable-scroll": true,
@@ -101,24 +101,29 @@
     "tooltip": false
   },
   "custom/bar": {
-    "format": "|"
+    "format": " | "
+  },
+  "custom/blankSpace": {
+    "format": " "
   },
   "pulseaudio": {
     "format": "{icon}",
     "format-alt": "{icon}{volume}%",
     "format-bluetooth": "{icon} {volume}% {format_source} ",
-    "format-bluetooth-muted": " {icon} {format_source} ",
+    "format-bluetooth-muted": " {icon} {format_source} ",
     "format-muted": " ",
     "format-icons": {
       "headphone": " ",
-      "hands-free": "",
-      "headset": "",
+      "hands-free": " ",
+      "headset": " ",
       "phone": " ",
       "portable": " ",
       "car": " ",
       "default": [
         " ",
-        " ",
+        " ",
+        " ",
+        " ",
         " "
       ]
     },

@@ -5,6 +5,7 @@ environment=(
   gdu # TUI para analizar armazenamento
   duf # grafico de discos
   udiskie
+  quickshell
 )
 
 dev=(

@@ -8,3 +8,4 @@ export PATH="$PATH:/home/raul/.local/bin"
 export PATH=/home/raul/.opencode/bin:$PATH
 export PATH="$HOME/Miniforge3/bin:$PATH"
 . "$HOME/.cargo/env"
+. "/home/raul/.deno/env"

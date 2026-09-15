@@ -13,6 +13,9 @@
   alignment = left
   vertical_alignment = top
   show_indicators = false
+  origin = top-right
+  offset = (8, 46)
+  gap_size = 8
 
 [urgency_low]
   timeout = 5

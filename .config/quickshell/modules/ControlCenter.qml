@@ -1,0 +1,209 @@
+import QtQuick
+import QtQuick.Layouts
+import "."
+
+// ControlCenter.qml – 300×188, divisor no meio exato (150px), círculo centrado no vão esq,
+// bloco de infos com texto centralizado no vão dir + filetes finos entre wifi/volume/bateria.
+// Ordem wifi → volume → bateria. API externa idêntica para shell.qml
+Rectangle {
+    id: rootCC
+    property int volumeLevel: 35
+    property bool volumeMuted: false
+    property string networkIcon: "󰤭 "
+    property string networkTooltip: "Desconectado"
+    property string batteryIcon: " "
+    property int batteryCapacity: 100
+    property string batteryStatus: "Not charging"
+    property bool batteryCharging: false
+    property string fontFamily: "JetBrainsMono Nerd Font"
+    property color colText: "#cdd6f4"
+    property color colSurface0: "#313244"
+    property color colSurface1: "#45475a"
+    property color colMauve: "#cba6f7"
+    property color colBarBg: "#1e1e2e"
+    signal requestSetVolume(int level)
+    signal requestToggleMute()
+    signal requestRefresh()
+
+    width: 300
+    height: 188
+    radius: 12
+    color: colBarBg
+    border.color: colSurface0
+    border.width: 1
+
+    property string widgetState: networkTooltip === "Desconectado" || networkIcon === "󰤭 " ? "disconnected" : "connected"
+    property color colDanger: "#f38ba8"
+    property color colSub: "#a6adc8"
+
+    RowLayout {
+        anchors.fill: parent
+        anchors.margins: 12
+        spacing: 0
+
+        // ── Vão esquerdo (metade): círculo 88 centrado ──
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            NetworkStatusWidget {
+                anchors.centerIn: parent
+                widgetSize: 88
+                primaryColor: rootCC.colMauve
+                backgroundColor: rootCC.colBarBg
+                surfaceColor: rootCC.colSurface0
+                borderColor: rootCC.colSurface0
+                textColor: rootCC.colText
+                state: rootCC.widgetState
+                volumeLevel: rootCC.volumeLevel
+                volumeMuted: rootCC.volumeMuted
+                batteryCapacity: rootCC.batteryCapacity
+                batteryCharging: rootCC.batteryCharging
+            }
+        }
+
+        // ── Divisor no meio exato ──
+        Rectangle {
+            Layout.preferredWidth: 1
+            Layout.fillHeight: true
+            Layout.topMargin: 8
+            Layout.bottomMargin: 8
+            color: "#7f849c"
+            opacity: 0.5
+        }
+
+        // ── Vão direito (metade): bloco centrado, texto centralizado ──
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            ColumnLayout {
+                anchors.centerIn: parent
+                width: 122
+                height: 158
+                spacing: 4
+
+            // 1. Wi-Fi
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 44
+                spacing: 2
+                Text {
+                    text: "Wi-Fi"
+                    color: colText; opacity: 0.55
+                    font.family: fontFamily; font.pixelSize: 10; font.bold: true
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
+                }
+                Text {
+                    text: networkTooltip === "" || networkTooltip === "Desconectado" ? "Desconectado" : networkTooltip
+                    color: networkTooltip === "Desconectado" ? colDanger : colText
+                    font.family: fontFamily; font.pixelSize: 13; font.bold: true
+                    elide: Text.ElideRight; Layout.fillWidth: true
+                    maximumLineCount: 1
+                    horizontalAlignment: Text.AlignHCenter
+                }
+                Text {
+                    text: networkIcon === "󰤨 " ? "󰤨 Wi-Fi" : networkIcon === " " ? " Ethernet" : "󰤭 Sem rede"
+                    color: colSub
+                    font.family: fontFamily; font.pixelSize: 11
+                    Layout.fillWidth: true
+                    maximumLineCount: 1
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
+
+            // ── filete wifi/volume ──
+            Rectangle {
+                Layout.preferredHeight: 1
+                Layout.fillWidth: true
+                Layout.leftMargin: 10
+                Layout.rightMargin: 10
+                color: "#7f849c"
+                opacity: 0.5
+            }
+
+            // 2. Volume
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 44
+                spacing: 2
+                Text {
+                    text: "Volume"
+                    color: colText; opacity: 0.55
+                    font.family: fontFamily; font.pixelSize: 10; font.bold: true
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
+                }
+                Text {
+                    text: volumeMuted ? "Mudo" : volumeLevel + "%"
+                    color: volumeMuted ? colDanger : colText
+                    font.family: fontFamily; font.pixelSize: 13; font.bold: true
+                    Layout.fillWidth: true
+                    maximumLineCount: 1
+                    horizontalAlignment: Text.AlignHCenter
+                }
+                Text {
+                    text: volumeMuted ? " mutado" : (volumeLevel < 33 ? " baixo" : volumeLevel < 66 ? " médio" : " alto")
+                    color: colSub
+                    font.family: fontFamily; font.pixelSize: 11
+                    Layout.fillWidth: true
+                    maximumLineCount: 1
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
+
+            // ── filete volume/bateria ──
+            Rectangle {
+                Layout.preferredHeight: 1
+                Layout.fillWidth: true
+                Layout.leftMargin: 10
+                Layout.rightMargin: 10
+                color: "#7f849c"
+                opacity: 0.5
+            }
+
+            // 3. Bateria
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 44
+                spacing: 2
+                Text {
+                    text: "Bateria"
+                    color: colText; opacity: 0.55
+                    font.family: fontFamily; font.pixelSize: 10; font.bold: true
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
+                }
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignHCenter
+                    spacing: 5
+                    Text {
+                        text: batteryIcon.replace("󱐋","").trim()
+                        color: batteryCharging ? colMauve : colText
+                        font.family: fontFamily; font.pixelSize: 13; font.bold: true
+                    }
+                    Text {
+                        text: batteryCapacity + "%"
+                        color: colText
+                        font.family: fontFamily; font.pixelSize: 13; font.bold: true
+                    }
+                    Text {
+                        text: batteryCharging ? "󱐋" : ""
+                        color: colMauve
+                        font.family: fontFamily; font.pixelSize: 13; font.bold: true
+                        visible: batteryCharging
+                    }
+                }
+                Text {
+                    text: batteryStatus
+                    color: colSub
+                    font.family: fontFamily; font.pixelSize: 11
+                    elide: Text.ElideRight; Layout.fillWidth: true
+                    maximumLineCount: 1
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
+            }
+        }
+    }
+}

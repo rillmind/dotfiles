@@ -1,0 +1,6 @@
+module qs.modules
+NetworkStatusWidget 1.0 NetworkStatusWidget.qml
+ControlCenter 1.0 ControlCenter.qml
+Dock 1.0 Dock.qml
+CalendarWidget 1.0 CalendarWidget.qml
+VolumePopup 1.0 VolumePopup.qml

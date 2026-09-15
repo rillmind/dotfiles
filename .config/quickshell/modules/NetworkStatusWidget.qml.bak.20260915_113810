@@ -1,0 +1,239 @@
+import QtQuick
+
+// NetworkStatusWidget.qml
+// Widget circular isolado: container + wifi central + anel de bateria 280° + 4 dots de volume no gap
+// - Anel 280° = 180° topo + 50° cada lateral, gap 80° no centro-em baixo livre para volume
+// - 4 dots embaixo fechando a circunferência: 1 dot = 25% volume (lit: volume >= (i+1)*25) esq→dir
+// - Wifi central 3 arcos + ponto, encorpado, proporcional ao tamanho
+// Reutilizável: widgetSize grande (ControlCenter) ou compacto (barra futura)
+// Catppuccin Mocha, props configuráveis
+//
+Item {
+    id: root
+
+    // ── API pública ──────────────────────────────────────────────
+    property int widgetSize: 84                  // diâmetro do círculo externo
+    property color primaryColor: "#cba6f7"       // Catppuccin mauve (wifi)
+    property color backgroundColor: "#1e1e2e"    // base
+    property color surfaceColor: "#313244"       // surface0 (trilho bateria / dots apagados)
+    property color borderColor: "#313244"
+    property color textColor: "#cdd6f4"
+    property string state: "connected"           // scanning | connected | disconnected (wifi)
+    property int volumeLevel: 35                 // 0..100 – usado para 4 dots (threshold 25%)
+    property bool volumeMuted: false
+    property int batteryCapacity: 100            // 0..100 – usado para anel 280°
+    property bool batteryCharging: false
+    property int animationDuration: 1200         // para scanning (wifi) se necessário futuro
+
+    // tamanho dos dots de volume (4 pontos pequenos na circunferência)
+    property int dotSize: Math.max(5, Math.round(widgetSize * 0.095))
+    // espessura do anel de bateria
+    property real ringStroke: Math.max(3, widgetSize * 0.045)
+    // gap embaixo para volume – 80° dá mais espaço pros 4 dots
+    property real gapDeg: 80
+    // arco total bateria
+    property real batteryArcDeg: 360 - gapDeg // 280
+
+    width: widgetSize
+    height: widgetSize
+
+    // raio do anel (centralizado, na borda interna)
+    property real ringRadius: widgetSize / 2 - ringStroke / 2 - 0.5
+
+    // ── Container circular (fundo) ─────────────────────────────────
+    Rectangle {
+        id: circle
+        anchors.centerIn: parent
+        width: root.widgetSize
+        height: root.widgetSize
+        radius: root.widgetSize / 2
+        color: root.backgroundColor
+        border.color: root.borderColor
+        border.width: 1.2
+
+        // ── Anel de bateria 280° (Canvas) ──────────────────────────
+        // 280° = 180 topo + 50 esq + 50 dir, gap 80° embaixo centrado no sul (90°).
+        // Canvas usa 0° = leste (3h), cresce horário. Sul = 90°. Gap: 50°→130° (centro 90°).
+        // Arco bateria: start = 130° (fim do gap à direita), percorre 280° horário até 50°+360°.
+        // Progresso: batteryCapacity/100 * 280° a partir de start.
+        Canvas {
+            id: batteryRing
+            anchors.centerIn: parent
+            width: root.widgetSize
+            height: root.widgetSize
+
+            // repinta quando props mudam
+            onWidthChanged: requestPaint()
+            onHeightChanged: requestPaint()
+
+            property color trackColor: root.surfaceColor
+            property color fillColor: {
+                if (root.batteryCharging) return root.primaryColor // mauve quando carregando
+                if (root.batteryCapacity <= 15) return "#f38ba8" // red crítico
+                if (root.batteryCapacity <= 40) return "#fab387" // peach aviso
+                return "#a6e3a1" // green ok
+            }
+
+            onFillColorChanged: requestPaint()
+
+            onPaint: {
+                var ctx = getContext("2d")
+                ctx.reset()
+                ctx.clearRect(0, 0, width, height)
+
+                var cx = width / 2
+                var cy = height / 2
+                var r = root.ringRadius
+                var sw = root.ringStroke
+
+                // gap centrado no sul: gapStart 50°, gapEnd 130° (80° gap)
+                var gapStartDeg = 90 - root.gapDeg/2 // 50
+                var gapEndDeg   = 90 + root.gapDeg/2 // 130
+                // arco bateria começa no fim do gap e dá volta completa menos gap
+                var battStartDeg = gapEndDeg // 130
+                var battSpanDeg = root.batteryArcDeg // 280
+                var battEndDeg = battStartDeg + (root.batteryCapacity / 100) * battSpanDeg
+
+                // trilho (fundo 280° completo, sempre visível)
+                ctx.strokeStyle = trackColor
+                ctx.lineWidth = sw
+                ctx.lineCap = "round"
+                ctx.beginPath()
+                ctx.arc(cx, cy, r, battStartDeg * Math.PI/180, (battStartDeg + battSpanDeg) * Math.PI/180, false)
+                ctx.stroke()
+
+                // progresso bateria
+                if (root.batteryCapacity > 0) {
+                    ctx.strokeStyle = fillColor
+                    ctx.lineWidth = sw
+                    ctx.lineCap = "round"
+                    ctx.beginPath()
+                    ctx.arc(cx, cy, r, battStartDeg * Math.PI/180, battEndDeg * Math.PI/180, false)
+                    ctx.stroke()
+                }
+
+                // pequeno ponto de destaque no fim do progresso (opcional, só se >0 e <100 e não mutado)
+                if (root.batteryCapacity > 0 && root.batteryCapacity < 100) {
+                    var ang = battEndDeg * Math.PI/180
+                    var px = cx + r * Math.cos(ang)
+                    var py = cy + r * Math.sin(ang)
+                    ctx.fillStyle = fillColor
+                    ctx.beginPath()
+                    ctx.arc(px, py, sw * 0.42, 0, Math.PI*2)
+                    ctx.fill()
+                }
+            }
+
+            Component.onCompleted: requestPaint()
+            Connections {
+                target: root
+                function onBatteryCapacityChanged() { batteryRing.requestPaint() }
+                function onBatteryChargingChanged() { batteryRing.requestPaint() }
+                function onWidgetSizeChanged() { batteryRing.requestPaint() }
+            }
+        }
+
+        // ── Ícone WiFi centralizado (Canvas) – encorpado, maior ────
+        Canvas {
+            id: wifiCanvas
+            anchors.centerIn: parent
+            width: root.widgetSize * 0.62
+            height: root.widgetSize * 0.62
+            anchors.verticalCenterOffset: -root.widgetSize * 0.02
+
+            property color wifiColor: {
+                if (root.state === "disconnected") return "#f38ba8"
+                return root.primaryColor
+            }
+            onWifiColorChanged: requestPaint()
+            onWidthChanged: requestPaint()
+            onHeightChanged: requestPaint()
+
+            onPaint: {
+                var ctx = getContext("2d")
+                ctx.reset()
+                ctx.clearRect(0, 0, width, height)
+                var cx = width / 2
+                var cy = height * 0.62
+                // mais encorpado: baseR maior, stroke mais grosso, ocupa espaço que estava vazio
+                var baseR = Math.min(width, height) * 0.24
+                var stroke = Math.max(1.8, root.widgetSize * 0.030)
+                ctx.strokeStyle = wifiColor
+                ctx.fillStyle = wifiColor
+                ctx.lineWidth = stroke
+                ctx.lineCap = "round"
+                // bolinha mais próxima das barras: 0.60*baseR em vez de 0.85
+                ctx.beginPath()
+                ctx.arc(cx, cy + baseR * 0.60, stroke * 1.05, 0, Math.PI * 2)
+                ctx.fill()
+                var angles = [{r: baseR*1.0,a:60},{r: baseR*1.65,a:60},{r: baseR*2.3,a:60}]
+                for (var i=0;i<angles.length;i++){
+                    var rad=angles[i].r, ang=angles[i].a*Math.PI/180
+                    var start=(Math.PI*1.5)-ang, end=(Math.PI*1.5)+ang
+                    ctx.beginPath()
+                    ctx.arc(cx,cy,rad,start,end,false)
+                    ctx.stroke()
+                }
+            }
+            Component.onCompleted: requestPaint()
+            Connections {
+                target: root
+                function onWidgetSizeChanged(){ wifiCanvas.requestPaint() }
+                function onStateChanged(){ wifiCanvas.requestPaint() }
+            }
+        }
+
+        // ── 4 dots de volume embaixo, dentro do gap 80° ───────────
+        // Cada dot = threshold 25%: lit se volumeLevel >= (index+1)*25, esq→dir
+        // Posição: igualmente espaçados dentro do gap (80°), sobre a circunferência (mesmo ringRadius)
+        // Gap 80° centrado no sul (90°): gapStart 50°, gapEnd 130°, gap centralizado embaixo
+        // Dots em: gapEnd - (i+0.5)/4 * gapSpan  (inverte para esq→dir, margem 10° cada lado)
+        Item {
+            id: volumeDots
+            anchors.fill: parent
+            property real gapStartDeg: 90 - root.gapDeg/2 // 50
+            property real gapSpanDeg: root.gapDeg // 80
+            Repeater {
+                model: 4
+                Rectangle {
+                    id: vdot
+                    width: root.dotSize
+                    height: root.dotSize
+                    radius: root.dotSize/2
+                    property int idx: index
+                    property int threshold: (index+1)*25
+                    property bool lit: !root.volumeMuted && root.volumeLevel >= threshold
+                    color: lit ? root.primaryColor : root.surfaceColor
+                    opacity: lit ? 1.0 : 0.38
+                    scale: lit ? 1.0 : 0.85
+                    border.color: lit ? root.primaryColor : "transparent"
+                    border.width: 0
+
+                    // ângulo dentro do gap, distribuído eqüidistante, invertido esq→dir
+                    // idx 0 = esquerda (130° lado esq), idx 3 = direita (50° lado dir)
+                    // gapEnd - (i+0.5)/4*gapSpan garante margem 10° e ordem esq→dir
+                    property real thetaDeg: volumeDots.gapStartDeg + volumeDots.gapSpanDeg - ( (idx+0.5)/4 * volumeDots.gapSpanDeg )
+                    property real thetaRad: thetaDeg * Math.PI/180
+                    // levemente para dentro do anel ( -1.5px ) para não sobrepor traço, centralizado embaixo
+                    x: root.widgetSize/2 + (root.ringRadius - 1.0) * Math.cos(thetaRad) - width/2
+                    y: root.widgetSize/2 + (root.ringRadius - 1.0) * Math.sin(thetaRad) - height/2
+
+                    Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutQuad } }
+                    Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutQuad } }
+                    Behavior on color { ColorAnimation { duration: 180 } }
+                }
+            }
+        }
+
+        // overlay disconnected opcional (borda vermelha sutil já no anel trilho, mantido leve)
+        Rectangle {
+            visible: root.state === "disconnected"
+            anchors.fill: parent
+            radius: parent.radius
+            color: "transparent"
+            border.color: "#f38ba8"
+            border.width: 1.0
+            opacity: 0.55
+        }
+    }
+}

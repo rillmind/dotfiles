@@ -1,0 +1,168 @@
+import QtQuick
+import QtQuick.Layouts
+import "."
+
+// ControlCenter.qml – layout horizontal: ícone esq + barra fina overlay1 + infos dir vertical
+// Mantém API externa idêntica para shell.qml:279-298
+// Infos na direita em sequência vertical: wifi (topo), volume (meio), bateria (baixo) com secundários
+// Sem slider e sem botões Som/Atualizar
+Rectangle {
+    id: rootCC
+    property int volumeLevel: 35
+    property bool volumeMuted: false
+    property string networkIcon: "󰤭 "
+    property string networkTooltip: "Desconectado"
+    property string batteryIcon: " "
+    property int batteryCapacity: 100
+    property string batteryStatus: "Not charging"
+    property bool batteryCharging: false
+    property string fontFamily: "JetBrainsMono Nerd Font"
+    property color colText: "#cdd6f4"
+    property color colSurface0: "#313244"
+    property color colSurface1: "#45475a"
+    property color colMauve: "#cba6f7"
+    property color colBarBg: "#1e1e2e"
+    signal requestSetVolume(int level)
+    signal requestToggleMute()
+    signal requestRefresh()
+
+    width: 540
+    height: 155
+    radius: 12
+    color: colBarBg
+    border.color: colSurface0
+    border.width: 1
+
+    property string widgetState: networkTooltip === "Desconectado" || networkIcon === "󰤭 " ? "disconnected" : "connected"
+
+    RowLayout {
+        anchors.fill: parent
+        anchors.margins: 16
+        spacing: 16
+
+        // ── Esquerda: ícone circular ───────────────────────────
+        Item {
+            Layout.preferredWidth: 110
+            Layout.preferredHeight: 110
+            Layout.alignment: Qt.AlignVCenter
+            NetworkStatusWidget {
+                anchors.centerIn: parent
+                widgetSize: 96
+                primaryColor: rootCC.colMauve
+                backgroundColor: rootCC.colBarBg
+                surfaceColor: rootCC.colSurface0
+                borderColor: rootCC.colSurface0
+                textColor: rootCC.colText
+                state: rootCC.widgetState
+                volumeLevel: rootCC.volumeLevel
+                volumeMuted: rootCC.volumeMuted
+                batteryCapacity: rootCC.batteryCapacity
+                batteryCharging: rootCC.batteryCharging
+            }
+        }
+
+        // ── Barra fina vertical overlay1 entre ícone e infos (espaço equivalente esq/dir) ──
+        Rectangle {
+            Layout.preferredWidth: 1
+            Layout.fillHeight: true
+            Layout.topMargin: 8
+            Layout.bottomMargin: 8
+            color: "#7f849c" // overlay1
+            opacity: 0.85
+        }
+
+        // ── Direita: infos vertical wifi → volume → bateria ──
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            spacing: 10
+            Layout.alignment: Qt.AlignVCenter
+
+            // WiFi
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 2
+                Text {
+                    text: "Wi-Fi"
+                    color: colText; opacity: 0.6
+                    font.family: fontFamily; font.pixelSize: 10; font.bold: true
+                    Layout.fillWidth: true
+                }
+                Text {
+                    text: networkTooltip === "" || networkTooltip === "Desconectado" ? "Desconectado" : networkTooltip
+                    color: networkTooltip === "Desconectado" ? "#f38ba8" : colText
+                    font.family: fontFamily; font.pixelSize: 12; font.bold: true
+                    elide: Text.ElideRight; Layout.fillWidth: true
+                    maximumLineCount: 1
+                }
+                Text {
+                    text: networkIcon === "󰤨 " ? "󰤨 Wi-Fi" : networkIcon === " " ? " Ethernet" : "󰤭 Sem rede"
+                    color: colText; opacity: 0.7
+                    font.family: fontFamily; font.pixelSize: 10
+                    Layout.fillWidth: true
+                }
+            }
+
+            // Volume
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 2
+                Text {
+                    text: "Volume"
+                    color: colText; opacity: 0.6
+                    font.family: fontFamily; font.pixelSize: 10; font.bold: true
+                    Layout.fillWidth: true
+                }
+                Text {
+                    text: volumeMuted ? "Mudo" : volumeLevel + "%"
+                    color: volumeMuted ? "#f38ba8" : colText
+                    font.family: fontFamily; font.pixelSize: 12; font.bold: true
+                    Layout.fillWidth: true
+                }
+                Text {
+                    text: volumeMuted ? " mutado" : (volumeLevel < 33 ? " baixo" : volumeLevel < 66 ? " médio" : " alto")
+                    color: colText; opacity: 0.7
+                    font.family: fontFamily; font.pixelSize: 10
+                    Layout.fillWidth: true
+                }
+            }
+
+            // Bateria
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 2
+                Text {
+                    text: "Bateria"
+                    color: colText; opacity: 0.6
+                    font.family: fontFamily; font.pixelSize: 10; font.bold: true
+                    Layout.fillWidth: true
+                }
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 4
+                    Text {
+                        text: batteryIcon.replace("󱐋","").trim()
+                        color: batteryCharging ? colMauve : colText
+                        font.family: fontFamily; font.pixelSize: 12; font.bold: true
+                    }
+                    Text {
+                        text: batteryCapacity + "%"
+                        color: colText; font.family: fontFamily; font.pixelSize: 12; font.bold: true
+                    }
+                    Text {
+                        text: batteryCharging ? "󱐋" : ""
+                        color: colMauve; font.family: fontFamily; font.pixelSize: 12; font.bold: true
+                        visible: batteryCharging
+                    }
+                }
+                Text {
+                    text: batteryStatus
+                    color: colText; opacity: 0.7
+                    font.family: fontFamily; font.pixelSize: 10
+                    elide: Text.ElideRight; Layout.fillWidth: true
+                    maximumLineCount: 1
+                }
+            }
+        }
+    }
+}
