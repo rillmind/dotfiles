@@ -65,13 +65,7 @@ Item {
             onHeightChanged: requestPaint()
 
             property color trackColor: root.remainderColor
-            property color fillColor: {
-                if (root.batteryCapacity >= 100) return root.primaryColor // 100% sempre mauve, não verde
-                if (root.batteryCharging) return root.primaryColor
-                if (root.batteryCapacity <= 15) return "#f38ba8"
-                if (root.batteryCapacity <= 40) return "#fab387"
-                return "#a6e3a1"
-            }
+            property color fillColor: root.primaryColor // sempre mauve
             onFillColorChanged: requestPaint()
 
             onPaint: {
