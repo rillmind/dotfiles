@@ -3,8 +3,9 @@
 # Em uso:
 
 Start-Process syncthing -ArgumentList "--no-browser" -WindowStyle Hidden
-Start-Process -FilePath "C:\Program Files (x86)\Thermal Control Center\tcc-g15.exe" -Verb RunAs
+Start-Process -FilePath "C:\Program Files\glzr.io\GlazeWM\glazewm.exe"
 yasb
+Start-Process -FilePath "C:\Program Files (x86)\Thermal Control Center\tcc-g15.exe" -Verb RunAs
 
 # Em desuso:
 
