@@ -1,4 +1,5 @@
 {
+  "format_on_save": "on",
   "cli_default_open_behavior": "new_window",
   "title_bar": {
     "show_branch_status_icon": true,
@@ -10,7 +11,7 @@
     "show_menus": false,
   },
   "ui_font_weight": 500.0,
-  "ui_font_family": "JetBrains Mono NL",
+  "ui_font_family": "JetBrainsMono Nerd Font",
   "disable_ai": true,
   "show_completion_documentation": true,
   "show_completions_on_input": true,
@@ -59,8 +60,12 @@
   "gutter": {
     "min_line_number_digits": 2,
   },
-  "graphics_backend": "opengl",
   "file_scan_exclusions": [],
+  "languages": {
+    "Rust": {
+      "tab_size": 2,
+    },
+  },
   "lsp": {
     "gopls": {
       "initialization_options": {

@@ -1,4 +1,5 @@
 [
+  // Definir como navegar pelas abas
   {
     "context": "Pane",
     "bindings": {
@@ -14,10 +15,30 @@
       "ctrl-0": "pane::ActivateLastItem",
     },
   },
+
+  // Fechar aba
   {
     "context": "Pane",
     "bindings": {
-      "alt-q": "pane::CloseActiveItem",
+      "ctrl-q": "pane::CloseActiveItem",
+    },
+  },
+  {
+    "context": "vim_mode == normal",
+    "bindings": {
+      "ctrl-q": "pane::CloseActiveItem",
+    },
+  },
+
+  // Explorador de arquivos
+  {
+    "context": "ProjectPanel && not_editing",
+    "bindings": {
+      "a": "project_panel::NewFile",
+      "d": "project_panel::Trash",
+      "r": "project_panel::Rename",
+      "x": "project_panel::Cut",
+      "p": "project_panel::Paste",
     },
   },
   {
@@ -38,13 +59,8 @@
       "ctrl-alt-e": "workspace::ToggleRightDock",
     },
   },
-  {
-    "context": "ProjectPanel && not_editing",
-    "bindings": {
-      "a": "project_panel::NewFile",
-      "d": "project_panel::Trash",
-    },
-  },
+
+  // Agentes de IA
   {
     "context": "Workspace",
     "bindings": {
@@ -52,15 +68,59 @@
     },
   },
   {
-    "context": "Workspace",
+    "context": "vim_mode == normal",
     "bindings": {
-      "ctrl-t": "terminal_panel::Toggle",
+      "ctrl-i": "agent::ToggleFocus",
+    },
+  },
+
+  // Ações de código
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-.": "editor::ToggleCodeActions",
+    },
+  },
+
+  // Abrir arquivo de atalhos
+  {
+    "bindings": {
+      "ctrl-alt-<": "zed::OpenKeymapFile",
+    },
+  },
+
+  // Limpar notificações
+  {
+    "bindings": {
+      "ctrl-alt-shift-v": "workspace::ClearAllNotifications",
+    },
+  },
+
+  // Editando atalhos do vim_mode
+  {
+    "context": "vim_mode == normal",
+    "bindings": {
+      "j": ["workspace::SendKeystrokes", "g j"],
+      "k": ["workspace::SendKeystrokes", "g k"],
+      "$": ["workspace::SendKeystrokes", "g $"],
+      "0": ["workspace::SendKeystrokes", "g 0"],
     },
   },
   {
-    "context": "Workspace",
+    "context": "Editor",
     "bindings": {
-      "ctrl-`": "terminal_panel::Toggle",
+      "j": ["workspace::SendKeystrokes", "g j"],
+      "k": ["workspace::SendKeystrokes", "g k"],
+      "$": ["workspace::SendKeystrokes", "g $"],
+      "0": ["workspace::SendKeystrokes", "g 0"],
+    },
+  },
+
+  // Terminal
+  {
+    "context": "vim_mode == normal",
+    "bindings": {
+      "ctrl-'": "terminal_panel::Toggle",
     },
   },
   {
@@ -70,28 +130,29 @@
     },
   },
   {
-    "context": "Editor",
+    "context": "Terminal",
     "bindings": {
-      "ctrl-.": "editor::ToggleCodeActions",
+      "ctrl-'": "terminal_panel::Toggle",
+    },
+  },
+
+  // Bottom Dock
+  {
+    "context": "vim_mode == normal",
+    "bindings": {
+      "ctrl-alt-'": "workspace::ToggleBottomDock",
     },
   },
   {
+    "context": "Workspace",
     "bindings": {
-      "ctrl-alt-<": "zed::OpenKeymapFile",
+      "ctrl-alt-'": "workspace::ToggleBottomDock",
     },
   },
   {
+    "context": "Terminal",
     "bindings": {
-      "ctrl-alt-shift-v": "workspace::ClearAllNotifications",
-    },
-  },
-  {
-    "context": "Editor && vim_mode == normal",
-    "bindings": {
-      "j": ["workspace::SendKeystrokes", "g j"],
-      "k": ["workspace::SendKeystrokes", "g k"],
-      "$": ["workspace::SendKeystrokes", "g $"],
-      "0": ["workspace::SendKeystrokes", "g 0"],
+      "ctrl-alt-'": "workspace::ToggleBottomDock",
     },
   },
 ]

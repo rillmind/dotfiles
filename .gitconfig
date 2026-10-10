@@ -5,4 +5,11 @@
 [user]
   name = Raul Holanda Lopes
   email = raulzc00@gmail.com
+	signingkey = 1E1F9AA33AA299C7
 
+[gpg]
+	program = gpg
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
