@@ -5,6 +5,9 @@
 include gruvbox-dark
 
 set pages-per-row-spacing 1
+set pages-per-row 1
+set scroll-page-aware true
+set scroll-full-overlap 0.01
 
 # Isso faz com que selecionar um texto mande direto 
 # para a área de transferência em sistemas wayland

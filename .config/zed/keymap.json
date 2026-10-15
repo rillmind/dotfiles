@@ -16,7 +16,7 @@
     },
   },
 
-  // Fechar aba
+  // Fechar aba ativa
   {
     "context": "Pane",
     "bindings": {
@@ -27,6 +27,70 @@
     "context": "vim_mode == normal",
     "bindings": {
       "ctrl-q": "pane::CloseActiveItem",
+    },
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-q": "pane::CloseActiveItem",
+    },
+  },
+  {
+    "context": "Terminal",
+    "bindings": {
+      "ctrl-q": "pane::CloseActiveItem",
+    },
+  },
+
+  // Fechar outras abas
+  {
+    "context": "Pane",
+    "bindings": {
+      "ctrl-alt-q": "pane::CloseOtherItems",
+    },
+  },
+  {
+    "context": "vim_mode == normal",
+    "bindings": {
+      "ctrl-alt-q": "pane::CloseOtherItems",
+    },
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-alt-q": "pane::CloseOtherItems",
+    },
+  },
+  {
+    "context": "Terminal",
+    "bindings": {
+      "ctrl-alt-q": "pane::CloseOtherItems",
+    },
+  },
+
+  // Fechar todas as abas
+  {
+    "context": "Pane",
+    "bindings": {
+      "ctrl-shift-q": "pane::CloseAllItems",
+    },
+  },
+  {
+    "context": "vim_mode == normal",
+    "bindings": {
+      "ctrl-shift-q": "pane::CloseAllItems",
+    },
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-shift-q": "pane::CloseAllItems",
+    },
+  },
+  {
+    "context": "Terminal",
+    "bindings": {
+      "ctrl-shift-q": "pane::CloseAllItems",
     },
   },
 
@@ -97,24 +161,24 @@
   },
 
   // Editando atalhos do vim_mode
-  {
-    "context": "vim_mode == normal",
-    "bindings": {
-      "j": ["workspace::SendKeystrokes", "g j"],
-      "k": ["workspace::SendKeystrokes", "g k"],
-      "$": ["workspace::SendKeystrokes", "g $"],
-      "0": ["workspace::SendKeystrokes", "g 0"],
-    },
-  },
-  {
-    "context": "Editor",
-    "bindings": {
-      "j": ["workspace::SendKeystrokes", "g j"],
-      "k": ["workspace::SendKeystrokes", "g k"],
-      "$": ["workspace::SendKeystrokes", "g $"],
-      "0": ["workspace::SendKeystrokes", "g 0"],
-    },
-  },
+  // {
+  //   "context": "vim_mode == normal",
+  //   "bindings": {
+  //     "j": ["workspace::SendKeystrokes", "g j"],
+  //     "k": ["workspace::SendKeystrokes", "g k"],
+  //     "$": ["workspace::SendKeystrokes", "g $"],
+  //     "0": ["workspace::SendKeystrokes", "g 0"],
+  //   },
+  // },
+  // {
+  //   "context": "Editor",
+  //   "bindings": {
+  //     "j": ["workspace::SendKeystrokes", "g j"],
+  //     "k": ["workspace::SendKeystrokes", "g k"],
+  //     "$": ["workspace::SendKeystrokes", "g $"],
+  //     "0": ["workspace::SendKeystrokes", "g 0"],
+  //   },
+  // },
 
   // Terminal
   {
