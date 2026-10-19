@@ -201,8 +201,8 @@ alias bu='brew update && brew upgrade'
 alias helix='flatpak run com.helix_editor.Helix'
 
 #Update all package-managers Aliase
-alias update='sudo dnf upgrade && flatpak update && brew upgrade && cargo install cargo-update && cargo install-update -a && uv tool upgrade --all'
-alias up='sudo dnf upgrade && flatpak update && brew upgrade && cargo install cargo-update && cargo install-update -a && uv tool upgrade --all'
+alias update='sudo dnf upgrade && flatpak update && brew upgrade && cargo install cargo-update && cargo install-update -a && uv tool upgrade --all && sudo dnf remove --oldinstallonly --setopt installonly_limit=2'
+alias up='sudo dnf upgrade && flatpak update && brew upgrade && cargo install cargo-update && cargo install-update -a && uv tool upgrade --all && sudo dnf remove --oldinstallonly --setopt installonly_limit=2'
 
 #Walker Aliases
 alias walker="walker --gapplication-service"

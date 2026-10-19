@@ -7,4 +7,9 @@
     Path("/home/raul/Nextcloud/Vídeos"),
     Path("/home/raul/Nextcloud"),
     Path("/"),
+    Network(
+        uri: "sftp://raul@100.74.171.65/DATA/AppData",
+        name: "CasaOS",
+        path: "/run/user/1000/gvfs/sftp:host=100.74.171.65,user=raul/DATA/AppData",
+    ),
 ]
