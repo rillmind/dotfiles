@@ -28,8 +28,8 @@ bash ~/.scripts/linux/clean/DevCaches.sh
 
 # --- Seção 5: Limpeza do Podman ---
 
-# Linha comentada pois limparia o Distrobox sempre que limpasse o sistema!
-#bash ~/.scripts/linux/clean/Podman.sh
+# Preserva os containers do Distrobox (label manager=distrobox)
+bash ~/.scripts/linux/clean/Podman.sh
 
 # --- Seçao 6: Limpeza do Homebrew ---
 bash ~/.scripts/linux/clean/Homebrew.sh
