@@ -12,7 +12,7 @@ bash ~/.scripts/linux/clean/DNF.sh
 
 # --- Seção 2: Limpeza do Flatpak ---
 
-bash ~/.scripts/linux/clean/Flatpak.sh
+bash ~/.scripts/linux/clean/Flatpaks.sh
 
 # --- Seção 3: Limpeza de Caches do Sistema e do Usuário ---
 
