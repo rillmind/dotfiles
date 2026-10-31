@@ -18,7 +18,7 @@ bash ~/.scripts/linux/clean/Flatpaks.sh
 
 bash ~/.scripts/linux/clean/UserCaches.sh
 
-# --- Seção 3.1: Limpeza de Caches de Desenvolvimento (Bun, npm) ---
+# --- Seção 3.1: Limpeza de Caches de Desenvolvimento (Bun, npm, Go, Gradle, Cargo) ---
 
 bash ~/.scripts/linux/clean/DevCaches.sh
 

@@ -16,5 +16,14 @@ if command -v npm &> /dev/null; then
     npm cache clean --force
 fi
 
+if command -v go &> /dev/null; then
+    echo -e "\n${VERDE}>> Limpando cache de módulos do Go...${NC}"
+    go clean -modcache
+fi
+
+echo -e "\n${VERDE}>> Limpando caches do Gradle e do registry do Cargo...${NC}"
+rm -rf ~/.gradle/caches ~/.cargo/registry/cache ~/.cargo/registry/src
+echo "Caches do Gradle e do Cargo limpos."
+
 echo -e "\n${AMARELO}Limpeza de caches de desenvolvimento concluída!${NC}"
 echo -e "${CIANO}-----------------------------------------------------${NC}\n"
