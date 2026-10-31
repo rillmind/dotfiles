@@ -18,6 +18,10 @@ bash ~/.scripts/linux/clean/Flatpaks.sh
 
 bash ~/.scripts/linux/clean/UserCaches.sh
 
+# --- Seção 3.1: Limpeza de Caches de Desenvolvimento (Bun, npm) ---
+
+bash ~/.scripts/linux/clean/DevCaches.sh
+
 # --- Seção 4: Limpeza do Docker ---
 
 #bash ~/.scripts/linux/clean/Docker.sh
