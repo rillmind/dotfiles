@@ -25,6 +25,7 @@ sudo journalctl --vacuum-size=500M
 echo -e "\n${VERDE}>> Limpando cache de aplicativos...${NC}"
 sudo rm -rfv ~/.var/app/*/cache/*
 sudo rm -rfv ~/.local/share/zed/node/node*/cache/*
+rm -rf ~/.stremio-server/stremio-cache ~/.config/hydralauncher/Cache
 
 echo -e "\n${VERDE}>> Limpando lixeira do sistema...${NC}"
 sudo rm -rfv ~/.local/share/Trash/files/*
