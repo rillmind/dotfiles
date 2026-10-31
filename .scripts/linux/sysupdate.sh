@@ -1,11 +1,35 @@
 #!/usr/bin/env bash
-# Atualiza o sistema (dnf, flatpak, brew, cargo, uv) e mantém só os 2 kernels mais recentes.
-#   sysupdate      -> pergunta uma vez antes de cada atualizador
-#   sysupdate -y   -> aceita tudo automaticamente
-# Depois da confirmação (ou com -y), os atualizadores rodam sem fazer perguntas próprias.
+# Atualiza o sistema rodando cada módulo de sysupdate.d/ em ordem de nome.
+#   sysupdate.sh      -> mostra o que será atualizado e pergunta em cada etapa ([S/n], Enter = sim)
+#   sysupdate.sh -y   -> aceita tudo automaticamente
+#
+# Interface de um módulo (sysupdate.d/NN-nome.sh):
+#   NAME="Homebrew"     obrigatório: nome exibido no output e no resumo
+#   REQUIRES=(brew)     opcional: comandos necessários; se faltar algum, o módulo é pulado
+#   pending() { ... }   opcional: imprime o que será atualizado (saída vazia = nada a fazer).
+#                       Se existir, o núcleo mostra a lista e pergunta [S/n].
+#                       Se não existir, o módulo usa o prompt nativo da ferramenta.
+#   update()  { ... }   obrigatório: faz a atualização. Com AUTO=1 (modo -y) não deve perguntar nada.
+# Helpers para os módulos: $AUTO (0/1) e yes_flag (imprime "-y" quando AUTO=1).
+#
+# Dependência opcional: `script` (Fedora: util-linux-script). Com ele, tudo roda num pseudo-terminal
+# gravado em log: as ferramentas mantêm barras de progresso e prompts normais e o resumo mostra o
+# motivo das falhas. Sem ele, roda direto e o motivo vira só o código de saída.
 
 AUTO=0
 [[ "$1" == "-y" || "$1" == "--yes" ]] && AUTO=1
+
+# Reexecuta o script inteiro dentro de um único `script`, gravando a sessão em SYSUPDATE_LOG.
+# Um terminal só para tudo: o sudo pede a senha uma vez e o visual das ferramentas não quebra.
+if [[ -z "$SYSUPDATE_LOG" ]] && command -v script &>/dev/null; then
+    export SYSUPDATE_LOG=$(mktemp)
+    SHELL=/bin/bash script -qefc "$(printf '%q ' "$(readlink -f "$0")" "$@")" "$SYSUPDATE_LOG"
+    code=$?
+    rm -f "$SYSUPDATE_LOG"
+    exit $code
+fi
+
+MODULE_DIR="${SYSUPDATE_DIR:-$(dirname "$(readlink -f "$0")")/sysupdate.d}"
 
 bold=$'\e[1m'; green=$'\e[32m'; red=$'\e[31m'; yellow=$'\e[33m'; gray=$'\e[90m'; reset=$'\e[0m'
 names=(); statuses=(); reasons=()
@@ -14,6 +38,8 @@ trap 'rm -rf "$logdir"' EXIT
 
 export NONINTERACTIVE=1 HOMEBREW_NO_ENV_HINTS=1
 
+yes_flag() { (( AUTO )) && echo "-y"; }
+
 confirm() {
     (( AUTO )) && return 0
     local reply
@@ -21,10 +47,14 @@ confirm() {
     [[ -z "$reply" || "$reply" =~ ^[SsYy] ]]
 }
 
+record() { names+=("$1"); statuses+=("$2"); reasons+=("$3"); }
+
+clean_log() { sed -e 's/\x1b\[[0-9;]*[a-zA-Z]//g' -e 's/\r/\n/g' "$1"; }
+
 # Pega uma linha curta explicando a falha a partir do stderr do atualizador
 failure_reason() {
     local log="$1" code="$2" line
-    line=$(sed -e 's/\x1b\[[0-9;]*[a-zA-Z]//g' -e 's/\r/\n/g' "$log" \
+    line=$(clean_log "$log" \
         | grep -iE 'error|erro|fail|falh|cannot|não |not found|denied|unable|conflict' \
         | grep -v '^\s*$' | tail -1 | sed -E 's/^\s+//')
     [[ -z "$line" ]] && line="saiu com código $code"
@@ -32,59 +62,78 @@ failure_reason() {
     echo "$line"
 }
 
-run_step() {
-    local name="$1"; shift
-    local log="$logdir/${#names[@]}.log" code
-    names+=("$name")
-    echo
-    echo "${bold}==> ${name}${reset}"
-    if ! confirm "Atualizar ${name}?"; then
-        echo "Pulado."
-        statuses+=(skip); reasons+=("pulado pelo usuário")
+run_module() {
+    local file="$1" log="$logdir/${#names[@]}.log" list code cmd
+
+    unset NAME REQUIRES
+    unset -f pending update
+    source "$file"
+
+    if [[ -z "$NAME" ]] || ! declare -F update &>/dev/null; then
+        record "$(basename "$file" .sh)" fail "módulo inválido: falta NAME ou update()"
         return
     fi
-    "$@" < /dev/null 2> >(tee "$log" >&2)
+
+    echo
+    echo "${bold}==> ${NAME}${reset}"
+
+    for cmd in "${REQUIRES[@]}"; do
+        if ! command -v "$cmd" &>/dev/null; then
+            echo "Pulado: $cmd não instalado."
+            record "$NAME" skip "$cmd não instalado"
+            return
+        fi
+    done
+
+    if declare -F pending &>/dev/null; then
+        list=$(pending 2>/dev/null)
+        if [[ -z "$list" ]]; then
+            echo "Nada para atualizar."
+            record "$NAME" skip "nada para atualizar"
+            return
+        fi
+        echo "$list" | sed 's/^/  /'
+        if ! confirm "Atualizar ${NAME}?"; then
+            echo "Pulado."
+            record "$NAME" skip "pulado pelo usuário"
+            return
+        fi
+    fi
+
+    # Sem pipes: a ferramenta escreve direto no terminal. O trecho do log da sessão gerado
+    # durante o update vira o log deste módulo.
+    local start=0
+    [[ -n "$SYSUPDATE_LOG" ]] && start=$(stat -c %s "$SYSUPDATE_LOG")
+    update
     code=$?
-    wait $!
-    if (( code == 0 )); then
-        statuses+=(ok); reasons+=("")
+    if [[ -n "$SYSUPDATE_LOG" ]]; then
+        tail -c +$((start + 1)) "$SYSUPDATE_LOG" > "$log"
     else
-        statuses+=(fail); reasons+=("$(failure_reason "$log" "$code")")
+        : > "$log"
+    fi
+
+    if (( code == 0 )); then
+        record "$NAME" ok ""
+    elif clean_log "$log" | grep -qiE 'abort|cancel'; then
+        record "$NAME" skip "cancelado pelo usuário"
+    else
+        record "$NAME" fail "$(failure_reason "$log" "$code")"
     fi
 }
 
-missing_step() {
-    names+=("$1"); statuses+=(skip); reasons+=("$2 não instalado")
-}
-
-cargo_update() {
-    if ! cargo install-update --version &>/dev/null; then
-        cargo install cargo-update || return 1
-    fi
-    cargo install-update -a
-}
-
-remove_old_kernels() {
-    local old
-    old=$(dnf repoquery --installed --installonly --latest-limit=-2 -q 2>/dev/null)
-    if [[ -z "$old" ]]; then
-        echo "Nenhum kernel antigo para remover."
-        return 0
-    fi
-    echo "Kernels/pacotes antigos que serão removidos:"
-    echo "$old" | sed 's/^/  /'
-    sudo dnf remove -y $old
-}
+shopt -s nullglob
+modules=("$MODULE_DIR"/*.sh)
+if (( ${#modules[@]} == 0 )); then
+    echo "${red}Nenhum módulo encontrado em ${MODULE_DIR}${reset}"
+    exit 1
+fi
 
 # Pede a senha do sudo uma vez no início
 sudo -v || exit 1
 
-run_step "DNF"     sudo dnf upgrade -y
-run_step "Flatpak" flatpak update -y --noninteractive
-if command -v brew  &>/dev/null; then run_step "Homebrew" brew upgrade;          else missing_step "Homebrew" brew;  fi
-if command -v cargo &>/dev/null; then run_step "Cargo"    cargo_update;          else missing_step "Cargo"    cargo; fi
-if command -v uv    &>/dev/null; then run_step "uv tools" uv tool upgrade --all; else missing_step "uv tools" uv;    fi
-run_step "Kernels" remove_old_kernels
+for module in "${modules[@]}"; do
+    run_module "$module"
+done
 
 echo
 echo "${bold}──────── Resumo ────────${reset}"
