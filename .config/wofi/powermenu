@@ -6,7 +6,7 @@ selected=$(echo -e $entries|wofi --width=50 --height=220 --dmenu --hide-scroll -
 
 case $selected in
   logout)
-    exec hyprctl dispatch exit NOW;;
+    exec hyprctl dispatch 'hl.dsp.exit()';;
   suspend)
     exec systemctl suspend;;
   reboot)

@@ -4,12 +4,8 @@ TOGGLE=$HOME/.toggle
 
 if [ ! -e $TOGGLE ]; then
 	touch $TOGGLE
-	hyprctl keyword general:gaps_in 0
-	hyprctl keyword general:gaps_out 0
-	hyprctl keyword decoration:rounding 0
+	hyprctl eval 'hl.config({ general = { gaps_in = 0, gaps_out = 0 }, decoration = { rounding = 0 } })'
 else
 	rm $TOGGLE
-	hyprctl keyword general:gaps_in 10
-	hyprctl keyword general:gaps_out 20
-	hyprctl keyword decoration:rounding 15
+	hyprctl eval 'hl.config({ general = { gaps_in = 10, gaps_out = 20 }, decoration = { rounding = 15 } })'
 fi
