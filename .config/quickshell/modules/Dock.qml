@@ -141,8 +141,8 @@ Item {
                         var addrStr = (typeof addr === "string" && addr.indexOf("0x") === 0) ? addr : "0x" + addr.toString(16)
                         var ws = modelData.workspace ? (modelData.workspace.id !== undefined ? modelData.workspace.id : modelData.workspace) : null
                         // se janela está em outro workspace, troca antes de focar
-                        if (ws) Hyprland.dispatch("workspace " + ws)
-                        Hyprland.dispatch("focuswindow address:" + addrStr)
+                        if (ws) Hyprland.dispatch('hl.dsp.focus({ workspace = "' + ws + '" })')
+                        Hyprland.dispatch('hl.dsp.focus({ window = "address:' + addrStr + '" })')
                         dockRoot.requestFocusClient(addrStr)
                         // fallback via activate para toplevels
                         if (modelData.activate && typeof addr !== "string") { try { modelData.activate() } catch(e) {} }
@@ -151,10 +151,10 @@ Item {
                         var addr = modelData.address
                         var addrStr = (typeof addr === "string" && addr.indexOf("0x") === 0) ? addr : "0x" + addr.toString(16)
                         if (mouse.button === Qt.RightButton) {
-                            Hyprland.dispatch("closewindow address:" + addrStr)
+                            Hyprland.dispatch('hl.dsp.window.close({ window = "address:' + addrStr + '" })')
                             dockRoot.requestCloseClient(addrStr)
                         } else if (mouse.button === Qt.MiddleButton) {
-                            Hyprland.dispatch("closewindow address:" + addrStr)
+                            Hyprland.dispatch('hl.dsp.window.close({ window = "address:' + addrStr + '" })')
                             dockRoot.requestCloseClient(addrStr)
                         }
                     }

@@ -443,13 +443,13 @@ ShellRoot {
                                 MouseArea {
                                     anchors.fill: parent
                                     cursorShape: Qt.PointingHandCursor
-                                    onClicked: Hyprland.dispatch("workspace " + (index+1))
+                                    onClicked: Hyprland.dispatch('hl.dsp.focus({ workspace = "' + (index+1) + '" })')
                                 }
                                 // wheel: waybar on-scroll-up/down e+1/e-1
                                 WheelHandler {
                                     onWheel: event => {
-                                        if(event.angleDelta.y > 0) Hyprland.dispatch("workspace e+1")
-                                        else if(event.angleDelta.y < 0) Hyprland.dispatch("workspace e-1")
+                                        if(event.angleDelta.y > 0) Hyprland.dispatch('hl.dsp.focus({ workspace = "e+1" })')
+                                        else if(event.angleDelta.y < 0) Hyprland.dispatch('hl.dsp.focus({ workspace = "e-1" })')
                                     }
                                 }
                             }
@@ -703,8 +703,8 @@ ShellRoot {
                 }
                 Connections {
                     target: dockLoader.item
-                    function onRequestFocusClient(addr) { Hyprland.dispatch("focuswindow address:" + addr) }
-                    function onRequestCloseClient(addr) { Hyprland.dispatch("closewindow address:" + addr) }
+                    function onRequestFocusClient(addr) { Hyprland.dispatch('hl.dsp.focus({ window = "address:' + addr + '" })') }
+                    function onRequestCloseClient(addr) { Hyprland.dispatch('hl.dsp.window.close({ window = "address:' + addr + '" })') }
                 }
                 MouseArea {
                     anchors.fill: parent
