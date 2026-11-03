@@ -8,6 +8,24 @@ return {
   config = function()
     local null_ls = require("null-ls")
 
+    -- Se o none-ls formata o buffer, usa só ele (evita brigar com ts_ls etc.); senão, o LSP
+    local function format(bufnr)
+      bufnr = bufnr or vim.api.nvim_get_current_buf()
+      local has_null_ls = #vim.lsp.get_clients({
+        bufnr = bufnr,
+        name = "null-ls",
+        method = "textDocument/formatting",
+      }) > 0
+      vim.lsp.buf.format({
+        bufnr = bufnr,
+        filter = function(client)
+          return not has_null_ls or client.name == "null-ls"
+        end,
+      })
+    end
+
+    local format_group = vim.api.nvim_create_augroup("FormatOnSave", { clear = true })
+
     null_ls.setup({
       sources = {
         -- Lua
@@ -30,22 +48,29 @@ return {
         -- TOML (via none-ls-extras)
         require("none-ls.formatting.taplo"),
 
-        -- JSON (via prettier)
-        null_ls.builtins.formatting.prettier,
+        -- JSON (via prettier) — só se estiver instalado (`npm i -g prettier`)
+        null_ls.builtins.formatting.prettier.with({
+          condition = function()
+            return vim.fn.executable("prettier") == 1
+          end,
+        }),
       },
       on_attach = function(client, bufnr)
         if client:supports_method("textDocument/formatting") then
+          vim.api.nvim_clear_autocmds({ group = format_group, buffer = bufnr })
           vim.api.nvim_create_autocmd("BufWritePre", {
-            group = vim.api.nvim_create_augroup("FormatOnSave", { clear = true }),
+            group = format_group,
             buffer = bufnr,
             callback = function()
-              vim.lsp.buf.format({ bufnr = bufnr })
+              format(bufnr)
             end,
           })
         end
       end,
     })
 
-    vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, { desc = "Format" })
+    vim.keymap.set("n", "<leader>f", function()
+      format()
+    end, { desc = "Format" })
   end,
 }

@@ -1,7 +1,8 @@
 return {
 	{
 		"nvim-telescope/telescope.nvim",
-		tag = "0.1.6",
+		-- master: a 0.1.6 usa ft_to_lang do nvim-treesitter antigo e quebra o previewer
+		branch = "master",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"nvim-telescope/telescope-ui-select.nvim",
@@ -20,7 +21,6 @@ return {
 						"--column",
 						"--smart-case",
 					},
-					previewer = false, -- Desativa previewer para evitar erro com tree-sitter
 				},
 				extensions = {
 					["ui-select"] = {
@@ -33,6 +33,7 @@ return {
 
 			vim.keymap.set("n", "<leader>p", builtin.find_files, { desc = "Find Files" })
 			vim.keymap.set("n", "<leader>fg", builtin.buffers, { desc = "Find Buffers" })
+			vim.keymap.set("n", "<leader>g", builtin.live_grep, { desc = "Live Grep" })
 		end,
 	},
 }

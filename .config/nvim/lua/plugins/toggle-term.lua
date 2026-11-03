@@ -10,6 +10,7 @@ return {
 		})
 
 		vim.keymap.set("n", "<leader>t", "<cmd>ToggleTerm<CR>", { desc = "Toggle Terminal" })
-		vim.keymap.set("t", "<leader>t", "<cmd>ToggleTerm<CR>", { desc = "Toggle Terminal" })
+		-- <C-\> no terminal: <leader>t aqui fazia todo espaço digitado esperar o timeoutlen
+		vim.keymap.set("t", "<C-\\>", "<cmd>ToggleTerm<CR>", { desc = "Toggle Terminal" })
 	end,
 }

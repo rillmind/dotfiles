@@ -7,6 +7,7 @@ return {
   },
   {
     "williamboman/mason-lspconfig.nvim",
+    dependencies = { "williamboman/mason.nvim" },
     config = function()
       require("mason-lspconfig").setup({
         ensure_installed = {
@@ -120,15 +121,19 @@ return {
 
       vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "LSP Hover" })
       vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
-      vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Prev Diagnostic" })
-      vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next Diagnostic" })
+      vim.keymap.set("n", "[d", function()
+        vim.diagnostic.jump({ count = -1 })
+      end, { desc = "Prev Diagnostic" })
+      vim.keymap.set("n", "]d", function()
+        vim.diagnostic.jump({ count = 1 })
+      end, { desc = "Next Diagnostic" })
       vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { desc = "Go to Declaration" })
       vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to Implementation" })
       vim.keymap.set("n", "[e", function()
-        vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
+        vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR })
       end, { desc = "Prev Error" })
       vim.keymap.set("n", "]e", function()
-        vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
+        vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR })
       end, { desc = "Next Error" })
 
       -- Diagnostic config: mostra popup ao passar o cursor
@@ -139,7 +144,7 @@ return {
         update_in_insert = false,
         severity_sort = true,
         float = {
-          source = "always",
+          source = true,
           header = { "", "" },
           prefix = "",
         },

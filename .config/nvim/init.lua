@@ -10,9 +10,6 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 	})
 end
 
-vim.wo.number = true
-vim.cmd([[highlight LineNr guifg=#FFFFFF guibg=#000000 gui=bold]])
-
 vim.opt.rtp:prepend(lazypath)
 
 require("vim-options")

@@ -3,7 +3,9 @@ vim.g.mapleader = " "
 -- Configuração do clipboard para Wayland
 vim.opt.clipboard = "unnamedplus"
 
+vim.opt.number = true
 vim.opt.scrolloff = 5
+vim.opt.updatetime = 250 -- CursorHold mais rápido (popup de diagnóstico)
 vim.opt.termguicolors = true
 vim.opt.mouse = "a"
 vim.opt.expandtab = true
