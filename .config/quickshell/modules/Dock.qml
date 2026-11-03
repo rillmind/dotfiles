@@ -79,13 +79,14 @@ Item {
         return list
     }
 
-    implicitHeight: 80
-    implicitWidth: sortedToplevels.length === 0 ? 80 : dockRow.implicitWidth + 16
+    // o respiro em volta fica por conta do fundo (shell.qml), aqui só o tamanho dos ícones
+    implicitHeight: 52
+    implicitWidth: sortedToplevels.length === 0 ? 52 : dockRow.implicitWidth
 
     RowLayout {
         id: dockRow
         anchors.centerIn: parent
-        spacing: 8
+        spacing: 6
         // Hyprland toplevels ordenados por workspace – ícone exato da janela (mesmo mapeamento da barra superior)
         // funciona mesmo em workspace vazio porque usa dockClients global (hyprctl)
         Repeater {
@@ -96,9 +97,9 @@ Item {
                 property string _appId: modelData.class !== undefined ? modelData.class : (modelData.appId || "")
                 property string _title: modelData.title || ""
                 property bool isActive: (modelData.address && dockRoot.activeWindowAddress && modelData.address === dockRoot.activeWindowAddress) || modelData.activated
-                Layout.preferredWidth: 64
-                Layout.preferredHeight: 64
-                radius: 14
+                Layout.preferredWidth: 52
+                Layout.preferredHeight: 52
+                radius: 12
                 color: isActive ? "#cba6f7" : "#313244"
                 border.color: isActive ? "#cba6f7" : "transparent"
                 border.width: isActive ? 2 : 0
@@ -109,11 +110,14 @@ Item {
                 Behavior on color { ColorAnimation { duration: 120 } }
 
                 Text {
-                    anchors.centerIn: parent
+                    // centraliza pelo próprio glifo (Nerd Font desalinha com anchors.centerIn)
+                    anchors.fill: parent
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                     text: dockRoot.appIcon(_appId, _title)
                     color: isActive ? "#1e1e2e" : "#cdd6f4"
                     font.family: dockRoot.fontFamily
-                    font.pixelSize: 30
+                    font.pixelSize: 26
                     font.bold: true
                 }
 

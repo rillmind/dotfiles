@@ -625,7 +625,17 @@ ShellRoot {
     }
 
     // ── Dock inferior OSX – vidro fosco catppuccin, auto-hide na borda inferior ─
-    // trigger invisível 12px na borda inferior para mostrar a dock (funciona mesmo em workspace vazio)
+    // esconde a dock quando o mouse não está nem na borda nem sobre ela
+    property bool dockTriggerHovered: false
+    Timer {
+        id: dockHideTimer
+        interval: 400
+        repeat: false
+        onTriggered: {
+            if (!root.dockHovered && !root.dockTriggerHovered) root.dockVisible = false
+        }
+    }
+    // trigger invisível de 2px na borda inferior: só mostra a dock quando o mouse quase encosta na borda
     Variants {
         model: Quickshell.screens
         PanelWindow {
@@ -636,12 +646,13 @@ ShellRoot {
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             anchors { bottom: true; left: true; right: true }
             margins { bottom: 0; left: 0; right: 0 }
-            implicitHeight: 12
+            implicitHeight: 2
             color: "transparent"
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
-                onEntered: root.dockVisible = true
+                onEntered: { root.dockTriggerHovered = true; root.dockVisible = true; dockHideTimer.stop() }
+                onExited: { root.dockTriggerHovered = false; dockHideTimer.restart() }
             }
         }
     }
@@ -658,31 +669,20 @@ ShellRoot {
             anchors { bottom: true }
             margins { bottom: 8 }
             // responsiva: largura ajusta ao conteúdo (sem espaço vazio)
-            implicitWidth: dockLoader.implicitWidth > 0 ? dockLoader.implicitWidth + 32 : 112
-            implicitHeight: 88
+            // margem extra para o zoom dos ícones no hover não ser cortado
+            implicitWidth: dockBg.implicitWidth + 16
+            implicitHeight: dockBg.implicitHeight + 16
             color: "transparent"
-            // auto-hide timer
-            Timer {
-                id: dockHideTimer
-                interval: 250
-                repeat: false
-                onTriggered: {
-                    if (!root.dockHovered) root.dockVisible = false
-                }
-            }
-            onVisibleChanged: {
-                if (visible) dockHideTimer.stop()
-                else dockHideTimer.stop()
-            }
 
             Rectangle {
                 id: dockBg
                 anchors.centerIn: parent
-                implicitWidth: dockLoader.implicitWidth > 0 ? dockLoader.implicitWidth + 16 : 96
-                implicitHeight: 80
+                // mesmo respiro (10px) em todos os lados dos ícones
+                implicitWidth: dockLoader.implicitWidth > 0 ? dockLoader.implicitWidth + 20 : 96
+                implicitHeight: dockLoader.implicitHeight > 0 ? dockLoader.implicitHeight + 20 : 72
                 width: implicitWidth
                 height: implicitHeight
-                radius: 18
+                radius: 16
                 color: "#A61e1e2e" // catppuccin mocha base com alpha para vidro fosco
                 border.color: "#313244"
                 border.width: 1
