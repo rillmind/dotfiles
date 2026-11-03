@@ -228,6 +228,24 @@ for i = 1, 10 do
   hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = tostring(i) }))
 end
 
+-- SUPER + SHIFT + N: move o workspace atual para o monitor N
+-- (monitores numerados por posição: da esquerda para a direita, depois de cima para baixo)
+for i = 1, 9 do
+  hl.bind("SUPER + SHIFT + " .. i, function()
+    local mons = {}
+    for _, m in ipairs(hl.get_monitors()) do
+      if m.enabled and not m.is_mirror then table.insert(mons, m) end
+    end
+    table.sort(mons, function(a, b)
+      if a.x ~= b.x then return a.x < b.x end
+      return a.y < b.y
+    end)
+    if mons[i] then
+      hl.dispatch(hl.dsp.workspace.move({ monitor = mons[i].name }))
+    end
+  end)
+end
+
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }))
 
