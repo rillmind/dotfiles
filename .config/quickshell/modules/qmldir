@@ -4,3 +4,4 @@ ControlCenter 1.0 ControlCenter.qml
 Dock 1.0 Dock.qml
 CalendarWidget 1.0 CalendarWidget.qml
 VolumePopup 1.0 VolumePopup.qml
+SystemMonitor 1.0 SystemMonitor.qml

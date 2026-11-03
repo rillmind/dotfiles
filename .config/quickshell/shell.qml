@@ -2,6 +2,8 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Io
 import Quickshell.Hyprland
+import Quickshell.Services.Pipewire
+import Quickshell.Services.UPower
 import QtQuick
 import QtQuick.Layouts
 
@@ -33,6 +35,10 @@ ShellRoot {
     property string hyprWindowIcon: " "
     property string networkIcon: "󰤭 "
     property string networkTooltip: ""
+    property string networkType: "disconnected"   // wifi | ethernet | disconnected
+    property string networkSsid: ""
+    property int networkSignal: 0
+    property string networkIp: ""
     property int volumeLevel: 35
     property bool volumeMuted: false
     property string pulseIcon: " "
@@ -47,7 +53,8 @@ ShellRoot {
     // ── Dock state ─────────────────────────────────────────
     property bool dockHovered: false
     property bool dockVisible: false
-    property bool batteryHovered: false
+    // ícone da barra sob o mouse ("net" | "vol" | "batt" | "") – mostra tooltip
+    property string barHover: ""
     // dock sempre visível quando workspace atual está vazio
     property bool isWorkspaceEmpty: {
         if (!Hyprland || !Hyprland.focusedWorkspace) return false
@@ -61,7 +68,82 @@ ShellRoot {
 
     // ── Control Center (único widget para wifi/volume/bateria) ─
     property bool controlCenterVisible: false
+    property bool sysMonVisible: false
     property bool calendarVisible: false
+
+    // ── Volume ao vivo via PipeWire ───────────────────────
+    PwObjectTracker { objects: [Pipewire.defaultAudioSink] }
+    readonly property var pwSink: Pipewire.defaultAudioSink
+    readonly property bool pwReady: pwSink !== null && pwSink.ready && pwSink.audio !== null
+    function syncVolume() {
+        if (!pwReady) return
+        volumeLevel = Math.round(pwSink.audio.volume * 100)
+        volumeMuted = pwSink.audio.muted
+        updatePulseIcon()
+    }
+    onPwReadyChanged: syncVolume()
+    Connections {
+        target: root.pwReady ? root.pwSink.audio : null
+        function onVolumeChanged() { root.syncVolume() }
+        function onMutedChanged() { root.syncVolume() }
+    }
+
+    // ── Bateria: extras do UPower (tempo restante, potência) ─
+    readonly property var upDev: UPower.displayDevice
+    function formatDuration(sec) {
+        if (!sec || sec <= 0) return ""
+        var h = Math.floor(sec / 3600), m = Math.round((sec % 3600) / 60)
+        return h > 0 ? h + "h" + (m < 10 ? "0" : "") + m : m + " min"
+    }
+    readonly property string batteryTimeText: {
+        if (!upDev || !upDev.ready) return ""
+        if (batteryCharging && upDev.timeToFull > 0) return formatDuration(upDev.timeToFull) + " para carregar"
+        if (!batteryCharging && upDev.timeToEmpty > 0) return formatDuration(upDev.timeToEmpty) + " restantes"
+        return ""
+    }
+    readonly property real batteryRate: upDev && upDev.ready ? Math.abs(upDev.changeRate) : 0
+
+    // ── Painel do sistema (CPU/RAM/GPU/rede/processos) ─────
+    property var sysInfo: null
+    property var cpuHistory: []
+    property real netRxRate: 0
+    property real netTxRate: 0
+    property real _lastRx: -1
+    property real _lastTx: -1
+    property real _lastNetTime: 0
+    Process {
+        id: sysInfoProc
+        command: [Quickshell.shellDir + "/scripts/sys-info.sh"]
+        stdout: SplitParser {
+            onRead: data => {
+                try {
+                    var j = JSON.parse(data)
+                    var now = Date.now()
+                    if (root._lastRx >= 0 && now > root._lastNetTime) {
+                        var dt = (now - root._lastNetTime) / 1000
+                        root.netRxRate = Math.max(0, (j.net.rx - root._lastRx) / dt)
+                        root.netTxRate = Math.max(0, (j.net.tx - root._lastTx) / dt)
+                    }
+                    root._lastRx = j.net.rx; root._lastTx = j.net.tx; root._lastNetTime = now
+                    root.sysInfo = j
+                } catch (e) {}
+            }
+        }
+    }
+    // só coleta enquanto o painel está aberto ou o mouse está na CPU/memória
+    Timer {
+        interval: 2000; repeat: true; triggeredOnStart: true
+        running: root.sysMonVisible || root.barHover === "cpu" || root.barHover === "mem"
+        onTriggered: if (!sysInfoProc.running) sysInfoProc.running = true
+        onRunningChanged: if (!running) { root._lastRx = -1; root.netRxRate = 0; root.netTxRate = 0 }
+    }
+    // histórico de uso de CPU (60 amostras de 1s) para o gráfico
+    Timer {
+        interval: 1000; running: true; repeat: true
+        onTriggered: { var h = root.cpuHistory.slice(-59); h.push(root.cpuUsage); root.cpuHistory = h }
+    }
+    Process { id: killProc }
+    Process { id: missionCenterProc; command: ["flatpak", "run", "io.missioncenter.MissionCenter"] }
 
     // ── Helpers ────────────────────────────────────────────
     function updatePulseIcon() {
@@ -156,13 +238,19 @@ ShellRoot {
     // igual wifiName.sh usa LANGUAGE=C (sem isso retorna sim/não e falha)
     Process {
         id: netProc
-        command: ["sh", "-c", "ssid=$(LANGUAGE=C nmcli -t -f active,ssid dev wifi 2>/dev/null | awk -F: '$1==\"yes\"{print $2; exit}'); if [ -n \"$ssid\" ]; then echo \"wifi:$ssid\"; elif LANGUAGE=C nmcli -t -f TYPE,STATE dev 2>/dev/null | grep -q 'wifi:connected'; then echo \"wifi:Wi-Fi\"; elif LANGUAGE=C nmcli -t -f TYPE,STATE dev 2>/dev/null | grep -q 'ethernet:connected'; then echo \"ethernet:\"; else echo \"disconnected:\"; fi"]
+        // saída: tipo|ssid|sinal|ip (ver scripts/net-info.sh)
+        command: [Quickshell.shellDir + "/scripts/net-info.sh"]
         stdout: SplitParser {
             onRead: data => {
                 if(!data) return
-                var d=data.trim()
-                if(d.startsWith("wifi:")){ networkIcon="󰤨 "; networkTooltip=d.substring(5) }
-                else if(d.startsWith("ethernet")){ networkIcon=" "; networkTooltip="Ethernet" }
+                var f=data.trim().split("|")
+                networkType=f[0]; networkSsid=f[1]||""; networkSignal=parseInt(f[2])||0; networkIp=f[3]||""
+                if(networkType==="wifi"){
+                    var s=networkSignal
+                    networkIcon=(s>=80?"󰤨":s>=60?"󰤥":s>=40?"󰤢":s>=20?"󰤟":"󰤯")+" "
+                    networkTooltip=networkSsid||"Wi-Fi"
+                }
+                else if(networkType==="ethernet"){ networkIcon=" "; networkTooltip="Ethernet" }
                 else { networkIcon="󰤭 "; networkTooltip="Desconectado" }
             }
         }
@@ -225,7 +313,8 @@ ShellRoot {
     // ── Timers (waybar intervals) ──────────────────────────
     Timer { interval: 1000; running: true; repeat: true; onTriggered: { cpuProc.running=true; memProc.running=true; battProc.running=true } } // cpu 1s mem 1s battery 1s
     Timer { interval: 5000; running: true; repeat: true; onTriggered: netProc.running=true }
-    Timer { interval: 2000; running: true; repeat: true; onTriggered: volProc.running=true }
+    // fallback por polling só se o PipeWire não estiver disponível
+    Timer { interval: 2000; running: !root.pwReady; repeat: true; onTriggered: volProc.running=true }
     Timer { interval: 200; running: true; repeat: true; onTriggered: { windowProc.running=true } }
     Timer { interval: 500; running: true; repeat: true; onTriggered: dockClientsProc.running=true }
 
@@ -241,12 +330,14 @@ ShellRoot {
     // Process já definidos acima controlam volume
     function setVolume(level) {
         level = Math.max(0, Math.min(100, level))
+        if (pwReady) { pwSink.audio.volume = level / 100; return }
         setVolumeProc.command = ["sh","-c", "wpctl set-volume @DEFAULT_AUDIO_SINK@ " + (level/100).toFixed(2)]
         setVolumeProc.running = true
         // refresh leitura canônica via volProc
         refreshVolTimer.restart()
     }
     function toggleMute() {
+        if (pwReady) { pwSink.audio.muted = !pwSink.audio.muted; return }
         toggleMuteProc.command = ["sh","-c", "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"]
         toggleMuteProc.running = true
         refreshVolTimer.restart()
@@ -260,28 +351,37 @@ ShellRoot {
         PanelWindow {
             property var modelData
             screen: modelData
+            id: ccWindow
             visible: root.controlCenterVisible
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
-            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+            // teclado só enquanto digita a senha do wifi
+            WlrLayershell.keyboardFocus: ccLoader.item && ccLoader.item.wantsKeyboard ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
             anchors { top: true; right: true }
             margins { top: 44; right: 8 }
-            implicitWidth: 320
-            implicitHeight: 208
+            implicitWidth: ccLoader.item ? ccLoader.item.implicitWidth : 340
+            implicitHeight: ccLoader.item ? ccLoader.item.implicitHeight : 200
             color: "transparent"
-            MouseArea {
-                anchors.fill: parent
-                onClicked: root.controlCenterVisible = false
+            // fecha ao clicar fora do painel
+            HyprlandFocusGrab {
+                windows: [ccWindow]
+                active: ccWindow.visible
+                onCleared: root.controlCenterVisible = false
             }
             Rectangle {
                 anchors.fill: parent
                 color: "transparent"
                 Loader {
                     id: ccLoader
-                    anchors.centerIn: parent
-                    width: 300; height: 188
+                    anchors.fill: parent
                     source: Qt.resolvedUrl("modules/ControlCenter.qml")
                     onLoaded: {
+                        item.networkType = Qt.binding(function() { return root.networkType })
+                        item.networkSsid = Qt.binding(function() { return root.networkSsid })
+                        item.networkSignal = Qt.binding(function() { return root.networkSignal })
+                        item.networkIp = Qt.binding(function() { return root.networkIp })
+                        item.batteryTimeText = Qt.binding(function() { return root.batteryTimeText })
+                        item.batteryRate = Qt.binding(function() { return root.batteryRate })
                         item.volumeLevel = Qt.binding(function() { return root.volumeLevel })
                         item.volumeMuted = Qt.binding(function() { return root.volumeMuted })
                         item.networkIcon = Qt.binding(function() { return root.networkIcon })
@@ -347,31 +447,99 @@ ShellRoot {
         }
     }
 
-    // ── Battery hover tooltip (porcentagem) ─────────────────
+    // ── Painel do sistema (abre pela CPU/memória) ──────────
+    Variants {
+        model: Quickshell.screens
+        PanelWindow {
+            id: smWindow
+            property var modelData
+            screen: modelData
+            visible: root.sysMonVisible
+            WlrLayershell.layer: WlrLayer.Top
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+            anchors { top: true; right: true }
+            margins { top: 44; right: 8 }
+            implicitWidth: smLoader.item ? smLoader.item.implicitWidth : 360
+            implicitHeight: smLoader.item ? smLoader.item.implicitHeight : 300
+            color: "transparent"
+            HyprlandFocusGrab {
+                windows: [smWindow]
+                active: smWindow.visible
+                onCleared: root.sysMonVisible = false
+            }
+            Loader {
+                id: smLoader
+                anchors.fill: parent
+                source: Qt.resolvedUrl("modules/SystemMonitor.qml")
+                onLoaded: {
+                    item.info = Qt.binding(function() { return root.sysInfo })
+                    item.cpuUsage = Qt.binding(function() { return root.cpuUsage })
+                    item.cpuHistory = Qt.binding(function() { return root.cpuHistory })
+                    item.rxRate = Qt.binding(function() { return root.netRxRate })
+                    item.txRate = Qt.binding(function() { return root.netTxRate })
+                    item.fontFamily = root.fontFamily
+                    item.colBarBg = root.colBase
+                }
+            }
+            Connections {
+                target: smLoader.item
+                function onRequestKill(pid) { killProc.command = ["kill", String(pid)]; killProc.running = true; sysInfoProc.running = true }
+                function onRequestOpenMonitor() { missionCenterProc.running = true; root.sysMonVisible = false }
+            }
+        }
+    }
+
+    // ── Tooltip dos ícones da barra (wifi / volume / bateria) ─
+    function barTooltipText() {
+        if (barHover === "net") {
+            if (networkType === "wifi") return "󰤨  " + networkSsid + "  ·  sinal " + networkSignal + "%" + (networkIp ? "  ·  " + networkIp : "")
+            if (networkType === "ethernet") return "  Ethernet" + (networkIp ? "  ·  " + networkIp : "")
+            return "󰤭  Sem conexão"
+        }
+        if (barHover === "vol") {
+            var dev = pwSink ? (pwSink.nickname || pwSink.description || "") : ""
+            return (volumeMuted ? "󰝟  Mudo" : "󰕾  " + volumeLevel + "%") + (dev ? "  ·  " + dev : "") + "   (rolar ajusta)"
+        }
+        if (barHover === "cpu") {
+            var c = sysInfo ? sysInfo.cpu : null
+            return "  CPU " + cpuUsage + "%" + (c && c.temp !== null ? "  ·  " + c.temp + "°C" : "") + (c && c.freq ? "  ·  " + (c.freq / 1000).toFixed(1) + " GHz" : "")
+        }
+        if (barHover === "mem") {
+            if (!sysInfo) return "  RAM " + memUsage + "%"
+            var m = sysInfo.mem, used = (m.total - m.available) / 1048576
+            return "  RAM " + used.toFixed(1) + " / " + (m.total / 1048576).toFixed(1) + " GB  ·  " + memUsage + "%"
+        }
+        if (barHover === "batt") {
+            var st = batteryStatus === "Charging" ? "carregando" : batteryStatus === "Discharging" ? "descarregando" : batteryStatus === "Full" ? "carga completa" : batteryStatus.toLowerCase()
+            return "󰁹  " + batteryCapacity + "%  ·  " + st + (batteryTimeText ? "  ·  " + batteryTimeText : "")
+        }
+        return ""
+    }
     Variants {
         model: Quickshell.screens
         PanelWindow {
             property var modelData
             screen: modelData
-            visible: root.batteryHovered && !root.controlCenterVisible
+            visible: root.barHover !== "" && !root.controlCenterVisible && !root.sysMonVisible
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
             anchors { top: true; right: true }
-            margins { top: 44; right: 6 }
-            implicitWidth: 170
+            margins { top: 44; right: 8 }
+            implicitWidth: tipText.implicitWidth + 24
             implicitHeight: 32
             color: "transparent"
             Rectangle {
                 anchors.fill: parent
-                color: root.colSurface0
-                radius: 8
-                border.color: root.colOverlay0
+                color: root.colBase
+                radius: 10
+                border.color: root.colSurface1
                 border.width: 1
                 Text {
+                    id: tipText
                     anchors.centerIn: parent
-                    text: root.batteryCapacity + "%" + (root.batteryCharging ? " 󱐋" : "") + " • " + root.batteryStatus
-                    // fallback curto se status muito longo
+                    text: root.barTooltipText()
                     color: root.colText
                     font.family: root.fontFamily
                     font.pixelSize: 12
@@ -495,7 +663,7 @@ ShellRoot {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             root.calendarVisible = !root.calendarVisible
-                            if (root.calendarVisible) root.controlCenterVisible = false
+                            if (root.calendarVisible) { root.controlCenterVisible = false; root.sysMonVisible = false }
                         }
                     }
                     Timer { interval: 1000; running: true; repeat: true; onTriggered: clockText.text = Qt.formatDateTime(new Date(), "'Dia' dd '|' hh:mm") }
@@ -517,6 +685,17 @@ ShellRoot {
                         font.pixelSize: root.fontSize
                         font.bold: true
                         Layout.rightMargin: 4
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onEntered: root.barHover = "cpu"
+                            onExited: if (root.barHover === "cpu") root.barHover = ""
+                            onClicked: {
+                                root.sysMonVisible = !root.sysMonVisible
+                                if (root.sysMonVisible) { root.controlCenterVisible = false; root.calendarVisible = false }
+                            }
+                        }
                     }
                     // memory " {}%"
                     Text {
@@ -526,6 +705,17 @@ ShellRoot {
                         font.pixelSize: root.fontSize
                         font.bold: true
                         Layout.rightMargin: 6
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onEntered: root.barHover = "mem"
+                            onExited: if (root.barHover === "mem") root.barHover = ""
+                            onClicked: {
+                                root.sysMonVisible = !root.sysMonVisible
+                                if (root.sysMonVisible) { root.controlCenterVisible = false; root.calendarVisible = false }
+                            }
+                        }
                     }
                     // custom/bar " | "
                     Text {
@@ -548,10 +738,13 @@ ShellRoot {
                         Layout.rightMargin: 6
                         MouseArea {
                             anchors.fill: parent
+                            hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
+                            onEntered: root.barHover = "net"
+                            onExited: if (root.barHover === "net") root.barHover = ""
                             onClicked: {
                                 root.controlCenterVisible = !root.controlCenterVisible
-                                if (root.controlCenterVisible) root.calendarVisible = false
+                                if (root.controlCenterVisible) { root.calendarVisible = false; root.sysMonVisible = false }
                             }
                         }
                     }
@@ -567,18 +760,19 @@ ShellRoot {
                         MouseArea {
                             anchors.fill: parent
                             acceptedButtons: Qt.LeftButton | Qt.RightButton
+                            hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
+                            onEntered: root.barHover = "vol"
+                            onExited: if (root.barHover === "vol") root.barHover = ""
                             onClicked: mouse => {
                                 if (mouse.button === Qt.RightButton) pulsemixerProc.running = true
                                 else {
                                     root.controlCenterVisible = !root.controlCenterVisible
-                                    if (root.controlCenterVisible) root.calendarVisible = false
+                                    if (root.controlCenterVisible) { root.calendarVisible = false; root.sysMonVisible = false }
                                 }
                             }
                             // scroll sobre ícone altera volume (waybar on-scroll?)
-                            onWheel: wheel => {
-                                if (wheel.angleDelta.y > 0) setVolumeProc.command = ["sh","-c","wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && wpctl get-volume @DEFAULT_AUDIO_SINK@"]; else setVolumeProc.command = ["sh","-c","wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+ && wpctl get-volume @DEFAULT_AUDIO_SINK@"]; setVolumeProc.running = true
-                            }
+                            onWheel: wheel => root.setVolume(root.volumeLevel + (wheel.angleDelta.y > 0 ? 5 : -5))
                         }
                     }
                     // battery "{icon}" apenas ícone na barra (hover mostra %)
@@ -601,11 +795,11 @@ ShellRoot {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onEntered: root.batteryHovered = true
-                            onExited: root.batteryHovered = false
+                            onEntered: root.barHover = "batt"
+                            onExited: if (root.barHover === "batt") root.barHover = ""
                             onClicked: {
                                 root.controlCenterVisible = !root.controlCenterVisible
-                                if (root.controlCenterVisible) root.calendarVisible = false
+                                if (root.controlCenterVisible) { root.calendarVisible = false; root.sysMonVisible = false }
                             }
                         }
                     }
@@ -615,10 +809,10 @@ ShellRoot {
                 // clique no fundo da barra fecha popups (quando visíveis) – atrás dos ícones
                 MouseArea {
                     anchors.fill: parent
-                    enabled: root.controlCenterVisible || root.calendarVisible
+                    enabled: root.controlCenterVisible || root.calendarVisible || root.sysMonVisible
                     z: -1
                     propagateComposedEvents: true
-                    onClicked: { root.controlCenterVisible = false; root.calendarVisible = false }
+                    onClicked: { root.controlCenterVisible = false; root.calendarVisible = false; root.sysMonVisible = false }
                 }
             }
         }
