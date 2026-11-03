@@ -6,6 +6,7 @@ import Quickshell.Services.Pipewire
 import Quickshell.Services.UPower
 import QtQuick
 import QtQuick.Layouts
+import "modules/holidays.js" as Holidays
 
 ShellRoot {
     id: root
@@ -413,26 +414,31 @@ ShellRoot {
         PanelWindow {
             property var modelData
             screen: modelData
+            id: calWindow
             visible: root.calendarVisible
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
             anchors { top: true }
             margins { top: 44 }
-            implicitWidth: 360
-            implicitHeight: 400
+            implicitWidth: calLoader.item ? calLoader.item.implicitWidth : 336
+            implicitHeight: calLoader.item ? calLoader.item.implicitHeight : 420
             color: "transparent"
-            MouseArea {
-                anchors.fill: parent
-                onClicked: root.calendarVisible = false
+            HyprlandFocusGrab {
+                windows: [calWindow]
+                active: calWindow.visible
+                onCleared: root.calendarVisible = false
             }
             Rectangle {
                 anchors.fill: parent
                 color: "transparent"
                 Loader {
                     id: calLoader
-                    anchors.centerIn: parent
-                    width: 340; height: 380
+                    anchors.fill: parent
+                    Connections {
+                        target: root
+                        function onCalendarOpened() { if (calLoader.item) calLoader.item.goToday() }
+                    }
                     source: Qt.resolvedUrl("modules/CalendarWidget.qml")
                     onLoaded: {
                         item.fontFamily = root.fontFamily
@@ -490,6 +496,56 @@ ShellRoot {
         }
     }
 
+    // calendário reabre sempre no mês atual
+    onCalendarVisibleChanged: if (calendarVisible) calendarOpened()
+    signal calendarOpened()
+
+    // ── Tooltip do relógio ─────────────────────────────────
+    property date clockNow: new Date()
+    function clockTooltipText() {
+        var d = clockNow
+        var wd = ["Domingo","Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado"][d.getDay()]
+        var mo = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"][d.getMonth()]
+        var txt = "󰃭  " + wd + ", " + d.getDate() + " de " + mo + "  ·  semana " + Holidays.isoWeek(d)
+        var today = Holidays.holidayOn(d)
+        if (today) return txt + "  ·  hoje é feriado: " + today.name
+        var next = Holidays.upcoming(d, 1)[0]
+        if (next) txt += "  ·  próximo feriado: " + Qt.formatDate(next.date, "dd/MM") + " " + next.name + " (" + Holidays.relative(next.daysUntil) + ")"
+        return txt
+    }
+    Variants {
+        model: Quickshell.screens
+        PanelWindow {
+            property var modelData
+            screen: modelData
+            visible: root.barHover === "clock" && !root.calendarVisible
+            WlrLayershell.layer: WlrLayer.Top
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+            anchors { top: true }
+            margins { top: 44 }
+            implicitWidth: clockTip.implicitWidth + 24
+            implicitHeight: 32
+            color: "transparent"
+            Rectangle {
+                anchors.fill: parent
+                color: root.colBase
+                radius: 10
+                border.color: root.colSurface1
+                border.width: 1
+                Text {
+                    id: clockTip
+                    anchors.centerIn: parent
+                    text: root.clockTooltipText()
+                    color: root.colText
+                    font.family: root.fontFamily
+                    font.pixelSize: 12
+                    font.bold: true
+                }
+            }
+        }
+    }
+
     // ── Tooltip dos ícones da barra (wifi / volume / bateria) ─
     function barTooltipText() {
         if (barHover === "net") {
@@ -521,7 +577,7 @@ ShellRoot {
         PanelWindow {
             property var modelData
             screen: modelData
-            visible: root.barHover !== "" && !root.controlCenterVisible && !root.sysMonVisible
+            visible: root.barHover !== "" && root.barHover !== "clock" && !root.controlCenterVisible && !root.sysMonVisible
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
@@ -660,7 +716,10 @@ ShellRoot {
                     font.bold: true
                     MouseArea {
                         anchors.fill: parent
+                        hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
+                        onEntered: { root.clockNow = new Date(); root.barHover = "clock" }
+                        onExited: if (root.barHover === "clock") root.barHover = ""
                         onClicked: {
                             root.calendarVisible = !root.calendarVisible
                             if (root.calendarVisible) { root.controlCenterVisible = false; root.sysMonVisible = false }
