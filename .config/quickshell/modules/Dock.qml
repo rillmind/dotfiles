@@ -1,7 +1,9 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
+import Quickshell.Widgets
 
 Item {
     id: dockRoot
@@ -20,7 +22,28 @@ Item {
     signal requestFocusClient(string address)
     signal requestCloseClient(string address)
 
-    // exatamente mesmo mapeamento da barra superior (shell.qml:getAppIcon)
+    // menu do botão direito (um só, reposicionado no ícone clicado)
+    property bool menuOpen: false
+    property Item menuItem: null
+    property string menuAddress: ""
+    property string menuAppId: ""
+    property string menuTitle: ""
+
+    function dispatchOn(lua) { Hyprland.dispatch(lua.replace("%W", '"address:' + menuAddress + '"')) }
+    function openMenu(item, address, appId, title) {
+        menuItem = item; menuAddress = address; menuAppId = appId; menuTitle = title
+        menuOpen = true
+    }
+
+    // ícone real do app (tema de ícones via .desktop); "" se não achar
+    function appIconPath(appId) {
+        if (!appId) return ""
+        var entry = DesktopEntries.heuristicLookup(appId)
+        var name = (entry && entry.icon) ? entry.icon : appId
+        return Quickshell.iconPath(name, true)
+    }
+
+    // fallback em Nerd Font: mesmo mapeamento da barra superior (shell.qml:getAppIcon)
     function appIcon(appId, title) {
         var raw = (appId || "") + " " + (title || "")
         var s = raw.toLowerCase()
@@ -80,8 +103,8 @@ Item {
     }
 
     // o respiro em volta fica por conta do fundo (shell.qml), aqui só o tamanho dos ícones
-    implicitHeight: 52
-    implicitWidth: sortedToplevels.length === 0 ? 52 : dockRow.implicitWidth
+    implicitHeight: 64
+    implicitWidth: sortedToplevels.length === 0 ? 64 : dockRow.implicitWidth
 
     RowLayout {
         id: dockRow
@@ -97,10 +120,11 @@ Item {
                 property string _appId: modelData.class !== undefined ? modelData.class : (modelData.appId || "")
                 property string _title: modelData.title || ""
                 property bool isActive: (modelData.address && dockRoot.activeWindowAddress && modelData.address === dockRoot.activeWindowAddress) || modelData.activated
-                Layout.preferredWidth: 52
-                Layout.preferredHeight: 52
-                radius: 12
-                color: isActive ? "#cba6f7" : "#313244"
+                property string _iconPath: dockRoot.appIconPath(_appId)
+                Layout.preferredWidth: 64
+                Layout.preferredHeight: 64
+                radius: 14
+                color: hovered ? "#45475a" : "#313244"
                 border.color: isActive ? "#cba6f7" : "transparent"
                 border.width: isActive ? 2 : 0
                 // scale hover OSX
@@ -109,15 +133,23 @@ Item {
                 Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutQuad } }
                 Behavior on color { ColorAnimation { duration: 120 } }
 
+                IconImage {
+                    visible: dockItem._iconPath !== ""
+                    anchors.centerIn: parent
+                    implicitSize: 44
+                    source: dockItem._iconPath
+                }
+
                 Text {
+                    visible: dockItem._iconPath === ""
                     // centraliza pelo próprio glifo (Nerd Font desalinha com anchors.centerIn)
                     anchors.fill: parent
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     text: dockRoot.appIcon(_appId, _title)
-                    color: isActive ? "#1e1e2e" : "#cdd6f4"
+                    color: isActive ? "#cba6f7" : "#cdd6f4"
                     font.family: dockRoot.fontFamily
-                    font.pixelSize: 26
+                    font.pixelSize: 32
                     font.bold: true
                 }
 
@@ -125,10 +157,10 @@ Item {
                 Rectangle {
                     visible: isActive
                     width: 4; height: 4; radius: 2
-                    color: "#1e1e2e"
+                    color: "#cba6f7"
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 4
+                    anchors.bottomMargin: 2
                 }
 
                 MouseArea {
@@ -155,8 +187,7 @@ Item {
                         var addr = modelData.address
                         var addrStr = (typeof addr === "string" && addr.indexOf("0x") === 0) ? addr : "0x" + addr.toString(16)
                         if (mouse.button === Qt.RightButton) {
-                            Hyprland.dispatch('hl.dsp.window.close({ window = "address:' + addrStr + '" })')
-                            dockRoot.requestCloseClient(addrStr)
+                            dockRoot.openMenu(dockItem, addrStr, dockItem._appId, dockItem._title)
                         } else if (mouse.button === Qt.MiddleButton) {
                             Hyprland.dispatch('hl.dsp.window.close({ window = "address:' + addrStr + '" })')
                             dockRoot.requestCloseClient(addrStr)
@@ -203,4 +234,138 @@ Item {
 
     // tooltip título ao hover
     // (simples, mostra title da janela hovered - usamos o último hovered)
+
+    // ── Menu do botão direito ──────────────────────────────
+    component MenuEntry: Rectangle {
+        id: entry
+        property string label: ""
+        property string icon: ""
+        property color tint: "#cdd6f4"
+        signal activated()
+        Layout.fillWidth: true
+        implicitHeight: 30
+        radius: 8
+        color: entryMouse.containsMouse ? "#45475a" : "transparent"
+        RowLayout {
+            anchors.fill: parent
+            anchors.leftMargin: 10
+            anchors.rightMargin: 10
+            spacing: 10
+            Text { text: entry.icon; color: entry.tint; font.family: dockRoot.fontFamily; font.pixelSize: 14 }
+            Text { text: entry.label; color: entry.tint; font.family: dockRoot.fontFamily; font.pixelSize: 13; Layout.fillWidth: true }
+        }
+        MouseArea {
+            id: entryMouse
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: { entry.activated(); dockRoot.menuOpen = false }
+        }
+    }
+
+    PopupWindow {
+        id: dockMenu
+        visible: dockRoot.menuOpen && dockRoot.menuItem !== null
+        anchor.item: dockRoot.menuItem
+        anchor.edges: Edges.Top
+        anchor.gravity: Edges.Top
+        anchor.margins.top: -8
+        implicitWidth: 230
+        implicitHeight: menuCol.implicitHeight + 16
+        color: "transparent"
+
+        Rectangle {
+            anchors.fill: parent
+            radius: 14
+            color: "#F21e1e2e"
+            border.color: "#45475a"
+            border.width: 1
+
+            ColumnLayout {
+                id: menuCol
+                anchors.fill: parent
+                anchors.margins: 8
+                spacing: 2
+
+                Text {
+                    text: dockRoot.menuTitle
+                    color: "#a6adc8"
+                    font.family: dockRoot.fontFamily
+                    font.pixelSize: 12
+                    elide: Text.ElideRight
+                    Layout.fillWidth: true
+                    Layout.leftMargin: 10
+                    Layout.rightMargin: 10
+                    Layout.bottomMargin: 4
+                }
+
+                MenuEntry { icon: "󰁔"; label: "Focar"; onActivated: dockRoot.dispatchOn('hl.dsp.focus({ window = %W })') }
+                MenuEntry {
+                    icon: ""; label: "Nova janela"
+                    visible: DesktopEntries.heuristicLookup(dockRoot.menuAppId) !== null
+                    onActivated: { var e = DesktopEntries.heuristicLookup(dockRoot.menuAppId); if (e) e.execute() }
+                }
+                MenuEntry { icon: "󰖲"; label: "Flutuar / encaixar"; onActivated: dockRoot.dispatchOn('hl.dsp.window.float({ window = %W, action = "toggle" })') }
+                MenuEntry { icon: "󰐃"; label: "Fixar em todos os workspaces"; onActivated: dockRoot.dispatchOn('hl.dsp.window.pin({ window = %W, action = "toggle" })') }
+                MenuEntry { icon: "󰊓"; label: "Tela cheia"; onActivated: dockRoot.dispatchOn('hl.dsp.window.fullscreen({ window = %W, mode = "fullscreen" })') }
+
+                Text {
+                    text: "Mover para o workspace"
+                    color: "#a6adc8"
+                    font.family: dockRoot.fontFamily
+                    font.pixelSize: 12
+                    Layout.leftMargin: 10
+                    Layout.topMargin: 6
+                }
+                GridLayout {
+                    columns: 5
+                    rowSpacing: 4
+                    columnSpacing: 4
+                    Layout.fillWidth: true
+                    Layout.leftMargin: 6
+                    Layout.rightMargin: 6
+                    Layout.bottomMargin: 4
+                    Repeater {
+                        model: 10
+                        Rectangle {
+                            required property int index
+                            Layout.fillWidth: true
+                            implicitHeight: 26
+                            radius: 7
+                            color: wsMouse.containsMouse ? "#cba6f7" : "#313244"
+                            Text {
+                                anchors.centerIn: parent
+                                text: index + 1
+                                color: wsMouse.containsMouse ? "#1e1e2e" : "#cdd6f4"
+                                font.family: dockRoot.fontFamily
+                                font.pixelSize: 12
+                            }
+                            MouseArea {
+                                id: wsMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    dockRoot.dispatchOn('hl.dsp.window.move({ window = %W, workspace = "' + (index + 1) + '", follow = false })')
+                                    dockRoot.menuOpen = false
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: "#45475a"; Layout.topMargin: 2; Layout.bottomMargin: 2 }
+
+                MenuEntry { icon: "󰅖"; label: "Fechar"; onActivated: dockRoot.dispatchOn('hl.dsp.window.close({ window = %W })') }
+                MenuEntry { icon: "󰚌"; label: "Forçar fechamento"; tint: "#f38ba8"; onActivated: dockRoot.dispatchOn('hl.dsp.window.kill({ window = %W })') }
+            }
+        }
+    }
+
+    // fecha o menu ao clicar fora dele
+    HyprlandFocusGrab {
+        windows: [dockMenu]
+        active: dockMenu.visible
+        onCleared: dockRoot.menuOpen = false
+    }
 }

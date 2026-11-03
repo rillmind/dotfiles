@@ -627,12 +627,13 @@ ShellRoot {
     // ── Dock inferior OSX – vidro fosco catppuccin, auto-hide na borda inferior ─
     // esconde a dock quando o mouse não está nem na borda nem sobre ela
     property bool dockTriggerHovered: false
+    property bool dockMenuOpen: false
     Timer {
         id: dockHideTimer
         interval: 400
         repeat: false
         onTriggered: {
-            if (!root.dockHovered && !root.dockTriggerHovered) root.dockVisible = false
+            if (!root.dockHovered && !root.dockTriggerHovered && !root.dockMenuOpen) root.dockVisible = false
         }
     }
     // trigger invisível de 2px na borda inferior: só mostra a dock quando o mouse quase encosta na borda
@@ -661,8 +662,9 @@ ShellRoot {
         PanelWindow {
             property var modelData
             screen: modelData
-            // dock aparece quando hover, ou sempre se workspace vazio (sem janelas)
-            visible: root.dockVisible || root.dockHovered || root.isWorkspaceEmpty
+            // sem nenhum app aberto a dock não aparece; com apps: hover, menu aberto ou workspace vazio
+            visible: root.dockClients.length > 0
+                     && (root.dockVisible || root.dockHovered || root.dockMenuOpen || root.isWorkspaceEmpty)
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
@@ -677,12 +679,12 @@ ShellRoot {
             Rectangle {
                 id: dockBg
                 anchors.centerIn: parent
-                // mesmo respiro (10px) em todos os lados dos ícones
-                implicitWidth: dockLoader.implicitWidth > 0 ? dockLoader.implicitWidth + 20 : 96
-                implicitHeight: dockLoader.implicitHeight > 0 ? dockLoader.implicitHeight + 20 : 72
+                // pouco respiro (6px) entre os ícones e a borda da dock
+                implicitWidth: dockLoader.implicitWidth > 0 ? dockLoader.implicitWidth + 12 : 76
+                implicitHeight: dockLoader.implicitHeight > 0 ? dockLoader.implicitHeight + 12 : 76
                 width: implicitWidth
                 height: implicitHeight
-                radius: 16
+                radius: 20 // raio dos ícones (14) + respiro (6): cantos concêntricos
                 color: "#A61e1e2e" // catppuccin mocha base com alpha para vidro fosco
                 border.color: "#313244"
                 border.width: 1
@@ -705,6 +707,10 @@ ShellRoot {
                     target: dockLoader.item
                     function onRequestFocusClient(addr) { Hyprland.dispatch('hl.dsp.focus({ window = "address:' + addr + '" })') }
                     function onRequestCloseClient(addr) { Hyprland.dispatch('hl.dsp.window.close({ window = "address:' + addr + '" })') }
+                    function onMenuOpenChanged() {
+                        root.dockMenuOpen = dockLoader.item.menuOpen
+                        if (!root.dockMenuOpen) dockHideTimer.restart()
+                    }
                 }
                 MouseArea {
                     anchors.fill: parent
