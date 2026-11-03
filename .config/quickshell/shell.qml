@@ -7,6 +7,7 @@ import Quickshell.Services.UPower
 import QtQuick
 import QtQuick.Layouts
 import "modules/holidays.js" as Holidays
+import qs.modules
 
 ShellRoot {
     id: root
@@ -186,7 +187,8 @@ ShellRoot {
 
     // ── Processes ──────────────────────────────────────────
     // Launcher helper
-    Process { id: launcherProc; command: ["wofi", "--show", "drun", "--columns", "1", "-I", "-s", "/home/raul/.config/wofi/style.css"] }
+    // launcher próprio (modules/Launcher.qml); também abre por `quickshell ipc call launcher toggle`
+    Launcher { id: appLauncher; fontFamily: root.fontFamily }
     Process { id: agsProc; command: ["ags", "toggle", "calendar"] }
 
     // Hypr window title + class + address (para ícone antes do título e dock highlight)
@@ -637,7 +639,7 @@ ShellRoot {
                         Layout.leftMargin: 15
                         Layout.rightMargin: -6
                         Layout.alignment: Qt.AlignVCenter
-                        MouseArea { anchors.fill: parent; onClicked: launcherProc.running=true; cursorShape: Qt.PointingHandCursor }
+                        MouseArea { anchors.fill: parent; onClicked: appLauncher.toggle(); cursorShape: Qt.PointingHandCursor }
                     }
                     // workspaces 1..10 – só mostra se tem janelas ou é o ativo (vazios ocultos)
                     RowLayout {
