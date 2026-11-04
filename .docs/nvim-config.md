@@ -57,6 +57,7 @@ Testado em modo headless: highlight e indent ativos num `.go`, gopls conectado, 
 - O branch `master` do nvim-treesitter está congelado e não suporta o nvim 0.12. Não voltar para ele.
 - Formatters comentados no none-ls (stylua, black, isort, gofumpt, goimports): os binários não estão instalados. Para religar, instale primeiro (`:Mason` ou o gerenciador do sistema). Go já formata com gofumpt pelo `gopls` (`gofumpt = true`). O `rustfmt` não é mais builtin do none-ls; o rust-analyzer já formata.
 - Prefixos de keymap ainda em comum (causam o pequeno atraso do `timeoutlen`): `<leader>f` / `<leader>fg` e `<leader>c` / `<leader>ca`. Foram mantidos de propósito.
+- **`<C-1>`…`<C-9>`** (2026-11-03, `bufferline.lua`) vão para a aba N do bufferline (`<C-9>` = última). Só funcionam em terminal com o protocolo de teclado do kitty (Ghostty, kitty, Alacritty ≥ 0.13). Em terminais legados, o Ctrl+número não chega ao nvim, e se o terminal tiver um atalho próprio em Ctrl+número, ele captura antes.
 - O nvim 0.11+ já tem por padrão `grn`, `gra`, `grr`, `gri`, `K`, `[d`/`]d` e `gc` (comentários).
 
 ## 4. Pendências opcionais

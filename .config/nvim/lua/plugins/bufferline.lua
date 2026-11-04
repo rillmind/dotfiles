@@ -96,5 +96,13 @@ return {
 		vim.keymap.set("n", "<leader>bh", "<cmd>BufferLineCloseLeft<cr>", { desc = "Fechar abas a esquerda" })
 		vim.keymap.set("n", "<leader>bl", "<cmd>BufferLineCloseRight<cr>", { desc = "Fechar abas a direita" })
 		vim.keymap.set("n", "<leader>bo", "<cmd>BufferLineCloseOthers<cr>", { desc = "Fechar as outras abas" })
+
+		-- Ctrl+1..9 vai direto para a aba N (Ctrl+9 = última)
+		for i = 1, 9 do
+			local target = i == 9 and -1 or i
+			vim.keymap.set("n", "<C-" .. i .. ">", function()
+				bufferline.go_to(target, true)
+			end, { desc = "Ir para a aba " .. (i == 9 and "última" or i) })
+		end
 	end,
 }
