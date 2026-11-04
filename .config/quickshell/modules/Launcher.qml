@@ -56,7 +56,7 @@ Scope {
     // ── Busca ──────────────────────────────────────────────
     property string query: ""
     readonly property int maxRows: 5     // linhas visíveis na lista
-    readonly property int rowHeight: 44
+    readonly property int rowHeight: 52
     property int selected: 0
     property string confirmKey: ""       // comando do sistema aguardando confirmação
 
@@ -187,7 +187,7 @@ Scope {
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
         WlrLayershell.namespace: "quickshell-launcher"
         // sem âncoras: o compositor centraliza a janela na tela
-        implicitWidth: 480
+        implicitWidth: 580
         implicitHeight: panel.implicitHeight
         color: "transparent"
 
@@ -219,18 +219,18 @@ Scope {
                 // campo de busca
                 Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: 40
+                    implicitHeight: 42
                     radius: 10
                     color: launcher.colSurface0
                     RowLayout {
                         anchors.fill: parent
-                        anchors.leftMargin: 14
-                        anchors.rightMargin: 14
-                        spacing: 12
+                        anchors.leftMargin: 10
+                        anchors.rightMargin: 10
+                        spacing: 8
                         Text {
                             text: launcher.query.startsWith("=") ? "󰃬" : launcher.query.startsWith(">") ? "" : ""
                             color: launcher.colMauve
-                            font.family: launcher.fontFamily; font.pixelSize: 16
+                            font.family: launcher.fontFamily; font.pixelSize: 22
                         }
                         TextInput {
                             id: search
@@ -238,7 +238,7 @@ Scope {
                             color: launcher.colText
                             selectionColor: launcher.colMauve
                             selectedTextColor: launcher.colBase
-                            font.family: launcher.fontFamily; font.pixelSize: 14
+                            font.family: launcher.fontFamily; font.pixelSize: 20
                             clip: true
                             focus: true
                             onTextChanged: launcher.query = text
@@ -248,14 +248,6 @@ Scope {
                                 else if ((ctrl && event.key === Qt.Key_N) || event.key === Qt.Key_Down) { launcher.move(1); event.accepted = true }
                                 else if ((ctrl && event.key === Qt.Key_P) || event.key === Qt.Key_Up) { launcher.move(-1); event.accepted = true }
                                 else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) { launcher.activate(launcher.results[launcher.selected]); event.accepted = true }
-                            }
-                            Text {
-                                visible: search.text === ""
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: "Buscar apps…   = calcular   > sistema"
-                                color: launcher.colSub
-                                opacity: 0.7
-                                font: search.font
                             }
                         }
                     }
@@ -293,7 +285,7 @@ Scope {
                             spacing: 12
                             // ícone do app ou glifo
                             Item {
-                                implicitWidth: 28; implicitHeight: 28
+                                implicitWidth: 32; implicitHeight: 32
                                 IconImage {
                                     id: appIcon
                                     anchors.fill: parent
@@ -307,7 +299,7 @@ Scope {
                                     horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
                                     text: row.modelData.kind === "app" ? "" : row.modelData.glyph
                                     color: row.modelData.kind === "sys" && row.modelData.confirm ? launcher.colPeach : launcher.colMauve
-                                    font.family: launcher.fontFamily; font.pixelSize: 18
+                                    font.family: launcher.fontFamily; font.pixelSize: 24
                                 }
                             }
                             ColumnLayout {
@@ -316,14 +308,14 @@ Scope {
                                 Text {
                                     text: row.modelData.title
                                     color: launcher.colText
-                                    font.family: launcher.fontFamily; font.pixelSize: 13; font.bold: row.isSel
+                                    font.family: launcher.fontFamily; font.pixelSize: 19; font.bold: row.isSel
                                     elide: Text.ElideRight; Layout.fillWidth: true
                                 }
                                 Text {
-                                    visible: text !== ""
-                                    text: row.needsConfirm ? "Pressione Enter de novo para confirmar" : row.modelData.subtitle
-                                    color: row.needsConfirm ? launcher.colRed : launcher.colSub
-                                    font.family: launcher.fontFamily; font.pixelSize: 10
+                                    visible: row.needsConfirm
+                                    text: "Pressione Enter de novo para confirmar"
+                                    color: launcher.colRed
+                                    font.family: launcher.fontFamily; font.pixelSize: 16
                                     elide: Text.ElideRight; Layout.fillWidth: true
                                 }
                             }
@@ -331,7 +323,7 @@ Scope {
                                 visible: row.isSel
                                 text: "󰌑"
                                 color: launcher.colSub
-                                font.family: launcher.fontFamily; font.pixelSize: 14
+                                font.family: launcher.fontFamily; font.pixelSize: 20
                             }
                         }
                         MouseArea {
@@ -348,34 +340,9 @@ Scope {
                     visible: list.count === 0
                     text: "Nada encontrado"
                     color: launcher.colSub
-                    font.family: launcher.fontFamily; font.pixelSize: 12
+                    font.family: launcher.fontFamily; font.pixelSize: 18
                     Layout.alignment: Qt.AlignHCenter
                     Layout.topMargin: 4; Layout.bottomMargin: 6
-                }
-
-                // dicas de teclado
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.leftMargin: 6; Layout.rightMargin: 6
-                    spacing: 14
-                    Repeater {
-                        model: [["Ctrl+N/P", "navegar"], ["Enter", "abrir"], ["Esc", "fechar"]]
-                        RowLayout {
-                            required property var modelData
-                            spacing: 5
-                            Rectangle {
-                                implicitWidth: keyText.implicitWidth + 10; implicitHeight: 18; radius: 5
-                                color: launcher.colSurface0
-                                Text { id: keyText; anchors.centerIn: parent; text: modelData[0]; color: launcher.colText; font.family: launcher.fontFamily; font.pixelSize: 10 }
-                            }
-                            Text { text: modelData[1]; color: launcher.colSub; font.family: launcher.fontFamily; font.pixelSize: 10 }
-                        }
-                    }
-                    Item { Layout.fillWidth: true }
-                    Text {
-                        text: launcher.query.trim() === "" ? "mais usados" : list.count + (list.count === 1 ? " resultado" : " resultados")
-                        color: launcher.colSub; font.family: launcher.fontFamily; font.pixelSize: 10
-                    }
                 }
             }
         }
