@@ -82,8 +82,19 @@ ShellRoot {
         volumeLevel = Math.round(pwSink.audio.volume * 100)
         volumeMuted = pwSink.audio.muted
         updatePulseIcon()
+        // barrinha de volume: só para mudanças reais feitas fora do ControlCenter
+        // (não aparece ao iniciar nem ao trocar a saída de áudio)
+        if (osdSink === pwSink && (osdLevel !== volumeLevel || osdMuted !== volumeMuted) && !controlCenterVisible)
+            volumeOsd.show(volumeLevel, volumeMuted)
+        osdSink = pwSink
+        osdLevel = volumeLevel
+        osdMuted = volumeMuted
     }
+    property var osdSink: null
+    property int osdLevel: -1
+    property bool osdMuted: false
     onPwReadyChanged: syncVolume()
+    onPwSinkChanged: syncVolume()
     Connections {
         target: root.pwReady ? root.pwSink.audio : null
         function onVolumeChanged() { root.syncVolume() }
@@ -189,6 +200,7 @@ ShellRoot {
     // Launcher helper
     // launcher próprio (modules/Launcher.qml); também abre por `quickshell ipc call launcher toggle`
     Launcher { id: appLauncher; fontFamily: root.fontFamily }
+    VolumeOsd { id: volumeOsd; fontFamily: root.fontFamily }
     Process { id: agsProc; command: ["ags", "toggle", "calendar"] }
 
     // Hypr window title + class + address (para ícone antes do título e dock highlight)
