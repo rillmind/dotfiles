@@ -81,11 +81,11 @@ Scope {
     }
 
     readonly property var systemCommands: [
-        { key: "lock",     title: "Bloquear tela",     glyph: "󰌾", words: "bloquear lock tela swaylock",            cmd: ["swaylock"],                             confirm: false },
-        { key: "suspend",  title: "Suspender",         glyph: "󰒲", words: "suspender suspend dormir sleep",          cmd: ["systemctl", "suspend"],                 confirm: false },
-        { key: "logout",   title: "Sair do Hyprland",  glyph: "󰍃", words: "sair logout encerrar sessão exit",        cmd: ["hyprctl", "dispatch", "hl.dsp.exit()"], confirm: true },
-        { key: "reboot",   title: "Reiniciar",         glyph: "󰜉", words: "reiniciar reboot restart",                cmd: ["systemctl", "reboot"],                  confirm: true },
-        { key: "poweroff", title: "Desligar",          glyph: "󰐥", words: "desligar shutdown poweroff power off",    cmd: ["systemctl", "poweroff"],                confirm: true }
+        { key: "lock",     title: "Lock screen",       glyph: "󰌾", words: "bloquear lock tela swaylock",            cmd: ["swaylock"],                             confirm: false },
+        { key: "suspend",  title: "Suspend",           glyph: "󰒲", words: "suspender suspend dormir sleep",          cmd: ["systemctl", "suspend"],                 confirm: false },
+        { key: "logout",   title: "Log off",           glyph: "󰍃", words: "sair logout log off encerrar sessão exit", cmd: ["hyprctl", "dispatch", "hl.dsp.exit()"], confirm: true },
+        { key: "reboot",   title: "Reboot",            glyph: "󰜉", words: "reiniciar reboot restart",                cmd: ["systemctl", "reboot"],                  confirm: true },
+        { key: "poweroff", title: "Shutdown",          glyph: "󰐥", words: "desligar shutdown poweroff power off",    cmd: ["systemctl", "poweroff"],                confirm: true }
     ]
 
     // calculadora segura: só números, operadores e parênteses
@@ -117,7 +117,7 @@ Scope {
         var sys = []
         for (var c of systemCommands) {
             var s = sq === "" ? (sysOnly ? 50 : -1) : Math.max(score(sq, c.title), score(sq, c.words) - 10)
-            if (s >= (sysOnly ? 0 : 60)) sys.push({ kind: "sys", title: c.title, subtitle: c.confirm ? "Comando do sistema · pede confirmação" : "Comando do sistema", glyph: c.glyph, cmd: c.cmd, confirm: c.confirm, key: c.key, score: s })
+            if (s >= (sysOnly ? 0 : 60)) sys.push({ kind: "sys", title: c.title, subtitle: c.confirm ? "System command · asks for confirmation" : "System command", glyph: c.glyph, cmd: c.cmd, confirm: c.confirm, key: c.key, score: s })
         }
         if (sysOnly) return sys
 
@@ -313,7 +313,7 @@ Scope {
                                 }
                                 Text {
                                     visible: row.needsConfirm
-                                    text: "Pressione Enter de novo para confirmar"
+                                    text: "Press Enter again to confirm"
                                     color: launcher.colRed
                                     font.family: launcher.fontFamily; font.pixelSize: 16
                                     elide: Text.ElideRight; Layout.fillWidth: true
