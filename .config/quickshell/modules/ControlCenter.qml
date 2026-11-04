@@ -5,9 +5,9 @@ import Quickshell.Io
 import Quickshell.Services.Pipewire
 import "."
 
-// ControlCenter.qml – painel de wifi/volume/bateria aberto pela barra.
-// Topo: círculo de status (NetworkStatusWidget) + resumo. Depois: volume ao vivo (PipeWire) com
-// escolha da saída, Wi-Fi com lista de redes (nmcli) e bateria detalhada.
+// ControlCenter.qml – painel aberto pela barra. A tela principal é uma grade em que toda seção segue
+// a mesma estrutura (Tile): ícone, nome, botão do submenu, valor, detalhe e barra. Ali só o volume e
+// os botões são interativos; o resto fica nos submenus, escolhidos pela propriedade `page`.
 Rectangle {
     id: rootCC
     // ── Estado vindo do shell.qml ──────────────────────────
@@ -34,31 +34,24 @@ Rectangle {
     property color colDanger: "#f38ba8"
     property color colSub: "#a6adc8"
     property color colGreen: "#a6e3a1"
+    property color colTile: "#27273a"
     signal requestSetVolume(int level)
     signal requestToggleMute()
     signal requestRefresh()
 
-    // submenu de imagem (DisplayMenu), aberto pelo botão "Monitores"
+    // submenu aberto: "" (tela principal), network, sound, battery, displays ou fans
+    property string page: ""
     property var displays: null
-    property bool displaysOpen: false
-    Connections {
-        target: rootCC.displays
-        function onMenuRequested() { rootCC.fansOpen = false; rootCC.displaysOpen = true }
-    }
-
-    // submenu de ventoinhas (FanMenu), aberto pelo botão "Ventoinhas"
     property var fans: null
-    property bool fansOpen: false
-    Connections {
-        target: rootCC.fans
-        function onMenuRequested() { rootCC.displaysOpen = false; rootCC.fansOpen = true }
-    }
+    onPageChanged: if (page === "network" && wifiEnabled) scanWifi()
 
     // o painel pede foco de teclado só enquanto a senha do wifi está sendo digitada
     readonly property bool wantsKeyboard: passwordSsid !== ""
 
     implicitWidth: 340
-    implicitHeight: (displaysOpen ? displayMenu.implicitHeight : fansOpen ? fanMenu.implicitHeight : mainCol.implicitHeight) + 28
+    readonly property Item currentPage: page === "network" ? networkPage : page === "sound" ? soundPage : page === "battery" ? batteryPage
+                                       : page === "displays" ? displayMenu : page === "fans" ? fanMenu : homePage
+    implicitHeight: currentPage.implicitHeight + 28
     radius: 16
     color: colBarBg
     border.color: colSurface0
@@ -70,6 +63,15 @@ Rectangle {
         if (s === "Full") return "Carga completa"
         if (s === "Not charging") return "Conectado, sem carregar"
         return s
+    }
+    function batteryDetail() {
+        if (batteryTimeText) return batteryTimeText
+        return batteryStatus === "Not charging" ? "Sem carregar" : batteryStatusPt(batteryStatus)
+    }
+    readonly property var activeMonitors: displays ? displays.monitors.filter(m => !m.disabled) : []
+    function monitorsDetail() {
+        if (activeMonitors.length !== 1) return activeMonitors.map(m => m.name).join(" · ")
+        return activeMonitors[0].currentRes + " · " + Math.round(activeMonitors[0].currentRate) + " Hz"
     }
     function wifiIconFor(signal) {
         if (signal >= 80) return "󰤨"
@@ -98,7 +100,6 @@ Rectangle {
     property bool wifiEnabled: true
     property var wifiNetworks: []        // [{ ssid, signal, secure, inUse, known }]
     property var knownConnections: []
-    property bool wifiListOpen: false
     property bool wifiScanning: false
     property string passwordSsid: ""     // rede aguardando senha
     property string wifiMessage: ""
@@ -175,9 +176,10 @@ Rectangle {
         radioSetProc.command = ["nmcli", "radio", "wifi", on ? "on" : "off"]
         radioSetProc.running = true
         wifiEnabled = on
+        if (on && page === "network") scanWifi()
     }
     Component.onCompleted: { radioProc.running = true; knownProc.running = true }
-    onVisibleChanged: if (visible) { radioProc.running = true; if (wifiListOpen) scanWifi() } else { passwordSsid = ""; wifiMessage = ""; displaysOpen = false; fansOpen = false }
+    onVisibleChanged: if (visible) radioProc.running = true; else { passwordSsid = ""; wifiMessage = ""; page = "" }
 
     // ── Componentes visuais reutilizados ───────────────────
     component SectionTitle: Text {
@@ -209,9 +211,160 @@ Rectangle {
         MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: sw.toggled() }
     }
 
+    // Seção da tela principal. Toda seção usa este componente, para ficarem iguais.
+    component Tile: Rectangle {
+        id: tile
+        property string icon: ""
+        property string title: ""
+        property string value: ""
+        property string detail: ""
+        property string target: ""     // submenu aberto pelo botão
+        property bool danger: false
+        property color meterColor: rootCC.colMauve
+        property var meter: []         // uma barra por item, cada uma de 0 a 1
+        default property alias extra: extraSlot.data
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        Layout.preferredWidth: 100
+        implicitHeight: tileCol.implicitHeight + 20
+        radius: 12
+        color: rootCC.colTile
+        ColumnLayout {
+            id: tileCol
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: 10
+            spacing: 4
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 8
+                Text { text: tile.icon; color: rootCC.colMauve; font.family: rootCC.fontFamily; font.pixelSize: 16 }
+                SectionTitle { text: tile.title; elide: Text.ElideRight; Layout.fillWidth: true }
+                Rectangle {
+                    implicitWidth: 28; implicitHeight: 28; radius: 8
+                    color: goMouse.containsMouse ? rootCC.colSurface1 : rootCC.colSurface0
+                    Text { anchors.centerIn: parent; text: "󰅂"; color: rootCC.colText; font.family: rootCC.fontFamily; font.pixelSize: 14 }
+                    MouseArea {
+                        id: goMouse
+                        anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        onClicked: rootCC.page = tile.target
+                    }
+                }
+            }
+            Text {
+                text: tile.value
+                color: tile.danger ? rootCC.colDanger : rootCC.colText
+                font.family: rootCC.fontFamily; font.pixelSize: 13; font.bold: true
+                elide: Text.ElideRight
+                Layout.fillWidth: true
+            }
+            Text {
+                text: tile.detail
+                color: rootCC.colSub
+                font.family: rootCC.fontFamily; font.pixelSize: 11
+                elide: Text.ElideRight
+                Layout.fillWidth: true
+            }
+            RowLayout {
+                visible: tile.meter.length > 0
+                Layout.fillWidth: true
+                Layout.topMargin: 4
+                spacing: 4
+                Repeater {
+                    model: tile.meter
+                    Rectangle {
+                        required property var modelData
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 1
+                        implicitHeight: 6; radius: 3
+                        color: rootCC.colSurface0
+                        Rectangle {
+                            width: parent.width * Math.max(0, Math.min(1, parent.modelData)); height: parent.height; radius: 3
+                            color: tile.meterColor
+                        }
+                    }
+                }
+            }
+            ColumnLayout { id: extraSlot; visible: children.length > 0; Layout.fillWidth: true; spacing: 0 }
+        }
+    }
+
+    // controle de volume (arrastar ou rolar): escreve direto no PipeWire, sem atraso
+    component VolumeSlider: Item {
+        id: slider
+        readonly property real value: Math.min(1, rootCC.volumeLevel / 100)
+        Layout.fillWidth: true
+        implicitHeight: 22
+        Rectangle {
+            anchors.verticalCenter: parent.verticalCenter
+            width: parent.width; height: 6; radius: 3
+            color: rootCC.colSurface0
+            Rectangle {
+                width: Math.max(height, parent.width * slider.value); height: parent.height; radius: 3
+                color: rootCC.volumeMuted ? rootCC.colSurface1 : rootCC.colMauve
+            }
+        }
+        Rectangle {
+            width: 14; height: 14; radius: 7
+            anchors.verticalCenter: parent.verticalCenter
+            x: (slider.width - width) * slider.value
+            color: rootCC.colText
+            border.color: rootCC.colMauve; border.width: 2
+            scale: sliderMouse.pressed || sliderMouse.containsMouse ? 1.15 : 1.0
+            Behavior on scale { NumberAnimation { duration: 100 } }
+        }
+        MouseArea {
+            id: sliderMouse
+            anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+            function apply(mx) { rootCC.setVolumeFraction(mx / width) }
+            onPressed: mouse => apply(mouse.x)
+            onPositionChanged: mouse => { if (pressed) apply(mouse.x) }
+            onWheel: wheel => rootCC.setVolumeFraction(slider.value + (wheel.angleDelta.y > 0 ? 0.05 : -0.05))
+        }
+    }
+
+    // cabeçalho dos submenus, igual ao de Monitores e Ventoinhas
+    component SubHeader: RowLayout {
+        id: subHeader
+        property string title: ""
+        Layout.fillWidth: true
+        spacing: 8
+        Rectangle {
+            implicitWidth: 28; implicitHeight: 28; radius: 8
+            color: backMouse.containsMouse ? rootCC.colSurface1 : rootCC.colSurface0
+            Text { anchors.centerIn: parent; text: "󰁍"; color: rootCC.colText; font.family: rootCC.fontFamily; font.pixelSize: 14 }
+            MouseArea { id: backMouse; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: rootCC.page = "" }
+        }
+        Text {
+            text: subHeader.title
+            color: rootCC.colText
+            font.family: rootCC.fontFamily; font.pixelSize: 14; font.bold: true
+        }
+    }
+
+    // nome e valor em uma linha dos submenus
+    component InfoRow: RowLayout {
+        id: infoRow
+        property string label: ""
+        property string value: ""
+        visible: value !== ""
+        Layout.fillWidth: true
+        spacing: 12
+        Text { text: infoRow.label; color: rootCC.colSub; font.family: rootCC.fontFamily; font.pixelSize: 11 }
+        Text {
+            text: infoRow.value
+            color: rootCC.colText
+            font.family: rootCC.fontFamily; font.pixelSize: 11; font.bold: true
+            horizontalAlignment: Text.AlignRight
+            elide: Text.ElideRight
+            Layout.fillWidth: true
+        }
+    }
+
     DisplayMenu {
         id: displayMenu
-        visible: rootCC.displaysOpen
+        visible: rootCC.page === "displays"
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -225,12 +378,12 @@ Rectangle {
         colMauve: rootCC.colMauve
         colBase: rootCC.colBarBg
         colDanger: rootCC.colDanger
-        onBack: rootCC.displaysOpen = false
+        onBack: rootCC.page = ""
     }
 
     FanMenu {
         id: fanMenu
-        visible: rootCC.fansOpen
+        visible: rootCC.page === "fans"
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -244,437 +397,326 @@ Rectangle {
         colMauve: rootCC.colMauve
         colBase: rootCC.colBarBg
         colDanger: rootCC.colDanger
-        onBack: rootCC.fansOpen = false
+        onBack: rootCC.page = ""
     }
 
+    // ── Tela principal ─────────────────────────────────────
+    GridLayout {
+        id: homePage
+        visible: rootCC.page === ""
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: 14
+        columns: 2
+        columnSpacing: 10
+        rowSpacing: 10
+
+        Tile {
+            target: "network"
+            title: "REDE"
+            icon: rootCC.networkType === "wifi" ? rootCC.wifiIconFor(rootCC.networkSignal) : rootCC.networkType === "ethernet" ? "" : "󰤭"
+            value: rootCC.networkType === "wifi" ? rootCC.networkSsid : rootCC.networkType === "ethernet" ? "Ethernet" : "Desconectado"
+            detail: rootCC.networkType === "wifi" ? "sinal " + rootCC.networkSignal + "%" : rootCC.networkType === "ethernet" ? rootCC.networkIp : "Sem conexão"
+            danger: rootCC.networkType === "disconnected"
+            meter: [rootCC.networkType === "wifi" ? rootCC.networkSignal / 100 : rootCC.networkType === "ethernet" ? 1 : 0]
+        }
+        Tile {
+            target: "battery"
+            title: "BATERIA"
+            icon: rootCC.batteryCharging ? "󰂄" : "󰁹"
+            value: rootCC.batteryCapacity + "%"
+            detail: rootCC.batteryDetail()
+            danger: rootCC.batteryCapacity <= 15 && !rootCC.batteryCharging
+            meter: [rootCC.batteryCapacity / 100]
+            meterColor: danger ? rootCC.colDanger : rootCC.batteryCharging ? rootCC.colGreen : rootCC.colMauve
+        }
+        Tile {
+            Layout.columnSpan: 2
+            target: "sound"
+            title: "SOM"
+            icon: rootCC.volumeMuted ? "󰝟" : "󰕾"
+            value: rootCC.volumeMuted ? "Mudo" : rootCC.volumeLevel + "%"
+            detail: rootCC.sinkName(rootCC.sink)
+            danger: rootCC.volumeMuted
+            VolumeSlider {}
+        }
+        Tile {
+            target: "displays"
+            title: "MONITORES"
+            icon: "󰍹"
+            value: rootCC.activeMonitors.length + " de " + (rootCC.displays ? rootCC.displays.monitors.length : 0) + " ativos"
+            detail: rootCC.monitorsDetail()
+            meter: rootCC.displays ? rootCC.displays.monitors.map(m => m.disabled ? 0 : 1) : []
+        }
+        Tile {
+            readonly property bool ready: !!rootCC.fans && rootCC.fans.loaded && !rootCC.fans.offline
+            target: "fans"
+            title: "VENTOINHAS"
+            icon: "󰈐"
+            value: ready ? rootCC.fans.cpuTemp + " °C · " + rootCC.fans.gpuTemp + " °C" : "—"
+            detail: !ready ? (rootCC.fans && rootCC.fans.offline ? "Indisponível" : "Carregando") : rootCC.fans.gMode ? "G-Mode ligado" : rootCC.fans.mode
+            danger: !!rootCC.fans && rootCC.fans.offline
+            meter: ready ? [rootCC.fans.cpuBoost / 100, rootCC.fans.gpuBoost / 100] : [0, 0]
+        }
+    }
+
+    // ── Rede ───────────────────────────────────────────────
     ColumnLayout {
-        id: mainCol
-        visible: !rootCC.displaysOpen && !rootCC.fansOpen
+        id: networkPage
+        visible: rootCC.page === "network"
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.margins: 14
         spacing: 12
 
-        // ── Resumo: círculo + 3 linhas ─────────────────────
+        SubHeader { title: "Rede" }
+        Divider {}
         RowLayout {
             Layout.fillWidth: true
-            spacing: 14
-            NetworkStatusWidget {
-                widgetSize: 72
-                primaryColor: rootCC.colMauve
-                backgroundColor: rootCC.colBarBg
-                surfaceColor: rootCC.colSurface0
-                borderColor: rootCC.colSurface0
-                textColor: rootCC.colText
-                state: rootCC.networkType === "disconnected" ? "disconnected" : "connected"
-                volumeLevel: rootCC.volumeLevel
-                volumeMuted: rootCC.volumeMuted
-                batteryCapacity: rootCC.batteryCapacity
-                batteryCharging: rootCC.batteryCharging
-            }
+            spacing: 10
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: 3
-                Repeater {
-                    model: [
-                        { icon: rootCC.networkType === "wifi" ? rootCC.wifiIconFor(rootCC.networkSignal) : rootCC.networkType === "ethernet" ? "" : "󰤭",
-                          text: rootCC.networkType === "wifi" ? rootCC.networkSsid : rootCC.networkType === "ethernet" ? "Ethernet" : "Desconectado",
-                          danger: rootCC.networkType === "disconnected" },
-                        { icon: rootCC.volumeMuted ? "󰝟" : "󰕾",
-                          text: rootCC.volumeMuted ? "Mudo" : rootCC.volumeLevel + "% · " + rootCC.sinkName(rootCC.sink),
-                          danger: rootCC.volumeMuted },
-                        { icon: rootCC.batteryCharging ? "󰂄" : "󰁹",
-                          text: rootCC.batteryCapacity + "%" + (rootCC.batteryTimeText ? " · " + rootCC.batteryTimeText : ""),
-                          danger: rootCC.batteryCapacity <= 15 && !rootCC.batteryCharging }
-                    ]
-                    RowLayout {
-                        required property var modelData
-                        Layout.fillWidth: true
-                        spacing: 8
-                        Text {
-                            text: modelData.icon
-                            color: modelData.danger ? rootCC.colDanger : rootCC.colMauve
-                            font.family: rootCC.fontFamily; font.pixelSize: 14
-                            Layout.preferredWidth: 18
-                        }
-                        Text {
-                            text: modelData.text
-                            color: modelData.danger ? rootCC.colDanger : rootCC.colText
-                            font.family: rootCC.fontFamily; font.pixelSize: 12; font.bold: true
-                            elide: Text.ElideRight
-                            Layout.fillWidth: true
-                        }
-                    }
-                }
-            }
-        }
-
-        Divider {}
-
-        // ── Wi-Fi ──────────────────────────────────────────
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 8
-            RowLayout {
-                Layout.fillWidth: true
-                SectionTitle { text: "WI-FI"; Layout.fillWidth: true }
-                Switch { checked: rootCC.wifiEnabled; onToggled: rootCC.setWifiEnabled(!rootCC.wifiEnabled) }
-            }
-            // rede atual
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: 10
+                spacing: 1
                 Text {
-                    text: rootCC.networkType === "wifi" ? rootCC.wifiIconFor(rootCC.networkSignal) : rootCC.networkType === "ethernet" ? "" : "󰤭"
-                    color: rootCC.networkType === "disconnected" ? rootCC.colDanger : rootCC.colMauve
-                    font.family: rootCC.fontFamily; font.pixelSize: 18
-                }
-                ColumnLayout {
+                    text: "Wi-Fi"
+                    color: rootCC.colText
+                    font.family: rootCC.fontFamily; font.pixelSize: 12; font.bold: true
                     Layout.fillWidth: true
-                    spacing: 1
-                    Text {
-                        text: rootCC.networkType === "wifi" ? rootCC.networkSsid : rootCC.networkType === "ethernet" ? "Ethernet" : "Desconectado"
-                        color: rootCC.colText
-                        font.family: rootCC.fontFamily; font.pixelSize: 13; font.bold: true
-                        elide: Text.ElideRight; Layout.fillWidth: true
-                    }
-                    Text {
-                        visible: text !== ""
-                        text: [rootCC.networkType === "wifi" ? "sinal " + rootCC.networkSignal + "%" : "", rootCC.networkIp].filter(s => s).join(" · ")
-                        color: rootCC.colSub
-                        font.family: rootCC.fontFamily; font.pixelSize: 11
-                    }
-                }
-                // abrir/fechar lista de redes
-                Rectangle {
-                    visible: rootCC.wifiEnabled
-                    implicitWidth: listBtnText.implicitWidth + 18; implicitHeight: 26; radius: 8
-                    color: listBtnMouse.containsMouse ? rootCC.colSurface1 : rootCC.colSurface0
-                    Text {
-                        id: listBtnText
-                        anchors.centerIn: parent
-                        text: rootCC.wifiListOpen ? "Ocultar redes" : "Trocar rede"
-                        color: rootCC.colText
-                        font.family: rootCC.fontFamily; font.pixelSize: 11
-                    }
-                    MouseArea {
-                        id: listBtnMouse
-                        anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                        onClicked: { rootCC.wifiListOpen = !rootCC.wifiListOpen; if (rootCC.wifiListOpen) rootCC.scanWifi() }
-                    }
-                }
-            }
-            // lista de redes
-            ColumnLayout {
-                visible: rootCC.wifiListOpen && rootCC.wifiEnabled
-                Layout.fillWidth: true
-                spacing: 2
-                Text {
-                    visible: rootCC.wifiScanning && rootCC.wifiNetworks.length === 0
-                    text: "Procurando redes…"
-                    color: rootCC.colSub; font.family: rootCC.fontFamily; font.pixelSize: 11
-                }
-                Repeater {
-                    model: rootCC.wifiNetworks.slice(0, 8)
-                    ColumnLayout {
-                        id: netRow
-                        required property var modelData
-                        Layout.fillWidth: true
-                        spacing: 4
-                        Rectangle {
-                            Layout.fillWidth: true
-                            implicitHeight: 32; radius: 8
-                            color: netMouse.containsMouse && !netRow.modelData.inUse ? rootCC.colSurface0 : "transparent"
-                            RowLayout {
-                                anchors.fill: parent
-                                anchors.leftMargin: 8; anchors.rightMargin: 8
-                                spacing: 8
-                                Text {
-                                    text: rootCC.wifiIconFor(netRow.modelData.signal)
-                                    color: netRow.modelData.inUse ? rootCC.colMauve : rootCC.colText
-                                    font.family: rootCC.fontFamily; font.pixelSize: 14
-                                }
-                                Text {
-                                    text: netRow.modelData.ssid
-                                    color: netRow.modelData.inUse ? rootCC.colMauve : rootCC.colText
-                                    font.family: rootCC.fontFamily; font.pixelSize: 12; font.bold: netRow.modelData.inUse
-                                    elide: Text.ElideRight; Layout.fillWidth: true
-                                }
-                                Text {
-                                    text: netRow.modelData.inUse ? "conectado" : netRow.modelData.known ? "salva" : ""
-                                    color: rootCC.colSub; font.family: rootCC.fontFamily; font.pixelSize: 10
-                                }
-                                Text {
-                                    visible: netRow.modelData.secure
-                                    text: "󰌾"
-                                    color: rootCC.colSub; font.family: rootCC.fontFamily; font.pixelSize: 11
-                                }
-                            }
-                            MouseArea {
-                                id: netMouse
-                                anchors.fill: parent; hoverEnabled: true
-                                cursorShape: netRow.modelData.inUse ? Qt.ArrowCursor : Qt.PointingHandCursor
-                                onClicked: {
-                                    var n = netRow.modelData
-                                    if (n.inUse) return
-                                    if (n.secure && !n.known) { rootCC.passwordSsid = n.ssid; pwField.text = ""; pwField.forceActiveFocus() }
-                                    else rootCC.connectTo(n, "")
-                                }
-                            }
-                        }
-                        // senha (só para redes novas protegidas)
-                        RowLayout {
-                            visible: rootCC.passwordSsid === netRow.modelData.ssid
-                            Layout.fillWidth: true
-                            Layout.leftMargin: 8; Layout.rightMargin: 8
-                            spacing: 6
-                            Rectangle {
-                                Layout.fillWidth: true
-                                implicitHeight: 28; radius: 8
-                                color: rootCC.colSurface0
-                                border.color: pwField.activeFocus ? rootCC.colMauve : "transparent"
-                                TextInput {
-                                    id: pwField
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 8; anchors.rightMargin: 8
-                                    verticalAlignment: TextInput.AlignVCenter
-                                    echoMode: TextInput.Password
-                                    color: rootCC.colText
-                                    font.family: rootCC.fontFamily; font.pixelSize: 12
-                                    clip: true
-                                    onAccepted: rootCC.connectTo(netRow.modelData, text)
-                                    Keys.onEscapePressed: rootCC.passwordSsid = ""
-                                }
-                                Text {
-                                    visible: pwField.text === ""
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.left: parent.left; anchors.leftMargin: 8
-                                    text: "Senha"
-                                    color: rootCC.colSub; font.family: rootCC.fontFamily; font.pixelSize: 12
-                                }
-                            }
-                            Rectangle {
-                                implicitWidth: 64; implicitHeight: 28; radius: 8
-                                color: rootCC.colMauve
-                                Text { anchors.centerIn: parent; text: "Conectar"; color: rootCC.colBarBg; font.family: rootCC.fontFamily; font.pixelSize: 11; font.bold: true }
-                                MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: rootCC.connectTo(netRow.modelData, pwField.text) }
-                            }
-                        }
-                    }
                 }
                 Text {
-                    visible: rootCC.wifiMessage !== ""
-                    text: rootCC.wifiMessage
+                    text: rootCC.wifiEnabled ? "Ligado" : "Desligado"
                     color: rootCC.colSub
                     font.family: rootCC.fontFamily; font.pixelSize: 10
-                    wrapMode: Text.WordWrap
-                    Layout.fillWidth: true
-                    Layout.leftMargin: 8
                 }
             }
+            Switch { checked: rootCC.wifiEnabled; onToggled: rootCC.setWifiEnabled(!rootCC.wifiEnabled) }
         }
-
-        Divider {}
-
-        // ── Volume ─────────────────────────────────────────
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: 8
-            SectionTitle { text: "SOM" }
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: 10
-                // botão de mudo
-                Rectangle {
-                    implicitWidth: 32; implicitHeight: 32; radius: 10
-                    color: muteMouse.containsMouse ? rootCC.colSurface1 : rootCC.colSurface0
-                    Text {
-                        anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
-                        text: rootCC.volumeMuted ? "󰝟" : rootCC.volumeLevel < 33 ? "󰕿" : rootCC.volumeLevel < 66 ? "󰖀" : "󰕾"
-                        color: rootCC.volumeMuted ? rootCC.colDanger : rootCC.colText
-                        font.family: rootCC.fontFamily; font.pixelSize: 16
-                    }
-                    MouseArea {
-                        id: muteMouse
-                        anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            if (rootCC.sink && rootCC.sink.audio) rootCC.sink.audio.muted = !rootCC.sink.audio.muted
-                            else rootCC.requestToggleMute()
-                        }
-                    }
-                }
-                // slider (arrastar ou rolar) – escreve direto no PipeWire, sem atraso
-                Item {
-                    id: slider
-                    Layout.fillWidth: true
-                    implicitHeight: 32
-                    readonly property real value: Math.min(1, rootCC.volumeLevel / 100)
-                    Rectangle {
-                        id: track
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: parent.width; height: 8; radius: 4
-                        color: rootCC.colSurface0
-                        Rectangle {
-                            width: Math.max(height, parent.width * slider.value); height: parent.height; radius: 4
-                            color: rootCC.volumeMuted ? rootCC.colSurface1 : rootCC.colMauve
-                        }
-                    }
-                    Rectangle {
-                        width: 16; height: 16; radius: 8
-                        anchors.verticalCenter: parent.verticalCenter
-                        x: (slider.width - width) * slider.value
-                        color: rootCC.colText
-                        border.color: rootCC.colMauve; border.width: 2
-                        scale: sliderMouse.pressed || sliderMouse.containsMouse ? 1.15 : 1.0
-                        Behavior on scale { NumberAnimation { duration: 100 } }
-                    }
-                    MouseArea {
-                        id: sliderMouse
-                        anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                        function apply(mx) { rootCC.setVolumeFraction(mx / width) }
-                        onPressed: mouse => apply(mouse.x)
-                        onPositionChanged: mouse => { if (pressed) apply(mouse.x) }
-                        onWheel: wheel => rootCC.setVolumeFraction(slider.value + (wheel.angleDelta.y > 0 ? 0.05 : -0.05))
-                    }
-                }
-                Text {
-                    text: rootCC.volumeLevel + "%"
-                    color: rootCC.colText
-                    font.family: rootCC.fontFamily; font.pixelSize: 12; font.bold: true
-                    horizontalAlignment: Text.AlignRight
-                    Layout.preferredWidth: 40
-                }
+            spacing: 6
+            InfoRow { label: "Conexão"; value: rootCC.networkType === "wifi" ? rootCC.networkSsid : rootCC.networkType === "ethernet" ? "Ethernet" : "Desconectado" }
+            InfoRow { label: "Sinal"; value: rootCC.networkType === "wifi" ? rootCC.networkSignal + "%" : "" }
+            InfoRow { label: "IP"; value: rootCC.networkIp }
+        }
+        Divider { visible: rootCC.wifiEnabled }
+        SectionTitle { visible: rootCC.wifiEnabled; text: "REDES" }
+        // lista de redes
+        ColumnLayout {
+            visible: rootCC.wifiEnabled
+            Layout.fillWidth: true
+            spacing: 2
+            Text {
+                visible: rootCC.wifiScanning && rootCC.wifiNetworks.length === 0
+                text: "Procurando redes…"
+                color: rootCC.colSub; font.family: rootCC.fontFamily; font.pixelSize: 11
             }
-            // saídas de áudio
-            Flow {
-                Layout.fillWidth: true
-                spacing: 6
-                visible: rootCC.sinks.length > 1
-                Repeater {
-                    model: rootCC.sinks
+            Repeater {
+                model: rootCC.wifiNetworks.slice(0, 8)
+                ColumnLayout {
+                    id: netRow
+                    required property var modelData
+                    Layout.fillWidth: true
+                    spacing: 4
                     Rectangle {
-                        required property var modelData
-                        readonly property bool current: rootCC.sink === modelData
-                        implicitHeight: 26
-                        implicitWidth: Math.min(300, sinkLabel.implicitWidth + 20)
-                        radius: 8
-                        color: current ? rootCC.colMauve : sinkMouse.containsMouse ? rootCC.colSurface1 : rootCC.colSurface0
-                        Text {
-                            id: sinkLabel
-                            anchors.centerIn: parent
-                            width: Math.min(implicitWidth, 280)
-                            elide: Text.ElideRight
-                            text: rootCC.sinkName(modelData)
-                            color: parent.current ? rootCC.colBarBg : rootCC.colText
-                            font.family: rootCC.fontFamily; font.pixelSize: 11
+                        Layout.fillWidth: true
+                        implicitHeight: 32; radius: 8
+                        color: netMouse.containsMouse && !netRow.modelData.inUse ? rootCC.colSurface0 : "transparent"
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: 8; anchors.rightMargin: 8
+                            spacing: 8
+                            Text {
+                                text: rootCC.wifiIconFor(netRow.modelData.signal)
+                                color: netRow.modelData.inUse ? rootCC.colMauve : rootCC.colText
+                                font.family: rootCC.fontFamily; font.pixelSize: 14
+                            }
+                            Text {
+                                text: netRow.modelData.ssid
+                                color: netRow.modelData.inUse ? rootCC.colMauve : rootCC.colText
+                                font.family: rootCC.fontFamily; font.pixelSize: 12; font.bold: netRow.modelData.inUse
+                                elide: Text.ElideRight; Layout.fillWidth: true
+                            }
+                            Text {
+                                text: netRow.modelData.inUse ? "conectado" : netRow.modelData.known ? "salva" : ""
+                                color: rootCC.colSub; font.family: rootCC.fontFamily; font.pixelSize: 10
+                            }
+                            Text {
+                                visible: netRow.modelData.secure
+                                text: "󰌾"
+                                color: rootCC.colSub; font.family: rootCC.fontFamily; font.pixelSize: 11
+                            }
                         }
                         MouseArea {
-                            id: sinkMouse
-                            anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                            onClicked: Pipewire.preferredDefaultAudioSink = modelData
+                            id: netMouse
+                            anchors.fill: parent; hoverEnabled: true
+                            cursorShape: netRow.modelData.inUse ? Qt.ArrowCursor : Qt.PointingHandCursor
+                            onClicked: {
+                                var n = netRow.modelData
+                                if (n.inUse) return
+                                if (n.secure && !n.known) { rootCC.passwordSsid = n.ssid; pwField.text = ""; pwField.forceActiveFocus() }
+                                else rootCC.connectTo(n, "")
+                            }
+                        }
+                    }
+                    // senha (só para redes novas protegidas)
+                    RowLayout {
+                        visible: rootCC.passwordSsid === netRow.modelData.ssid
+                        Layout.fillWidth: true
+                        Layout.leftMargin: 8; Layout.rightMargin: 8
+                        spacing: 6
+                        Rectangle {
+                            Layout.fillWidth: true
+                            implicitHeight: 28; radius: 8
+                            color: rootCC.colSurface0
+                            border.color: pwField.activeFocus ? rootCC.colMauve : "transparent"
+                            TextInput {
+                                id: pwField
+                                anchors.fill: parent
+                                anchors.leftMargin: 8; anchors.rightMargin: 8
+                                verticalAlignment: TextInput.AlignVCenter
+                                echoMode: TextInput.Password
+                                color: rootCC.colText
+                                font.family: rootCC.fontFamily; font.pixelSize: 12
+                                clip: true
+                                onAccepted: rootCC.connectTo(netRow.modelData, text)
+                                Keys.onEscapePressed: rootCC.passwordSsid = ""
+                            }
+                            Text {
+                                visible: pwField.text === ""
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left; anchors.leftMargin: 8
+                                text: "Senha"
+                                color: rootCC.colSub; font.family: rootCC.fontFamily; font.pixelSize: 12
+                            }
+                        }
+                        Rectangle {
+                            implicitWidth: 64; implicitHeight: 28; radius: 8
+                            color: rootCC.colMauve
+                            Text { anchors.centerIn: parent; text: "Conectar"; color: rootCC.colBarBg; font.family: rootCC.fontFamily; font.pixelSize: 11; font.bold: true }
+                            MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: rootCC.connectTo(netRow.modelData, pwField.text) }
                         }
                     }
                 }
             }
-        }
-
-        Divider {}
-
-        // ── Bateria ────────────────────────────────────────
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 8
-            SectionTitle { text: "BATERIA" }
-            RowLayout {
+            Text {
+                visible: rootCC.wifiMessage !== ""
+                text: rootCC.wifiMessage
+                color: rootCC.colSub
+                font.family: rootCC.fontFamily; font.pixelSize: 10
+                wrapMode: Text.WordWrap
                 Layout.fillWidth: true
-                spacing: 10
+                Layout.leftMargin: 8
+            }
+        }
+    }
+
+    // ── Som ────────────────────────────────────────────────
+    ColumnLayout {
+        id: soundPage
+        visible: rootCC.page === "sound"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: 14
+        spacing: 12
+
+        SubHeader { title: "Som" }
+        Divider {}
+        SectionTitle { text: "VOLUME" }
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 10
+            Rectangle {
+                implicitWidth: 28; implicitHeight: 28; radius: 8
+                color: muteMouse.containsMouse ? rootCC.colSurface1 : rootCC.colSurface0
                 Text {
-                    text: rootCC.batteryCapacity + "%"
-                    color: rootCC.batteryCapacity <= 15 && !rootCC.batteryCharging ? rootCC.colDanger : rootCC.colText
-                    font.family: rootCC.fontFamily; font.pixelSize: 20; font.bold: true
+                    anchors.centerIn: parent
+                    text: rootCC.volumeMuted ? "󰝟" : rootCC.volumeLevel < 33 ? "󰕿" : rootCC.volumeLevel < 66 ? "󰖀" : "󰕾"
+                    color: rootCC.volumeMuted ? rootCC.colDanger : rootCC.colText
+                    font.family: rootCC.fontFamily; font.pixelSize: 14
                 }
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 1
-                    Text {
-                        text: (rootCC.batteryCharging ? "󱐋 " : "") + rootCC.batteryStatusPt(rootCC.batteryStatus)
-                        color: rootCC.batteryCharging ? rootCC.colGreen : rootCC.colText
-                        font.family: rootCC.fontFamily; font.pixelSize: 12; font.bold: true
+                MouseArea {
+                    id: muteMouse
+                    anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        if (rootCC.sink && rootCC.sink.audio) rootCC.sink.audio.muted = !rootCC.sink.audio.muted
+                        else rootCC.requestToggleMute()
                     }
+                }
+            }
+            VolumeSlider {}
+            Text {
+                text: rootCC.volumeLevel + "%"
+                color: rootCC.colText
+                font.family: rootCC.fontFamily; font.pixelSize: 12; font.bold: true
+                horizontalAlignment: Text.AlignRight
+                Layout.preferredWidth: 40
+            }
+        }
+        Divider { visible: rootCC.sinks.length > 1 }
+        SectionTitle { visible: rootCC.sinks.length > 1; text: "SAÍDA" }
+        // saídas de áudio
+        Flow {
+            Layout.fillWidth: true
+            spacing: 6
+            visible: rootCC.sinks.length > 1
+            Repeater {
+                model: rootCC.sinks
+                Rectangle {
+                    required property var modelData
+                    readonly property bool current: rootCC.sink === modelData
+                    implicitHeight: 26
+                    implicitWidth: Math.min(300, sinkLabel.implicitWidth + 20)
+                    radius: 8
+                    color: current ? rootCC.colMauve : sinkMouse.containsMouse ? rootCC.colSurface1 : rootCC.colSurface0
                     Text {
-                        visible: text !== ""
-                        text: [rootCC.batteryTimeText, rootCC.batteryRate > 0.1 ? rootCC.batteryRate.toFixed(1) + " W" : ""].filter(s => s).join(" · ")
-                        color: rootCC.colSub
+                        id: sinkLabel
+                        anchors.centerIn: parent
+                        width: Math.min(implicitWidth, 280)
+                        elide: Text.ElideRight
+                        text: rootCC.sinkName(modelData)
+                        color: parent.current ? rootCC.colBarBg : rootCC.colText
                         font.family: rootCC.fontFamily; font.pixelSize: 11
                     }
-                }
-            }
-            Rectangle {
-                Layout.fillWidth: true
-                implicitHeight: 6; radius: 3
-                color: rootCC.colSurface0
-                Rectangle {
-                    width: parent.width * rootCC.batteryCapacity / 100; height: parent.height; radius: 3
-                    color: rootCC.batteryCapacity <= 15 && !rootCC.batteryCharging ? rootCC.colDanger : rootCC.batteryCharging ? rootCC.colGreen : rootCC.colMauve
+                    MouseArea {
+                        id: sinkMouse
+                        anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                        onClicked: Pipewire.preferredDefaultAudioSink = modelData
+                    }
                 }
             }
         }
+    }
 
+    // ── Bateria ────────────────────────────────────────────
+    ColumnLayout {
+        id: batteryPage
+        visible: rootCC.page === "battery"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: 14
+        spacing: 12
+
+        SubHeader { title: "Bateria" }
         Divider {}
-
-        // ── Monitores (abre o submenu) ─────────────────────
-        Rectangle {
+        ColumnLayout {
             Layout.fillWidth: true
-            implicitHeight: 36
-            radius: 10
-            color: displaysMouse.containsMouse ? rootCC.colSurface1 : rootCC.colSurface0
-            RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: 12
-                anchors.rightMargin: 12
-                spacing: 10
-                Text { text: "󰍹"; color: rootCC.colMauve; font.family: rootCC.fontFamily; font.pixelSize: 16 }
-                Text {
-                    text: "Monitores"
-                    color: rootCC.colText
-                    font.family: rootCC.fontFamily; font.pixelSize: 12; font.bold: true
-                    Layout.fillWidth: true
-                }
-                Text { text: "󰅂"; color: rootCC.colSub; font.family: rootCC.fontFamily; font.pixelSize: 14 }
-            }
-            MouseArea {
-                id: displaysMouse
-                anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                onClicked: rootCC.displaysOpen = true
-            }
+            spacing: 6
+            InfoRow { label: "Carga"; value: rootCC.batteryCapacity + "%" }
+            InfoRow { label: "Estado"; value: rootCC.batteryStatusPt(rootCC.batteryStatus) }
+            InfoRow { label: "Tempo"; value: rootCC.batteryTimeText }
+            InfoRow { label: "Consumo"; value: rootCC.batteryRate > 0.1 ? rootCC.batteryRate.toFixed(1) + " W" : "" }
         }
-
-        // ── Ventoinhas (abre o submenu) ────────────────────
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 36
-            radius: 10
-            color: fansMouse.containsMouse ? rootCC.colSurface1 : rootCC.colSurface0
-            RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin: 12
-                anchors.rightMargin: 12
-                spacing: 10
-                Text { text: "󰈐"; color: rootCC.colMauve; font.family: rootCC.fontFamily; font.pixelSize: 16 }
-                Text {
-                    text: "Ventoinhas"
-                    color: rootCC.colText
-                    font.family: rootCC.fontFamily; font.pixelSize: 12; font.bold: true
-                    Layout.fillWidth: true
-                }
-                Text { text: "󰅂"; color: rootCC.colSub; font.family: rootCC.fontFamily; font.pixelSize: 14 }
-            }
-            MouseArea {
-                id: fansMouse
-                anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                onClicked: rootCC.fansOpen = true
+            implicitHeight: 6; radius: 3
+            color: rootCC.colSurface0
+            Rectangle {
+                width: parent.width * rootCC.batteryCapacity / 100; height: parent.height; radius: 3
+                color: rootCC.batteryCapacity <= 15 && !rootCC.batteryCharging ? rootCC.colDanger : rootCC.batteryCharging ? rootCC.colGreen : rootCC.colMauve
             }
         }
     }

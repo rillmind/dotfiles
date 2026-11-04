@@ -19,8 +19,6 @@ ColumnLayout {
     readonly property bool locked: !!manager && manager.gMode
 
     spacing: 12
-    onVisibleChanged: if (manager) manager.watching = visible
-    onManagerChanged: if (manager) manager.watching = visible
 
     component Label: Text {
         color: menu.colSub

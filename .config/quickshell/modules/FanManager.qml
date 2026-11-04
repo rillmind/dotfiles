@@ -3,7 +3,7 @@ import Quickshell
 import Quickshell.Io
 
 // FanManager.qml – fala com o g15-daemon (serviço do g15-control-center, em ~/git) pelo socket dele.
-// Lê temperatura, RPM, boost e modo a cada 2 s enquanto o submenu de ventoinhas está aberto.
+// Lê temperatura, RPM, boost e modo a cada 2 s enquanto o painel está aberto.
 // O daemon guarda as escolhas sozinho, e o app original continua funcionando junto.
 //
 // Regras herdadas do daemon/app:
@@ -19,7 +19,7 @@ Scope {
     readonly property var modes: ["Silencioso", "Balanceado", "Performance"]
     readonly property string customMode: "Personalizado"
 
-    property bool watching: false     // ligado pelo FanMenu enquanto está visível
+    property bool watching: false     // ligado pelo shell.qml enquanto o painel está aberto
     property bool loaded: false       // já recebeu dados do daemon ao menos uma vez
     property bool offline: false      // o daemon não respondeu
     property string errorText: ""

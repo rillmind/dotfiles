@@ -210,18 +210,26 @@ ShellRoot {
         fontFamily: root.fontFamily
         // o painel fecha para a confirmação receber o clique (o focus grab dele engoliria)
         onPendingChanged: if (pending) root.controlCenterVisible = false
-        onMenuRequested: {
-            root.popupScreen = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : Quickshell.screens[0].name
-            root.calendarVisible = false; root.sysMonVisible = false; root.controlCenterVisible = true
-        }
+        onMenuRequested: root.openPanel("displays")
         onMenuCloseRequested: root.controlCenterVisible = false
+    }
+    // abre o painel na tela em foco, já em um submenu; page vazio é a tela principal
+    signal panelPageRequested(string page)
+    function openPanel(page) {
+        root.popupScreen = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : Quickshell.screens[0].name
+        root.calendarVisible = false; root.sysMonVisible = false; root.controlCenterVisible = true
+        root.panelPageRequested(page)
+    }
+    // quickshell ipc call panel open <""|network|sound|battery|displays|fans>
+    IpcHandler {
+        target: "panel"
+        function open(page: string): void { root.openPanel(page) }
+        function close(): void { root.controlCenterVisible = false }
     }
     FanManager {
         id: fanManager
-        onMenuRequested: {
-            root.popupScreen = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : Quickshell.screens[0].name
-            root.calendarVisible = false; root.sysMonVisible = false; root.controlCenterVisible = true
-        }
+        watching: root.controlCenterVisible
+        onMenuRequested: root.openPanel("fans")
         onMenuCloseRequested: root.controlCenterVisible = false
     }
     Process { id: agsProc; command: ["ags", "toggle", "calendar"] }
@@ -442,6 +450,10 @@ ShellRoot {
                     function onRequestSetVolume(lvl) { root.setVolume(lvl) }
                     function onRequestToggleMute() { root.toggleMute() }
                     function onRequestRefresh() { netProc.running = true; volProc.running = true; battProc.running = true }
+                }
+                Connections {
+                    target: root
+                    function onPanelPageRequested(page) { if (ccLoader.item && root.popupScreen === modelData.name) ccLoader.item.page = page }
                 }
             }
         }
