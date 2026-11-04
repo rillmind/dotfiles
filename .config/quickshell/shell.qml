@@ -114,7 +114,8 @@ ShellRoot {
     readonly property string batteryTimeText: {
         if (!upDev || !upDev.ready) return ""
         if (batteryCharging && upDev.timeToFull > 0) return formatDuration(upDev.timeToFull) + " para carregar"
-        if (!batteryCharging && upDev.timeToEmpty > 0) return formatDuration(upDev.timeToEmpty) + " restantes"
+        // parada na tomada a corrente é quase zero, e a estimativa daria milhares de horas
+        if (batteryStatus === "Discharging" && upDev.timeToEmpty > 0) return formatDuration(upDev.timeToEmpty) + " restantes"
         return ""
     }
     readonly property real batteryRate: upDev && upDev.ready ? Math.abs(upDev.changeRate) : 0
