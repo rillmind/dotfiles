@@ -38,11 +38,19 @@ Rectangle {
     signal requestToggleMute()
     signal requestRefresh()
 
+    // submenu de imagem (DisplayMenu), aberto pelo botão "Monitores"
+    property var displays: null
+    property bool displaysOpen: false
+    Connections {
+        target: rootCC.displays
+        function onMenuRequested() { rootCC.displaysOpen = true }
+    }
+
     // o painel pede foco de teclado só enquanto a senha do wifi está sendo digitada
     readonly property bool wantsKeyboard: passwordSsid !== ""
 
     implicitWidth: 340
-    implicitHeight: mainCol.implicitHeight + 28
+    implicitHeight: (displaysOpen ? displayMenu.implicitHeight : mainCol.implicitHeight) + 28
     radius: 16
     color: colBarBg
     border.color: colSurface0
@@ -161,7 +169,7 @@ Rectangle {
         wifiEnabled = on
     }
     Component.onCompleted: { radioProc.running = true; knownProc.running = true }
-    onVisibleChanged: if (visible) { radioProc.running = true; if (wifiListOpen) scanWifi() } else { passwordSsid = ""; wifiMessage = "" }
+    onVisibleChanged: if (visible) { radioProc.running = true; if (wifiListOpen) scanWifi() } else { passwordSsid = ""; wifiMessage = ""; displaysOpen = false }
 
     // ── Componentes visuais reutilizados ───────────────────
     component SectionTitle: Text {
@@ -193,8 +201,28 @@ Rectangle {
         MouseArea { anchors.fill: parent; cursorShape: Qt.PointingHandCursor; onClicked: sw.toggled() }
     }
 
+    DisplayMenu {
+        id: displayMenu
+        visible: rootCC.displaysOpen
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: 14
+        manager: rootCC.displays
+        fontFamily: rootCC.fontFamily
+        colText: rootCC.colText
+        colSub: rootCC.colSub
+        colSurface0: rootCC.colSurface0
+        colSurface1: rootCC.colSurface1
+        colMauve: rootCC.colMauve
+        colBase: rootCC.colBarBg
+        colDanger: rootCC.colDanger
+        onBack: rootCC.displaysOpen = false
+    }
+
     ColumnLayout {
         id: mainCol
+        visible: !rootCC.displaysOpen
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -564,6 +592,35 @@ Rectangle {
                     width: parent.width * rootCC.batteryCapacity / 100; height: parent.height; radius: 3
                     color: rootCC.batteryCapacity <= 15 && !rootCC.batteryCharging ? rootCC.colDanger : rootCC.batteryCharging ? rootCC.colGreen : rootCC.colMauve
                 }
+            }
+        }
+
+        Divider {}
+
+        // ── Monitores (abre o submenu) ─────────────────────
+        Rectangle {
+            Layout.fillWidth: true
+            implicitHeight: 36
+            radius: 10
+            color: displaysMouse.containsMouse ? rootCC.colSurface1 : rootCC.colSurface0
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: 12
+                anchors.rightMargin: 12
+                spacing: 10
+                Text { text: "󰍹"; color: rootCC.colMauve; font.family: rootCC.fontFamily; font.pixelSize: 16 }
+                Text {
+                    text: "Monitores"
+                    color: rootCC.colText
+                    font.family: rootCC.fontFamily; font.pixelSize: 12; font.bold: true
+                    Layout.fillWidth: true
+                }
+                Text { text: "󰅂"; color: rootCC.colSub; font.family: rootCC.fontFamily; font.pixelSize: 14 }
+            }
+            MouseArea {
+                id: displaysMouse
+                anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                onClicked: rootCC.displaysOpen = true
             }
         }
     }

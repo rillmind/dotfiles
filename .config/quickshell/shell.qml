@@ -72,6 +72,9 @@ ShellRoot {
     property bool controlCenterVisible: false
     property bool sysMonVisible: false
     property bool calendarVisible: false
+    // tela onde os popups acima abrem (a da barra clicada). Precisa ser uma só: cada janela tem seu
+    // HyprlandFocusGrab, e com janelas em duas telas um grab derruba o outro e o popup fecha sozinho
+    property string popupScreen: ""
 
     // ── Volume ao vivo via PipeWire ───────────────────────
     PwObjectTracker { objects: [Pipewire.defaultAudioSink] }
@@ -201,6 +204,17 @@ ShellRoot {
     // launcher próprio (modules/Launcher.qml); também abre por `quickshell ipc call launcher toggle`
     Launcher { id: appLauncher; fontFamily: root.fontFamily }
     VolumeOsd { id: volumeOsd; fontFamily: root.fontFamily }
+    DisplayManager {
+        id: displayManager
+        fontFamily: root.fontFamily
+        // o painel fecha para a confirmação receber o clique (o focus grab dele engoliria)
+        onPendingChanged: if (pending) root.controlCenterVisible = false
+        onMenuRequested: {
+            root.popupScreen = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : Quickshell.screens[0].name
+            root.calendarVisible = false; root.sysMonVisible = false; root.controlCenterVisible = true
+        }
+        onMenuCloseRequested: root.controlCenterVisible = false
+    }
     Process { id: agsProc; command: ["ags", "toggle", "calendar"] }
 
     // Hypr window title + class + address (para ícone antes do título e dock highlight)
@@ -367,7 +381,7 @@ ShellRoot {
             property var modelData
             screen: modelData
             id: ccWindow
-            visible: root.controlCenterVisible
+            visible: root.controlCenterVisible && root.popupScreen === modelData.name
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             // teclado só enquanto digita a senha do wifi
@@ -405,6 +419,7 @@ ShellRoot {
                         item.batteryCapacity = Qt.binding(function() { return root.batteryCapacity })
                         item.batteryStatus = Qt.binding(function() { return root.batteryStatus })
                         item.batteryCharging = Qt.binding(function() { return root.batteryCharging })
+                        item.displays = displayManager
                         item.fontFamily = root.fontFamily
                         item.colText = root.colText
                         item.colSurface0 = root.colSurface0
@@ -429,7 +444,7 @@ ShellRoot {
             property var modelData
             screen: modelData
             id: calWindow
-            visible: root.calendarVisible
+            visible: root.calendarVisible && root.popupScreen === modelData.name
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
@@ -474,7 +489,7 @@ ShellRoot {
             id: smWindow
             property var modelData
             screen: modelData
-            visible: root.sysMonVisible
+            visible: root.sysMonVisible && root.popupScreen === modelData.name
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
@@ -735,6 +750,7 @@ ShellRoot {
                         onEntered: { root.clockNow = new Date(); root.barHover = "clock" }
                         onExited: if (root.barHover === "clock") root.barHover = ""
                         onClicked: {
+                            root.popupScreen = barWindow.modelData.name
                             root.calendarVisible = !root.calendarVisible
                             if (root.calendarVisible) { root.controlCenterVisible = false; root.sysMonVisible = false }
                         }
@@ -765,6 +781,7 @@ ShellRoot {
                             onEntered: root.barHover = "cpu"
                             onExited: if (root.barHover === "cpu") root.barHover = ""
                             onClicked: {
+                                root.popupScreen = barWindow.modelData.name
                                 root.sysMonVisible = !root.sysMonVisible
                                 if (root.sysMonVisible) { root.controlCenterVisible = false; root.calendarVisible = false }
                             }
@@ -785,6 +802,7 @@ ShellRoot {
                             onEntered: root.barHover = "mem"
                             onExited: if (root.barHover === "mem") root.barHover = ""
                             onClicked: {
+                                root.popupScreen = barWindow.modelData.name
                                 root.sysMonVisible = !root.sysMonVisible
                                 if (root.sysMonVisible) { root.controlCenterVisible = false; root.calendarVisible = false }
                             }
@@ -816,6 +834,7 @@ ShellRoot {
                             onEntered: root.barHover = "net"
                             onExited: if (root.barHover === "net") root.barHover = ""
                             onClicked: {
+                                root.popupScreen = barWindow.modelData.name
                                 root.controlCenterVisible = !root.controlCenterVisible
                                 if (root.controlCenterVisible) { root.calendarVisible = false; root.sysMonVisible = false }
                             }
@@ -840,6 +859,7 @@ ShellRoot {
                             onClicked: mouse => {
                                 if (mouse.button === Qt.RightButton) pulsemixerProc.running = true
                                 else {
+                                    root.popupScreen = barWindow.modelData.name
                                     root.controlCenterVisible = !root.controlCenterVisible
                                     if (root.controlCenterVisible) { root.calendarVisible = false; root.sysMonVisible = false }
                                 }
@@ -871,6 +891,7 @@ ShellRoot {
                             onEntered: root.barHover = "batt"
                             onExited: if (root.barHover === "batt") root.barHover = ""
                             onClicked: {
+                                root.popupScreen = barWindow.modelData.name
                                 root.controlCenterVisible = !root.controlCenterVisible
                                 if (root.controlCenterVisible) { root.calendarVisible = false; root.sysMonVisible = false }
                             }
