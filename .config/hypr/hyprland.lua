@@ -8,12 +8,12 @@ local c = require("mocha")
 ---- MONITORS ----
 ------------------
 
---hl.monitor({ output = "HDMI-A-1", mode = "3840x2160@60", position = "0x0", scale = 2 })
+hl.monitor({ output = "HDMI-A-1", mode = "3840x2160@60", position = "0x0", scale = 2 })
+hl.monitor({ output = "HDMI-A-1", mode = "1920x1080@60", position = "0x0", scale = 1 })
 hl.monitor({ output = "HDMI-A-1", mode = "2560x1440@60", position = "0x0", scale = 1.33 })
---hl.monitor({ output = "HDMI-A-1", mode = "1920x1080@120", position = "0x0", scale = 1 })
 
 hl.monitor({ output = "eDP-1", disabled = true })
---hl.monitor({ output = "eDP-1", mode = "1920x1080@120", position = "0x1080", scale = 1 })
+hl.monitor({ output = "eDP-1", mode = "1920x1080@120", position = "0x1080", scale = 1 })
 
 -- Escolhas confirmadas no menu de monitores do quickshell (modules/DisplayManager.qml) valem por
 -- cima das regras acima. Para voltar a usar só as regras acima, apague este arquivo.
