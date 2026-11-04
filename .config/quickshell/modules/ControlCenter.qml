@@ -43,14 +43,22 @@ Rectangle {
     property bool displaysOpen: false
     Connections {
         target: rootCC.displays
-        function onMenuRequested() { rootCC.displaysOpen = true }
+        function onMenuRequested() { rootCC.fansOpen = false; rootCC.displaysOpen = true }
+    }
+
+    // submenu de ventoinhas (FanMenu), aberto pelo botão "Ventoinhas"
+    property var fans: null
+    property bool fansOpen: false
+    Connections {
+        target: rootCC.fans
+        function onMenuRequested() { rootCC.displaysOpen = false; rootCC.fansOpen = true }
     }
 
     // o painel pede foco de teclado só enquanto a senha do wifi está sendo digitada
     readonly property bool wantsKeyboard: passwordSsid !== ""
 
     implicitWidth: 340
-    implicitHeight: (displaysOpen ? displayMenu.implicitHeight : mainCol.implicitHeight) + 28
+    implicitHeight: (displaysOpen ? displayMenu.implicitHeight : fansOpen ? fanMenu.implicitHeight : mainCol.implicitHeight) + 28
     radius: 16
     color: colBarBg
     border.color: colSurface0
@@ -169,7 +177,7 @@ Rectangle {
         wifiEnabled = on
     }
     Component.onCompleted: { radioProc.running = true; knownProc.running = true }
-    onVisibleChanged: if (visible) { radioProc.running = true; if (wifiListOpen) scanWifi() } else { passwordSsid = ""; wifiMessage = ""; displaysOpen = false }
+    onVisibleChanged: if (visible) { radioProc.running = true; if (wifiListOpen) scanWifi() } else { passwordSsid = ""; wifiMessage = ""; displaysOpen = false; fansOpen = false }
 
     // ── Componentes visuais reutilizados ───────────────────
     component SectionTitle: Text {
@@ -220,9 +228,28 @@ Rectangle {
         onBack: rootCC.displaysOpen = false
     }
 
+    FanMenu {
+        id: fanMenu
+        visible: rootCC.fansOpen
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: 14
+        manager: rootCC.fans
+        fontFamily: rootCC.fontFamily
+        colText: rootCC.colText
+        colSub: rootCC.colSub
+        colSurface0: rootCC.colSurface0
+        colSurface1: rootCC.colSurface1
+        colMauve: rootCC.colMauve
+        colBase: rootCC.colBarBg
+        colDanger: rootCC.colDanger
+        onBack: rootCC.fansOpen = false
+    }
+
     ColumnLayout {
         id: mainCol
-        visible: !rootCC.displaysOpen
+        visible: !rootCC.displaysOpen && !rootCC.fansOpen
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -621,6 +648,33 @@ Rectangle {
                 id: displaysMouse
                 anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
                 onClicked: rootCC.displaysOpen = true
+            }
+        }
+
+        // ── Ventoinhas (abre o submenu) ────────────────────
+        Rectangle {
+            Layout.fillWidth: true
+            implicitHeight: 36
+            radius: 10
+            color: fansMouse.containsMouse ? rootCC.colSurface1 : rootCC.colSurface0
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: 12
+                anchors.rightMargin: 12
+                spacing: 10
+                Text { text: "󰈐"; color: rootCC.colMauve; font.family: rootCC.fontFamily; font.pixelSize: 16 }
+                Text {
+                    text: "Ventoinhas"
+                    color: rootCC.colText
+                    font.family: rootCC.fontFamily; font.pixelSize: 12; font.bold: true
+                    Layout.fillWidth: true
+                }
+                Text { text: "󰅂"; color: rootCC.colSub; font.family: rootCC.fontFamily; font.pixelSize: 14 }
+            }
+            MouseArea {
+                id: fansMouse
+                anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                onClicked: rootCC.fansOpen = true
             }
         }
     }

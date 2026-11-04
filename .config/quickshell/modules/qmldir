@@ -9,3 +9,5 @@ Launcher 1.0 Launcher.qml
 VolumeOsd 1.0 VolumeOsd.qml
 DisplayManager 1.0 DisplayManager.qml
 DisplayMenu 1.0 DisplayMenu.qml
+FanManager 1.0 FanManager.qml
+FanMenu 1.0 FanMenu.qml

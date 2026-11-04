@@ -215,6 +215,14 @@ ShellRoot {
         }
         onMenuCloseRequested: root.controlCenterVisible = false
     }
+    FanManager {
+        id: fanManager
+        onMenuRequested: {
+            root.popupScreen = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : Quickshell.screens[0].name
+            root.calendarVisible = false; root.sysMonVisible = false; root.controlCenterVisible = true
+        }
+        onMenuCloseRequested: root.controlCenterVisible = false
+    }
     Process { id: agsProc; command: ["ags", "toggle", "calendar"] }
 
     // Hypr window title + class + address (para ícone antes do título e dock highlight)
@@ -420,6 +428,7 @@ ShellRoot {
                         item.batteryStatus = Qt.binding(function() { return root.batteryStatus })
                         item.batteryCharging = Qt.binding(function() { return root.batteryCharging })
                         item.displays = displayManager
+                        item.fans = fanManager
                         item.fontFamily = root.fontFamily
                         item.colText = root.colText
                         item.colSurface0 = root.colSurface0
