@@ -26,6 +26,10 @@ window-padding-x = 1
 
 window-padding-balance = true
 
+# Cola texto e avisa o tmux, que cola imagem no Claude Code (ver ~/.scripts/linux/tmux-paste-image.sh)
+keybind = ctrl+shift+v=paste_from_clipboard
+keybind = chain=csi:9999~
+
 # This template file has been automatically created at the following
 # path since Ghostty couldn't find any existing config files on your system:
 #
