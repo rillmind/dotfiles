@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Terminal=false
+Type=Application
+Name=WhatsApp Lite
+Exec=flatpak 'run' '--command=/app/bin/chrome' 'com.google.Chrome' '--profile-directory=Default' '--app-id=kffbnhgdadjpaeeddjhgfgdjplkhbpnm'
+Icon=/home/raul/.var/app/com.google.Chrome/data/icons/hicolor/512x512/apps/chrome-kffbnhgdadjpaeeddjhgfgdjplkhbpnm-Default.png
+StartupWMClass=crx_kffbnhgdadjpaeeddjhgfgdjplkhbpnm
+X-Flatpak-Part-Of=com.google.Chrome
+TryExec=/var/lib/flatpak/exports/bin/com.google.Chrome
