@@ -154,12 +154,29 @@ hl.config({
 
 local mainMod = "ALT"
 
--- Tampa do notebook
+-- Tampa do notebook: nunca suspende (logind com HandleLidSwitch=ignore em
+-- /etc/systemd/logind.conf.d/10-lid-ignore.conf, instalado por ~/.scripts/linux/lid-ignore.sh),
+-- só apaga a tela e tudo segue rodando.
+-- Com monitor externo, desativa o eDP-1 para as janelas irem para o outro monitor.
+local function has_external_monitor()
+  for _, m in ipairs(hl.get_monitors()) do
+    if m.name ~= "eDP-1" then return true end
+  end
+  return false
+end
 hl.bind("switch:on:Lid Switch", function()
-  hl.monitor({ output = "eDP-1", disabled = true })
+  if has_external_monitor() then
+    hl.monitor({ output = "eDP-1", disabled = true })
+  else
+    hl.dispatch(hl.dsp.dpms({ action = "disable", monitor = "eDP-1" }))
+  end
 end, { locked = true })
 hl.bind("switch:off:Lid Switch", function()
-  hl.monitor({ output = "eDP-1", mode = "preferred", position = "auto", scale = 1 })
+  local edp = hl.get_monitor("eDP-1")
+  if not edp or not edp.enabled then
+    hl.monitor({ output = "eDP-1", mode = "preferred", position = "auto", scale = 1 })
+  end
+  hl.dispatch(hl.dsp.dpms({ action = "enable", monitor = "eDP-1" }))
 end, { locked = true })
 
 hl.bind("SUPER + E", hl.dsp.exec_cmd("nautilus"))
