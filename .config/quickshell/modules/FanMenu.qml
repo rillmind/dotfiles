@@ -17,6 +17,7 @@ ColumnLayout {
     signal back()
 
     readonly property bool locked: !!manager && manager.gMode
+    readonly property bool fansLocked: !!manager && manager.fansLocked
 
     spacing: 12
 
@@ -45,6 +46,14 @@ ColumnLayout {
             if (draft !== boost) menu.manager.setBoost(fanId, draft)
         }
 
+        // descarta um ajuste em andamento se a trava entrar no meio dele
+        Connections {
+            target: menu
+            function onFansLockedChanged() {
+                if (menu.fansLocked) { fan.editing = false; wheelCommit.stop() }
+            }
+        }
+
         RowLayout {
             Layout.fillWidth: true
             spacing: 8
@@ -55,7 +64,7 @@ ColumnLayout {
             }
             Item { Layout.fillWidth: true }
             Text {
-                text: fan.temp + " °C · " + fan.rpm + " RPM"
+                text: menu.fansLocked ? fan.temp + " °C" : fan.temp + " °C · " + fan.rpm + " RPM"
                 color: menu.colSub
                 font.family: menu.fontFamily; font.pixelSize: 11
             }
@@ -67,8 +76,8 @@ ColumnLayout {
                 id: slider
                 Layout.fillWidth: true
                 implicitHeight: 28
-                opacity: menu.locked ? 0.5 : 1
-                readonly property real value: fan.shown / 100
+                readonly property real value: menu.fansLocked && menu.manager
+                                              ? Math.min(1, fan.rpm / menu.manager.maxRpm) : fan.shown / 100
                 Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     width: parent.width; height: 8; radius: 4
@@ -79,6 +88,7 @@ ColumnLayout {
                     }
                 }
                 Rectangle {
+                    visible: !menu.fansLocked
                     width: 16; height: 16; radius: 8
                     anchors.verticalCenter: parent.verticalCenter
                     x: (slider.width - width) * slider.value
@@ -88,7 +98,7 @@ ColumnLayout {
                 // o boost só é enviado ao soltar: o daemon limita os pedidos por segundo
                 MouseArea {
                     anchors.fill: parent
-                    enabled: !menu.locked
+                    enabled: !menu.fansLocked
                     cursorShape: Qt.PointingHandCursor
                     function pick(mx) { fan.draft = Math.max(0, Math.min(100, Math.round(mx / width * 100))) }
                     onPressed: mouse => { fan.editing = true; pick(mouse.x) }
@@ -104,11 +114,11 @@ ColumnLayout {
                 Timer { id: wheelCommit; interval: 400; onTriggered: fan.commit() }
             }
             Text {
-                text: fan.shown + "%"
+                text: menu.fansLocked ? fan.rpm + " RPM" : fan.shown + "%"
                 color: menu.colText
                 font.family: menu.fontFamily; font.pixelSize: 12; font.bold: true
                 horizontalAlignment: Text.AlignRight
-                Layout.preferredWidth: 40
+                Layout.preferredWidth: menu.fansLocked ? 66 : 40
             }
         }
     }
@@ -228,6 +238,41 @@ ColumnLayout {
         Divider {}
 
         // ── Ventoinhas ─────────────────────────────────────
+        RowLayout {
+            visible: menu.fansLocked
+            Layout.fillWidth: true
+            spacing: 8
+            Text {
+                text: "󰌾"
+                color: menu.colMauve
+                font.family: menu.fontFamily; font.pixelSize: 14
+            }
+            Text {
+                text: menu.locked ? "Travadas pelo G-Mode" : "Automáticas no " + (menu.manager ? menu.manager.mode : "")
+                color: menu.colSub
+                font.family: menu.fontFamily; font.pixelSize: 11
+                elide: Text.ElideRight
+                Layout.fillWidth: true
+            }
+            Rectangle {
+                visible: !menu.locked
+                implicitWidth: manualText.implicitWidth + 16; implicitHeight: 24; radius: 8
+                color: manualMouse.containsMouse ? menu.colSurface1 : menu.colSurface0
+                Text {
+                    id: manualText
+                    anchors.centerIn: parent
+                    text: "Ajuste manual"
+                    color: menu.colText
+                    font.family: menu.fontFamily; font.pixelSize: 11
+                }
+                MouseArea {
+                    id: manualMouse
+                    anchors.fill: parent; hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: menu.manager.setManual()
+                }
+            }
+        }
         FanControl {
             title: "CPU"
             fanId: 1

@@ -9,15 +9,17 @@ import Quickshell.Io
 // Regras herdadas do daemon/app:
 // - escolher Silencioso, Balanceado ou Performance zera os boosts manuais;
 // - os boosts só voltam ao reiniciar no modo Personalizado, por isso mexer neles muda o modo;
-// - com o G-Mode ligado, modos e boosts ficam travados (como no app).
+// - com o G-Mode ligado, modos e boosts ficam travados (como no app);
+// - nos modos automáticos os boosts também ficam travados, até pedir o ajuste manual com setManual().
 //
 // Precisa do socat. Também responde por IPC:
-// quickshell ipc call fans <menu|closeMenu|status|setMode|setBoost|toggleGMode>
+// quickshell ipc call fans <menu|closeMenu|status|setMode|setManual|setBoost|toggleGMode>
 Scope {
     id: mgr
     readonly property string socketPath: "/tmp/g15-daemon.sock"
     readonly property var modes: ["Silencioso", "Balanceado", "Performance"]
     readonly property string customMode: "Personalizado"
+    readonly property int maxRpm: 4800    // fanN_max do alienware_wmi, só para a escala da barra
 
     property bool watching: false     // ligado pelo shell.qml enquanto o painel está aberto
     property bool loaded: false       // já recebeu dados do daemon ao menos uma vez
@@ -32,6 +34,8 @@ Scope {
     property int gpuBoost: 0
     property string mode: ""
     property bool gMode: false
+    // a BIOS comanda as ventoinhas: o menu mostra a velocidade real em vez do slider de boost
+    readonly property bool fansLocked: gMode || modes.indexOf(mode) !== -1
 
     signal menuRequested()
     signal menuCloseRequested()
@@ -41,11 +45,12 @@ Scope {
         function menu(): void { mgr.menuRequested() }
         function closeMenu(): void { mgr.menuCloseRequested() }
         function status(): string {
-            return JSON.stringify({ loaded: mgr.loaded, offline: mgr.offline, error: mgr.errorText, mode: mgr.mode, gMode: mgr.gMode,
+            return JSON.stringify({ loaded: mgr.loaded, offline: mgr.offline, error: mgr.errorText, mode: mgr.mode, gMode: mgr.gMode, fansLocked: mgr.fansLocked,
                                     cpu: { temp: mgr.cpuTemp, rpm: mgr.cpuRpm, boost: mgr.cpuBoost },
                                     gpu: { temp: mgr.gpuTemp, rpm: mgr.gpuRpm, boost: mgr.gpuBoost } })
         }
         function setMode(name: string): void { mgr.setMode(name) }
+        function setManual(): void { mgr.setManual() }
         function setBoost(fan: int, percent: int): void { mgr.setBoost(fan, percent) }
         function toggleGMode(): void { mgr.toggleGMode() }
     }
@@ -60,9 +65,18 @@ Scope {
         refresh()
     }
 
+    // sai do modo automático para o Personalizado, que herda o perfil atual do daemon
+    function setManual() {
+        if (!loaded || !fansLocked || gMode) return
+        errorText = ""
+        mode = customMode
+        send({ action: "set_power_mode", mode: customMode })
+        refresh()
+    }
+
     // fan: 1 = CPU, 2 = GPU
     function setBoost(fan, percent) {
-        if (!loaded || gMode || (fan !== 1 && fan !== 2)) return
+        if (!loaded || fansLocked || (fan !== 1 && fan !== 2)) return
         var pct = Math.max(0, Math.min(100, Math.round(percent)))
         errorText = ""
         if (mode !== customMode) {

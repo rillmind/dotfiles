@@ -457,7 +457,9 @@ Rectangle {
             value: ready ? rootCC.fans.cpuTemp + " °C · " + rootCC.fans.gpuTemp + " °C" : "—"
             detail: !ready ? (rootCC.fans && rootCC.fans.offline ? "Indisponível" : "Carregando") : rootCC.fans.gMode ? "G-Mode ligado" : rootCC.fans.mode
             danger: !!rootCC.fans && rootCC.fans.offline
-            meter: ready ? [rootCC.fans.cpuBoost / 100, rootCC.fans.gpuBoost / 100] : [0, 0]
+            meter: !ready ? [0, 0]
+                   : rootCC.fans.fansLocked ? [Math.min(1, rootCC.fans.cpuRpm / rootCC.fans.maxRpm), Math.min(1, rootCC.fans.gpuRpm / rootCC.fans.maxRpm)]
+                   : [rootCC.fans.cpuBoost / 100, rootCC.fans.gpuBoost / 100]
         }
     }
 
