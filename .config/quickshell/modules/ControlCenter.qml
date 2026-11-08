@@ -6,8 +6,8 @@ import Quickshell.Services.Pipewire
 import "."
 
 // ControlCenter.qml – painel aberto pela barra. A tela principal é uma grade em que toda seção segue
-// a mesma estrutura (Tile): ícone, nome, botão do submenu, valor, detalhe e barra. Ali só o volume e
-// os botões são interativos; o resto fica nos submenus, escolhidos pela propriedade `page`.
+// a mesma estrutura (Tile): ícone, nome, seta do submenu, valor, detalhe e barra. Clicar em qualquer parte
+// do card abre o submenu, escolhido pela propriedade `page`; só o controle de volume fica por cima disso.
 Rectangle {
     id: rootCC
     // ── Estado vindo do shell.qml ──────────────────────────
@@ -233,7 +233,13 @@ Rectangle {
         Layout.preferredWidth: 100
         implicitHeight: tileCol.implicitHeight + 20
         radius: 12
-        color: rootCC.colTile
+        color: tileMouse.containsMouse ? rootCC.colSurface0 : rootCC.colTile
+        // o card inteiro abre o submenu; fica atrás do conteúdo para o volume continuar recebendo o clique
+        MouseArea {
+            id: tileMouse
+            anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+            onClicked: rootCC.page = tile.target
+        }
         ColumnLayout {
             id: tileCol
             anchors.left: parent.left
@@ -248,13 +254,8 @@ Rectangle {
                 SectionTitle { text: tile.title; elide: Text.ElideRight; Layout.fillWidth: true }
                 Rectangle {
                     implicitWidth: 28; implicitHeight: 28; radius: 8
-                    color: goMouse.containsMouse ? rootCC.colSurface1 : rootCC.colSurface0
+                    color: tileMouse.containsMouse ? rootCC.colSurface1 : rootCC.colSurface0
                     Text { anchors.centerIn: parent; text: "󰅂"; color: rootCC.colText; font.family: rootCC.fontFamily; font.pixelSize: 14 }
-                    MouseArea {
-                        id: goMouse
-                        anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                        onClicked: rootCC.page = tile.target
-                    }
                 }
             }
             Text {
@@ -436,6 +437,8 @@ Rectangle {
         columns: 2
         columnSpacing: 10
         rowSpacing: 10
+        uniformCellWidths: true
+        uniformCellHeights: true
 
         Tile {
             target: "network"
@@ -457,7 +460,6 @@ Rectangle {
             meterColor: danger ? rootCC.colDanger : rootCC.batteryCharging ? rootCC.colGreen : rootCC.colMauve
         }
         Tile {
-            Layout.columnSpan: 2
             target: "sound"
             title: "SOM"
             icon: rootCC.volumeMuted ? "󰝟" : "󰕾"
