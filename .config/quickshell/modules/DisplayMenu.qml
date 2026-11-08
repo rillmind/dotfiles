@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 
 // DisplayMenu.qml – submenu de imagem do ControlCenter: ativar/desativar cada monitor conectado e
-// escolher resolução e FPS. A lógica fica no DisplayManager, recebido em `manager`.
+// escolher resolução, FPS e escala. A lógica fica no DisplayManager, recebido em `manager`.
 ColumnLayout {
     id: menu
     property var manager: null
@@ -69,8 +69,12 @@ ColumnLayout {
             readonly property bool locked: !mon.disabled && menu.manager.activeCount <= 1
             property string selRes: mon.currentRes
             property string selRate: mon.currentRate
+            property real selScale: mon.raw.scale
+            property bool scalePicked: false   // depois de escolhida, a escala não muda ao trocar a resolução
             readonly property var selMode: mon.modes.find(x => x.res === selRes)
+            readonly property var scaleChoices: menu.manager.scaleOptionsFor(selRes)
             readonly property bool changed: selRes !== mon.currentRes || selRate !== mon.currentRate
+                                            || !menu.manager.sameScale(selScale, mon.raw.scale)
             Layout.fillWidth: true
             spacing: 8
 
@@ -137,6 +141,7 @@ ColumnLayout {
                             card.selRes = modelData.res
                             // na resolução atual mantém o FPS atual; nas outras sugere o maior
                             card.selRate = modelData.res === card.mon.currentRes ? card.mon.currentRate : modelData.rates[0]
+                            if (!card.scalePicked) card.selScale = menu.manager.suggestedScale(card.mon, modelData.res)
                         }
                     }
                 }
@@ -158,6 +163,75 @@ ColumnLayout {
                 }
             }
 
+            Label {
+                visible: !card.mon.disabled
+                // a escala em uso pode não estar entre as opções, como a 1.33 das regras do Hyprland
+                text: "ESCALA" + (menu.manager.scaleOptionsFor(card.mon.currentRes).some(s => menu.manager.sameScale(s, card.mon.raw.scale))
+                                  ? "" : " · ATUAL " + menu.manager.formatScale(card.mon.raw.scale))
+            }
+            Flow {
+                visible: !card.mon.disabled
+                Layout.fillWidth: true
+                spacing: 4
+                Repeater {
+                    model: card.scaleChoices
+                    Chip {
+                        required property var modelData
+                        label: menu.manager.formatScale(modelData)
+                        selected: menu.manager.sameScale(card.selScale, modelData)
+                        onClicked: { card.selScale = modelData; card.scalePicked = true }
+                    }
+                }
+            }
+
+            // barra de 1 a 3: só para em escalas limpas da resolução escolhida, então não gera aviso.
+            // No fim dela, a limpa mais próxima pode passar de 3, como a 3.2 de 2560x1440.
+            RowLayout {
+                visible: !card.mon.disabled
+                Layout.fillWidth: true
+                spacing: 10
+                Item {
+                    id: scaleSlider
+                    readonly property real value: Math.max(0, Math.min(1, (card.selScale - 1) / 2))
+                    Layout.fillWidth: true
+                    implicitHeight: 22
+                    Rectangle {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width; height: 6; radius: 3
+                        color: menu.colSurface0
+                        Rectangle {
+                            width: Math.max(height, parent.width * scaleSlider.value); height: parent.height; radius: 3
+                            color: menu.colMauve
+                        }
+                    }
+                    Rectangle {
+                        width: 14; height: 14; radius: 7
+                        anchors.verticalCenter: parent.verticalCenter
+                        x: (scaleSlider.width - width) * scaleSlider.value
+                        color: menu.colText
+                        border.color: menu.colMauve; border.width: 2
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true; preventStealing: true; cursorShape: Qt.PointingHandCursor
+                        function pick(mx) {
+                            var fraction = Math.max(0, Math.min(1, mx / width))
+                            card.selScale = menu.manager.nearestCleanScale(card.selRes, 1 + fraction * 2)
+                            card.scalePicked = true
+                        }
+                        onPressed: mouse => pick(mouse.x)
+                        onPositionChanged: mouse => { if (pressed) pick(mouse.x) }
+                    }
+                }
+                Text {
+                    text: menu.manager.formatScale(card.selScale) + "x"
+                    color: menu.colText
+                    font.family: menu.fontFamily; font.pixelSize: 11; font.bold: true
+                    horizontalAlignment: Text.AlignRight
+                    Layout.preferredWidth: 38
+                }
+            }
+
             Rectangle {
                 visible: !card.mon.disabled && card.changed
                 Layout.fillWidth: true
@@ -165,14 +239,14 @@ ColumnLayout {
                 color: menu.colMauve
                 Text {
                     anchors.centerIn: parent
-                    text: "Aplicar " + card.selRes + " a " + card.selRate + " Hz"
+                    text: "Aplicar " + card.selRes + " a " + card.selRate + " Hz · " + menu.manager.formatScale(card.selScale) + "x"
                     color: menu.colBase
                     font.family: menu.fontFamily; font.pixelSize: 12; font.bold: true
                 }
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: menu.manager.setMode(card.mon.name, card.selRes, card.selRate)
+                    onClicked: menu.manager.setMode(card.mon.name, card.selRes, card.selRate, card.selScale)
                 }
             }
         }

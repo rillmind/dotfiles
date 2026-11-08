@@ -5,7 +5,7 @@ import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland
 
-// DisplayManager.qml – lista os monitores do Hyprland e aplica ativar/desativar, resolução e FPS.
+// DisplayManager.qml – lista os monitores do Hyprland e aplica ativar/desativar, resolução, FPS e escala.
 // Vive no shell.qml (e não no ControlCenter) para sobreviver quando a tela do painel some ou muda.
 //
 // Toda mudança pede confirmação: sem resposta em 15 s ela é desfeita, porque um modo sem sinal
@@ -13,7 +13,7 @@ import Quickshell.Wayland
 // que o hyprland.lua carrega depois das próprias regras. Apague esse arquivo para voltar às
 // regras do hyprland.lua.
 //
-// Também responde por IPC: quickshell ipc call monitors <menu|closeMenu|setMode|setEnabled|keep|revert>
+// Também responde por IPC: quickshell ipc call monitors <menu|closeMenu|setMode|setScale|setEnabled|keep|revert>
 Scope {
     id: mgr
     property string fontFamily: "JetBrainsMono Nerd Font"
@@ -40,6 +40,10 @@ Scope {
         function menu(): void { mgr.menuRequested() }
         function closeMenu(): void { mgr.menuCloseRequested() }
         function setMode(name: string, res: string, rate: string): void { mgr.setMode(name, res, rate) }
+        function setScale(name: string, scale: real): void {
+            var m = mgr.find(name)
+            if (m) mgr.setMode(name, m.currentRes, m.currentRate, scale)
+        }
         function setEnabled(name: string, on: bool): void { mgr.setEnabled(name, on) }
         function keep(): void { mgr.keep() }
         function revert(): void { mgr.revert() }
@@ -111,12 +115,48 @@ Scope {
     }
 
     // ── Aplicar, confirmar, desfazer ───────────────────────
-    function setMode(name, res, rate) {
+    // sem escala escolhida: mantém a atual na mesma resolução e sugere a de scaleFor nas outras
+    // Escala limpa: múltiplo de 1/120 que dá uma área inteira na resolução. O Hyprland troca as outras
+    // pela limpa mais próxima e mostra um aviso com o fator sugerido.
+    readonly property var baseScales: [1, 1.25, 1.5, 1.75, 2, 2.5, 3]
+    function cleanSteps(res) {
+        var d = res.split("x")
+        var gcd = (a, b) => b ? gcd(b, a % b) : a
+        var g = gcd(d[0] * 120, d[1] * 120)
+        var steps = []
+        for (var k = 120; k <= 480; k++) if (g % k === 0) steps.push(k)
+        return steps
+    }
+    function nearestCleanScale(res, scale) {
+        var target = scale * 120
+        return cleanSteps(res).reduce((best, k) => Math.abs(k - target) < Math.abs(best - target) ? k : best) / 120
+    }
+    // as escalas fixas mais as que o Hyprland sugere no lugar delas nesta resolução
+    function scaleOptionsFor(res) {
+        var options = baseScales.slice()
+        for (var scale of baseScales) {
+            var clean = nearestCleanScale(res, scale)
+            if (!options.some(o => sameScale(o, clean))) options.push(clean)
+        }
+        return options.sort((a, b) => a - b)
+    }
+    readonly property string scaleNote: {
+        if (!pending || pending.next.disabled) return ""
+        var m = find(pending.next.output)
+        if (!m || m.disabled || sameScale(m.raw.scale, pending.next.scale)) return ""
+        return "\nO Hyprland ajustou a escala para " + formatScale(m.raw.scale) + " nesta resolução"
+    }
+    function suggestedScale(m, res) { return res === m.currentRes ? m.raw.scale : scaleFor(parseInt(res.split("x")[1])) }
+    function sameScale(a, b) { return Math.abs(a - b) < 0.01 }
+    function formatScale(scale) { return String(Number(scale.toFixed(2))) }
+    function setMode(name, res, rate, scale) {
         var m = find(name)
-        if (!m || m.disabled || (res === m.currentRes && rate === m.currentRate)) return
+        if (!m || m.disabled) return
+        if (scale === undefined) scale = suggestedScale(m, res)
+        if (res === m.currentRes && rate === m.currentRate && sameScale(scale, m.raw.scale)) return
         apply(m, { output: name, mode: res + "@" + rate, position: m.raw.x + "x" + m.raw.y,
-                   scale: scaleFor(parseInt(res.split("x")[1])), transform: m.raw.transform },
-              name + ": " + res + " a " + rate + " Hz")
+                   scale: scale, transform: m.raw.transform },
+              name + ": " + res + " a " + rate + " Hz, escala " + formatScale(scale))
     }
     function setEnabled(name, on) {
         var m = find(name)
@@ -234,7 +274,7 @@ Scope {
                         font.family: mgr.fontFamily; font.pixelSize: 15; font.bold: true
                     }
                     Text {
-                        text: (mgr.pending ? mgr.pending.summary : "") + "\nDesfazendo em " + mgr.countdown + " s"
+                        text: (mgr.pending ? mgr.pending.summary : "") + mgr.scaleNote + "\nDesfazendo em " + mgr.countdown + " s"
                         color: mgr.colSub
                         font.family: mgr.fontFamily; font.pixelSize: 12
                         wrapMode: Text.WordWrap
