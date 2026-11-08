@@ -39,18 +39,23 @@ Rectangle {
     signal requestToggleMute()
     signal requestRefresh()
 
-    // submenu aberto: "" (tela principal), network, sound, battery, displays ou fans
+    // submenu aberto: "" (tela principal), network, sound, battery, displays, fans ou bluetooth
     property string page: ""
     property var displays: null
     property var fans: null
-    onPageChanged: if (page === "network" && wifiEnabled) scanWifi()
+    property var bluetooth: null
+    onPageChanged: {
+        if (page === "network" && wifiEnabled) scanWifi()
+        if (bluetooth) bluetooth.watching = page === "bluetooth"
+    }
 
     // o painel pede foco de teclado só enquanto a senha do wifi está sendo digitada
-    readonly property bool wantsKeyboard: passwordSsid !== ""
+    readonly property bool wantsKeyboard: passwordSsid !== "" || bluetoothMenu.wantsKeyboard
 
     implicitWidth: 340
     readonly property Item currentPage: page === "network" ? networkPage : page === "sound" ? soundPage : page === "battery" ? batteryPage
-                                       : page === "displays" ? displayMenu : page === "fans" ? fanMenu : homePage
+                                       : page === "displays" ? displayMenu : page === "fans" ? fanMenu
+                                       : page === "bluetooth" ? bluetoothMenu : homePage
     implicitHeight: currentPage.implicitHeight + 28
     radius: 16
     color: colBarBg
@@ -400,6 +405,26 @@ Rectangle {
         onBack: rootCC.page = ""
     }
 
+    BluetoothMenu {
+        id: bluetoothMenu
+        visible: rootCC.page === "bluetooth"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: 14
+        manager: rootCC.bluetooth
+        fontFamily: rootCC.fontFamily
+        colText: rootCC.colText
+        colSub: rootCC.colSub
+        colSurface0: rootCC.colSurface0
+        colSurface1: rootCC.colSurface1
+        colMauve: rootCC.colMauve
+        colBase: rootCC.colBarBg
+        colDanger: rootCC.colDanger
+        colTile: rootCC.colTile
+        onBack: rootCC.page = ""
+    }
+
     // ── Tela principal ─────────────────────────────────────
     GridLayout {
         id: homePage
@@ -460,6 +485,20 @@ Rectangle {
             meter: !ready ? [0, 0]
                    : rootCC.fans.fansLocked ? [Math.min(1, rootCC.fans.cpuRpm / rootCC.fans.maxRpm), Math.min(1, rootCC.fans.gpuRpm / rootCC.fans.maxRpm)]
                    : [rootCC.fans.cpuBoost / 100, rootCC.fans.gpuBoost / 100]
+        }
+        Tile {
+            readonly property var connected: rootCC.bluetooth ? rootCC.bluetooth.connectedDevices : []
+            readonly property var withBattery: connected.filter(d => d.batteryAvailable)
+            readonly property bool on: !!rootCC.bluetooth && rootCC.bluetooth.enabled
+            target: "bluetooth"
+            title: "BLUETOOTH"
+            icon: !on ? "󰂲" : connected.length > 0 ? "󰂱" : "󰂯"
+            value: !rootCC.bluetooth || !rootCC.bluetooth.adapter ? "Sem adaptador" : !on ? "Desligado"
+                   : connected.length > 0 ? connected.map(d => d.name).join(" · ") : "Ligado"
+            detail: !on ? "" : connected.length > 0
+                    ? (withBattery.length > 0 ? "bateria " + withBattery.map(d => Math.round(d.battery * 100) + "%").join(" · ") : connected.length + (connected.length === 1 ? " conectado" : " conectados"))
+                    : rootCC.bluetooth.pairedCount + (rootCC.bluetooth.pairedCount === 1 ? " pareado" : " pareados")
+            meter: withBattery.map(d => d.battery)
         }
     }
 

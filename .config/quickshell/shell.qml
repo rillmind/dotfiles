@@ -220,7 +220,7 @@ ShellRoot {
         root.calendarVisible = false; root.sysMonVisible = false; root.controlCenterVisible = true
         root.panelPageRequested(page)
     }
-    // quickshell ipc call panel open <""|network|sound|battery|displays|fans>
+    // quickshell ipc call panel open <""|network|sound|battery|displays|fans|bluetooth>
     IpcHandler {
         target: "panel"
         function open(page: string): void { root.openPanel(page) }
@@ -230,6 +230,12 @@ ShellRoot {
         id: fanManager
         watching: root.controlCenterVisible
         onMenuRequested: root.openPanel("fans")
+        onMenuCloseRequested: root.controlCenterVisible = false
+    }
+    BluetoothManager {
+        id: bluetoothManager
+        fontFamily: root.fontFamily
+        onMenuRequested: root.openPanel("bluetooth")
         onMenuCloseRequested: root.controlCenterVisible = false
     }
     Process { id: agsProc; command: ["ags", "toggle", "calendar"] }
@@ -438,6 +444,7 @@ ShellRoot {
                         item.batteryCharging = Qt.binding(function() { return root.batteryCharging })
                         item.displays = displayManager
                         item.fans = fanManager
+                        item.bluetooth = bluetoothManager
                         item.fontFamily = root.fontFamily
                         item.colText = root.colText
                         item.colSurface0 = root.colSurface0

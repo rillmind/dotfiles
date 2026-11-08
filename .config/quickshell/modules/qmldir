@@ -11,3 +11,5 @@ DisplayManager 1.0 DisplayManager.qml
 DisplayMenu 1.0 DisplayMenu.qml
 FanManager 1.0 FanManager.qml
 FanMenu 1.0 FanMenu.qml
+BluetoothManager 1.0 BluetoothManager.qml
+BluetoothMenu 1.0 BluetoothMenu.qml
