@@ -179,6 +179,24 @@ hl.bind("switch:off:Lid Switch", function()
   hl.dispatch(hl.dsp.dpms({ action = "enable", monitor = "eDP-1" }))
 end, { locked = true })
 
+-- Sem monitor externo, reativa o eDP-1 para a sessão não ficar sem tela. disabled = false é obrigatório:
+-- as regras se somam por saída, e o disabled = true lá de cima continuaria valendo.
+-- O reload entra aqui porque reaplica esse disabled = true.
+local laptop_screen_auto_on = false
+local function ensure_laptop_screen()
+  if has_external_monitor() or hl.get_monitor("eDP-1") then return end
+  laptop_screen_auto_on = true
+  hl.monitor({ output = "eDP-1", disabled = false, mode = "1920x1080@120", position = "0x1080", scale = 1 })
+end
+hl.on("monitor.removed", ensure_laptop_screen)
+hl.on("config.reloaded", ensure_laptop_screen)
+-- Ao religar um externo, desfaz a ativação acima; se o eDP-1 já estava ligado antes, ele continua ligado.
+hl.on("monitor.added", function()
+  if not laptop_screen_auto_on or not has_external_monitor() then return end
+  laptop_screen_auto_on = false
+  hl.monitor({ output = "eDP-1", disabled = true })
+end)
+
 hl.bind("SUPER + E", hl.dsp.exec_cmd("nautilus"))
 hl.bind("SUPER + U", hl.dsp.exec_cmd("swaylock"))
 hl.bind("SUPER + I", hl.dsp.exec_cmd("codium ~/.config/hypr/"))
