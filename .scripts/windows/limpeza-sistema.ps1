@@ -8,55 +8,55 @@
     nenhum programa instalado é removido. O que foi feito uma única vez (desinstalações,
     WSL etc.) está registrado no bloco "HISTÓRICO" no fim do arquivo.
 
-    Pede elevação (UAC) sozinho quando necessário.
+    Fluxo: calcula o que vai ser apagado (sem admin), mostra o total, pede confirmação
+    e só então abre o UAC para executar.
 
 .PARAMETER Simular
-    Só mostra o que seria apagado e quanto ocuparia, sem apagar nada (não pede UAC).
+    Só mostra o que seria apagado e quanto ocuparia, sem perguntar nem apagar nada.
 
 .PARAMETER SemDism
     Pula a limpeza de componentes do Windows (DISM), que é a etapa mais demorada.
 
+.PARAMETER Confirmado
+    Executa direto, sem estimativa nem pergunta (usado internamente após o UAC;
+    útil também para agendar).
+
 .EXAMPLE
-    pwsh -File limpeza-sistema.ps1 -Simular
-    pwsh -File limpeza-sistema.ps1
+    pwsh -File limpeza-sistema.ps1            # estima, pergunta, executa como admin
+    pwsh -File limpeza-sistema.ps1 -Simular   # só estima
 #>
 param(
     [switch]$Simular,
     [switch]$SemDism,
+    [switch]$Confirmado,
     # Perfil do usuário capturado antes da elevação, para não limpar o perfil errado
     # caso o UAC peça credenciais de outra conta de administrador.
     [string]$Perfil = $env:USERPROFILE
 )
 
-# ── Elevação ────────────────────────────────────────────────────────────────
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-if (-not $isAdmin -and -not $Simular) {
-    $argv = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-NoExit', '-File', "`"$PSCommandPath`"", '-Perfil', "`"$Perfil`"")
-    if ($SemDism) { $argv += '-SemDism' }
-    Start-Process pwsh -Verb RunAs -ArgumentList $argv
-    return
-}
-
 $Local   = Join-Path $Perfil 'AppData\Local'
 $Roaming = Join-Path $Perfil 'AppData\Roaming'
-$logDir  = Join-Path $Local 'limpeza-sistema\logs'
-New-Item -ItemType Directory -Force $logDir | Out-Null
-Start-Transcript -Path (Join-Path $logDir ("limpeza-{0:yyyyMMdd-HHmm}.log" -f (Get-Date))) | Out-Null
 
-$livreAntes = (Get-PSDrive C).Free
-$totalBytes = 0
+# Modo da passada atual: $true = só mede, $false = apaga.
+$script:Seco       = $true
+$script:totalBytes = 0
 
 function Get-Tamanho([string]$Path) {
-    (Get-ChildItem -LiteralPath $Path -Recurse -Force -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum).Sum
+    [long](Get-ChildItem -LiteralPath $Path -Recurse -Force -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum).Sum
+}
+
+# Registra o item no total e imprime a linha (itens abaixo de 1 MB são omitidos).
+function Registrar([long]$Bytes, [string]$Descricao) {
+    $script:totalBytes += $Bytes
+    if ($Bytes -ge 1MB) { "{0,9:N2} GB  {1}" -f ($Bytes / 1GB), $Descricao }
 }
 
 # Apaga o conteúdo da pasta (mantém a pasta). Arquivos em uso são ignorados.
 function Limpar-Conteudo([string]$Path, [string]$Descricao) {
     if (-not (Test-Path -LiteralPath $Path)) { return }
-    $bytes = Get-Tamanho $Path
-    $script:totalBytes += $bytes
-    "{0,9:N2} GB  {1}" -f ($bytes / 1GB), $Descricao
-    if (-not $Simular) {
+    Registrar (Get-Tamanho $Path) $Descricao
+    if (-not $script:Seco) {
         Get-ChildItem -LiteralPath $Path -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
@@ -64,113 +64,153 @@ function Limpar-Conteudo([string]$Path, [string]$Descricao) {
 # Apaga a pasta inteira.
 function Remover-Pasta([string]$Path, [string]$Descricao) {
     if (-not (Test-Path -LiteralPath $Path)) { return }
-    $bytes = Get-Tamanho $Path
-    $script:totalBytes += $bytes
-    "{0,9:N2} GB  {1}" -f ($bytes / 1GB), $Descricao
-    if (-not $Simular) { Remove-Item -LiteralPath $Path -Recurse -Force -ErrorAction SilentlyContinue }
+    Registrar (Get-Tamanho $Path) $Descricao
+    if (-not $script:Seco) { Remove-Item -LiteralPath $Path -Recurse -Force -ErrorAction SilentlyContinue }
 }
 
-if ($Simular) { "*** MODO SIMULAÇÃO — nada será apagado ***`n" }
-
-# ── 1. Caches de apps ───────────────────────────────────────────────────────
-"== Caches de apps =="
-# Os apps precisam estar fechados para soltar os arquivos de cache.
-if (-not $Simular) { Get-Process Spotify, Stremio -ErrorAction SilentlyContinue | Stop-Process -Force; Start-Sleep 2 }
-Limpar-Conteudo "$Local\Spotify\Data"            'Spotify (cache de músicas)'
-Limpar-Conteudo "$Local\Spotify\Storage"         'Spotify (storage)'
-Limpar-Conteudo "$Local\Stremio\stremio-cache"   'Stremio (cache de streaming)'
-# Celestial (skins do LoL): é cache, mas ele baixa tudo de novo depois. Comente se incomodar.
-Remover-Pasta   "$Roaming\com.divineskins.celestial\storage"     'Celestial (storage)'
-Remover-Pasta   "$Roaming\com.divineskins.celestial\lmdb-hashes" 'Celestial (hashes)'
-
-# ── 2. Temporários e dumps ──────────────────────────────────────────────────
-"`n== Temporários =="
-Limpar-Conteudo "$Local\Temp"        'Temp do usuário'
-Limpar-Conteudo "$Local\CrashDumps"  'Crash dumps'
-Limpar-Conteudo 'C:\Windows\Temp'    'Temp do Windows'
-
-# ── 3. Instaladores acumulados ──────────────────────────────────────────────
-"`n== Instaladores de driver =="
-# O NVIDIA App guarda uma cópia de cada driver baixado (~0,8 GB cada, chegou a 25 GB).
-Limpar-Conteudo 'C:\ProgramData\NVIDIA Corporation\NVIDIA App\UpdateFramework\ota-artifacts' 'NVIDIA App (drivers antigos)'
-# Dell SupportAssist / Alienware Update: pacotes de driver já aplicados.
-Limpar-Conteudo 'C:\ProgramData\Dell\drivers' 'Dell (drivers baixados)'
-# Instaladores de driver NVIDIA baixados manualmente.
-Get-ChildItem "$Perfil\Downloads" -File -Filter '*-win10-win11-64bit-international-*.exe' -ErrorAction SilentlyContinue | ForEach-Object {
-    $script:totalBytes += $_.Length
-    "{0,9:N2} GB  Downloads\{1}" -f ($_.Length / 1GB), $_.Name
-    if (-not $Simular) { Remove-Item -LiteralPath $_.FullName -Force }
+function Test-ReinicioPendente {
+    (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending') -or
+    (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired')
 }
 
-# ── 4. Cache do Windows Update ──────────────────────────────────────────────
-"`n== Windows Update =="
-if (-not $Simular) { Stop-Service wuauserv, bits -Force -ErrorAction SilentlyContinue }
-Limpar-Conteudo 'C:\Windows\SoftwareDistribution\Download' 'Windows Update (downloads)'
-if (-not $Simular) { Start-Service wuauserv, bits -ErrorAction SilentlyContinue }
+function Invoke-Limpeza {
+    # ── 1. Caches de apps ───────────────────────────────────────────────────
+    "== Caches de apps =="
+    # Os apps precisam estar fechados para soltar os arquivos de cache.
+    if (-not $script:Seco) { Get-Process Spotify, Stremio -ErrorAction SilentlyContinue | Stop-Process -Force; Start-Sleep 2 }
+    Limpar-Conteudo "$Local\Spotify\Data"            'Spotify (cache de músicas)'
+    Limpar-Conteudo "$Local\Spotify\Storage"         'Spotify (storage)'
+    Limpar-Conteudo "$Local\Stremio\stremio-cache"   'Stremio (cache de streaming)'
+    # Celestial (skins do LoL): é cache, mas ele baixa tudo de novo depois. Comente se incomodar.
+    Remover-Pasta   "$Roaming\com.divineskins.celestial\storage"     'Celestial (storage)'
+    Remover-Pasta   "$Roaming\com.divineskins.celestial\lmdb-hashes" 'Celestial (hashes)'
 
-# ── 5. Sobras de apps já desinstalados ──────────────────────────────────────
-# Só apaga se o app NÃO estiver instalado. Se você reinstalar um deles, os dados ficam.
-"`n== Sobras de apps desinstalados =="
-if (-not (Test-Path "$Local\Google\Chrome SxS\Application\chrome.exe")) {
-    Remover-Pasta "$Local\Google\Chrome SxS" 'Chrome Canary (sobras)'
-}
-if (-not (Test-Path 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe')) {
-    # Só os dados do navegador. O WebView2 (EdgeWebView) fica: vários apps dependem dele.
-    Remover-Pasta "$Local\Microsoft\Edge" 'Edge (sobras de dados)'
-}
-if (-not (Test-Path "$Local\BraveSoftware\Brave-Browser\Application\brave.exe") -and
-    -not (Test-Path 'C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe')) {
-    Remover-Pasta "$Local\BraveSoftware" 'Brave (sobras)'
-    if (-not $Simular) {
-        Remove-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name 'BraveSoftware Update' -ErrorAction SilentlyContinue
-        Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object TaskName -match 'BraveSoftwareUpdate' |
-            Unregister-ScheduledTask -Confirm:$false -ErrorAction SilentlyContinue
+    # ── 2. Temporários e dumps ──────────────────────────────────────────────
+    "`n== Temporários =="
+    Limpar-Conteudo "$Local\Temp"        'Temp do usuário'
+    Limpar-Conteudo "$Local\CrashDumps"  'Crash dumps'
+    Limpar-Conteudo 'C:\Windows\Temp'    'Temp do Windows'
+
+    # ── 3. Instaladores acumulados ──────────────────────────────────────────
+    "`n== Instaladores de driver =="
+    # O NVIDIA App guarda uma cópia de cada driver baixado (~0,8 GB cada, chegou a 25 GB).
+    Limpar-Conteudo 'C:\ProgramData\NVIDIA Corporation\NVIDIA App\UpdateFramework\ota-artifacts' 'NVIDIA App (drivers antigos)'
+    # Dell SupportAssist / Alienware Update: pacotes de driver já aplicados.
+    Limpar-Conteudo 'C:\ProgramData\Dell\drivers' 'Dell (drivers baixados)'
+    # Instaladores de driver NVIDIA baixados manualmente.
+    Get-ChildItem "$Perfil\Downloads" -File -Filter '*-win10-win11-64bit-international-*.exe' -ErrorAction SilentlyContinue | ForEach-Object {
+        Registrar $_.Length "Downloads\$($_.Name)"
+        if (-not $script:Seco) { Remove-Item -LiteralPath $_.FullName -Force }
+    }
+
+    # ── 4. Cache do Windows Update ──────────────────────────────────────────
+    "`n== Windows Update =="
+    if (-not $script:Seco) { Stop-Service wuauserv, bits -Force -ErrorAction SilentlyContinue }
+    Limpar-Conteudo 'C:\Windows\SoftwareDistribution\Download' 'Windows Update (downloads)'
+    if (-not $script:Seco) { Start-Service wuauserv, bits -ErrorAction SilentlyContinue }
+
+    # ── 5. Sobras de apps já desinstalados ──────────────────────────────────
+    # Só apaga se o app NÃO estiver instalado. Se você reinstalar um deles, os dados ficam.
+    "`n== Sobras de apps desinstalados =="
+    if (-not (Test-Path "$Local\Google\Chrome SxS\Application\chrome.exe")) {
+        Remover-Pasta "$Local\Google\Chrome SxS" 'Chrome Canary (sobras)'
+    }
+    if (-not (Test-Path 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe')) {
+        # Só os dados do navegador. O WebView2 (EdgeWebView) fica: vários apps dependem dele.
+        Remover-Pasta "$Local\Microsoft\Edge" 'Edge (sobras de dados)'
+    }
+    if (-not (Test-Path "$Local\BraveSoftware\Brave-Browser\Application\brave.exe") -and
+        -not (Test-Path 'C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe')) {
+        Remover-Pasta "$Local\BraveSoftware" 'Brave (sobras)'
+        if (-not $script:Seco) {
+            Remove-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name 'BraveSoftware Update' -ErrorAction SilentlyContinue
+            Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object TaskName -match 'BraveSoftwareUpdate' |
+                Unregister-ScheduledTask -Confirm:$false -ErrorAction SilentlyContinue
+        }
+    }
+
+    # ── 6. Lixeira ──────────────────────────────────────────────────────────
+    "`n== Lixeira =="
+    Registrar (Get-Tamanho 'C:\$Recycle.Bin') 'Lixeira'
+    if (-not $script:Seco) { Clear-RecycleBin -Force -ErrorAction SilentlyContinue }
+
+    # ── 7. Inicialização automática ─────────────────────────────────────────
+    # Desativa pelo mesmo mecanismo do Gerenciador de Tarefas (reversível por lá).
+    # Vários desses apps se reativam sozinhos em atualizações, por isso fica aqui.
+    "`n== Inicialização automática =="
+    $desativar = 'EpicGamesLauncher', 'Steam', 'Hydra', 'Free Download Manager', 'NVIDIA Broadcast', 'Discord'
+    $approved  = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run'
+    $run       = Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -ErrorAction SilentlyContinue
+    $estado    = Get-ItemProperty $approved -ErrorAction SilentlyContinue
+    foreach ($nome in $desativar) {
+        if (-not $run.PSObject.Properties[$nome]) { continue }
+        # Primeiro byte 3 = já desativado.
+        if ($estado.PSObject.Properties[$nome] -and $estado.$nome[0] -eq 3) { continue }
+        "            desativar: $nome"
+        if (-not $script:Seco) {
+            if (-not (Test-Path $approved)) { New-Item $approved -Force | Out-Null }
+            Set-ItemProperty $approved -Name $nome -Value ([byte[]](3,0,0,0,0,0,0,0,0,0,0,0)) -Type Binary
+        }
+    }
+
+    # ── 8. Componentes do Windows (WinSxS) ──────────────────────────────────
+    "`n== DISM =="
+    if ($SemDism) {
+        '            pulado (-SemDism)'
+    } elseif (Test-ReinicioPendente) {
+        '            pulado: há uma reinicialização pendente (o DISM falha com 0x800f0806). Reinicie e rode de novo.'
+    } elseif ($script:Seco) {
+        '            será executado (ganho não estimável, costuma ser 1–5 GB)'
+    } else {
+        dism.exe /Online /Cleanup-Image /StartComponentCleanup
     }
 }
 
-# ── 6. Lixeira ──────────────────────────────────────────────────────────────
-"`n== Lixeira =="
-$lixeira = Get-Tamanho 'C:\$Recycle.Bin'
-$script:totalBytes += $lixeira
-"{0,9:N2} GB  Lixeira" -f ($lixeira / 1GB)
-if (-not $Simular) { Clear-RecycleBin -Force -ErrorAction SilentlyContinue }
-
-# ── 7. Inicialização automática ─────────────────────────────────────────────
-# Desativa pelo mesmo mecanismo do Gerenciador de Tarefas (reversível por lá).
-# Vários desses apps se reativam sozinhos em atualizações, por isso fica aqui.
-"`n== Inicialização automática =="
-$desativar = 'EpicGamesLauncher', 'Steam', 'Hydra', 'Free Download Manager', 'NVIDIA Broadcast', 'Discord'
-$approved  = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run'
-$run       = Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -ErrorAction SilentlyContinue
-foreach ($nome in $desativar) {
-    if (-not $run.PSObject.Properties[$nome]) { continue }
-    "desativado: $nome"
-    if (-not $Simular) {
-        if (-not (Test-Path $approved)) { New-Item $approved -Force | Out-Null }
-        Set-ItemProperty $approved -Name $nome -Value ([byte[]](3,0,0,0,0,0,0,0,0,0,0,0)) -Type Binary
-    }
-}
-
-# ── 8. Componentes do Windows (WinSxS) ──────────────────────────────────────
-"`n== DISM =="
-$reinicioPendente = (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending') -or
-                    (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired')
-if ($SemDism -or $Simular) {
-    'pulado'
-} elseif ($reinicioPendente) {
-    'pulado: há uma reinicialização pendente (o DISM falha com 0x800f0806). Reinicie e rode de novo.'
-} else {
-    dism.exe /Online /Cleanup-Image /StartComponentCleanup
-}
-
-# ── Resultado ───────────────────────────────────────────────────────────────
-"`n== Resultado =="
-if ($Simular) {
-    "Seria liberado: ~{0:N1} GB (sem contar o DISM)" -f ($totalBytes / 1GB)
-} else {
+# ── Execução real (admin) ───────────────────────────────────────────────────
+function Invoke-Execucao {
+    $logDir = Join-Path $Local 'limpeza-sistema\logs'
+    New-Item -ItemType Directory -Force $logDir | Out-Null
+    Start-Transcript -Path (Join-Path $logDir ("limpeza-{0:yyyyMMdd-HHmm}.log" -f (Get-Date))) | Out-Null
+    $livreAntes        = (Get-PSDrive C).Free
+    $script:Seco       = $false
+    $script:totalBytes = 0
+    Invoke-Limpeza
+    "`n== Resultado =="
     "Livre no C:  {0:N1} GB  (+{1:N1} GB)" -f ((Get-PSDrive C).Free / 1GB), (((Get-PSDrive C).Free - $livreAntes) / 1GB)
+    Stop-Transcript | Out-Null
 }
-Stop-Transcript | Out-Null
+
+if ($Confirmado) {
+    if (-not $isAdmin) { Write-Error '-Confirmado precisa ser rodado como administrador.'; return }
+    Invoke-Execucao
+    Read-Host "`nEnter para fechar" | Out-Null
+    return
+}
+
+# ── Estimativa (sem admin) ──────────────────────────────────────────────────
+"Calculando o que pode ser apagado...`n"
+Invoke-Limpeza
+"`n== Total =="
+"Estimativa: ~{0:N1} GB (sem contar o DISM)" -f ($script:totalBytes / 1GB)
+if (-not $isAdmin) { '(algumas pastas de sistema só são medidas por completo como admin)' }
+
+if ($Simular) { return }
+
+$resposta = Read-Host "`nApagar tudo isso? [s/N]"
+if ($resposta -notmatch '^(s|sim|y|yes)$') { 'Cancelado. Nada foi apagado.'; return }
+
+if ($isAdmin) {
+    Invoke-Execucao
+} else {
+    $argv = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$PSCommandPath`"", '-Confirmado', '-Perfil', "`"$Perfil`"")
+    if ($SemDism) { $argv += '-SemDism' }
+    'Abrindo janela de administrador (aceite o UAC)...'
+    try {
+        Start-Process pwsh -Verb RunAs -ArgumentList $argv -ErrorAction Stop
+    } catch {
+        'UAC recusado. Nada foi apagado.'
+    }
+}
 
 
 <# ════════════════════════════════════════════════════════════════════════════
