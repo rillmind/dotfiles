@@ -14,9 +14,6 @@
 .PARAMETER Simular
     Só mostra o que seria apagado e quanto ocuparia, sem perguntar nem apagar nada.
 
-.PARAMETER SemDism
-    Pula a limpeza de componentes do Windows (DISM), que é a etapa mais demorada.
-
 .PARAMETER Confirmado
     Executa direto, sem estimativa nem pergunta (usado internamente após o UAC;
     útil também para agendar).
@@ -27,7 +24,6 @@
 #>
 param(
     [switch]$Simular,
-    [switch]$SemDism,
     [switch]$Confirmado,
     # Perfil do usuário capturado antes da elevação, para não limpar o perfil errado
     # caso o UAC peça credenciais de outra conta de administrador.
@@ -66,11 +62,6 @@ function Remover-Pasta([string]$Path, [string]$Descricao) {
     if (-not (Test-Path -LiteralPath $Path)) { return }
     Registrar (Get-Tamanho $Path) $Descricao
     if (-not $script:Seco) { Remove-Item -LiteralPath $Path -Recurse -Force -ErrorAction SilentlyContinue }
-}
-
-function Test-ReinicioPendente {
-    (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending') -or
-    (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired')
 }
 
 function Invoke-Limpeza {
@@ -152,18 +143,6 @@ function Invoke-Limpeza {
             Set-ItemProperty $approved -Name $nome -Value ([byte[]](3,0,0,0,0,0,0,0,0,0,0,0)) -Type Binary
         }
     }
-
-    # ── 8. Componentes do Windows (WinSxS) ──────────────────────────────────
-    "`n== DISM =="
-    if ($SemDism) {
-        '            pulado (-SemDism)'
-    } elseif (Test-ReinicioPendente) {
-        '            pulado: há uma reinicialização pendente (o DISM falha com 0x800f0806). Reinicie e rode de novo.'
-    } elseif ($script:Seco) {
-        '            será executado (ganho não estimável, costuma ser 1–5 GB)'
-    } else {
-        dism.exe /Online /Cleanup-Image /StartComponentCleanup
-    }
 }
 
 # ── Execução real (admin) ───────────────────────────────────────────────────
@@ -191,19 +170,18 @@ if ($Confirmado) {
 "Calculando o que pode ser apagado...`n"
 Invoke-Limpeza
 "`n== Total =="
-"Estimativa: ~{0:N1} GB (sem contar o DISM)" -f ($script:totalBytes / 1GB)
+"Estimativa: ~{0:N1} GB" -f ($script:totalBytes / 1GB)
 if (-not $isAdmin) { '(algumas pastas de sistema só são medidas por completo como admin)' }
 
 if ($Simular) { return }
 
-$resposta = Read-Host "`nApagar tudo isso? [s/N]"
-if ($resposta -notmatch '^(s|sim|y|yes)$') { 'Cancelado. Nada foi apagado.'; return }
+$resposta = Read-Host "`nApagar tudo isso? [S/n]"
+if ($resposta -match '^(n|nao|não|no)$') { 'Cancelado. Nada foi apagado.'; return }
 
 if ($isAdmin) {
     Invoke-Execucao
 } else {
     $argv = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', "`"$PSCommandPath`"", '-Confirmado', '-Perfil', "`"$Perfil`"")
-    if ($SemDism) { $argv += '-SemDism' }
     'Abrindo janela de administrador (aceite o UAC)...'
     try {
         Start-Process pwsh -Verb RunAs -ArgumentList $argv -ErrorAction Stop
@@ -251,6 +229,13 @@ if ($isAdmin) {
      - WinLibs (GCC): traz um mingw32-make, mas é a toolchain inteira.
      - C:\ProgramData\NVIDIA\NGX (4,4 GB): modelos de DLSS usados pelos jogos.
      - C:\Windows\Installer e WinSxS manual: só via DISM, nunca apagar à mão.
+
+   DISM fora do script (de propósito)
+     - "dism /Online /Cleanup-Image /StartComponentCleanup" demora muito para 1–5 GB, e o
+       Windows já roda o mesmo sozinho pela tarefa agendada
+       \Microsoft\Windows\Servicing\StartComponentCleanup (com o PC ocioso).
+     - Se um dia quiser forçar, rode à mão num terminal de admin (falha com 0x800f0806
+       se houver reinicialização pendente).
 
    Pendente (decisão do usuário)
      - OneDrive (~9,5 GB) vs Nextcloud: OneDrive não é usado, ainda a analisar.
