@@ -202,6 +202,9 @@ if ($isAdmin) {
      - Get-AppxPackage MicrosoftCorporationII.WindowsSubsystemForLinux | Remove-AppxPackage
      - Disable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
      - "Plataforma de Máquina Virtual" (VirtualMachinePlatform) foi MANTIDA.
+     - O WSL também tinha uma parte MSI escondida (SystemComponent=1, 1,1 GB em
+       C:\Program Files\WSL), removida depois:
+       msiexec /x {8ACC61B3-7BB9-4E69-9382-B0F4AA8F2677} /quiet
 
    Desinstalados
      - Podman 5.8.9 (dependia do WSL) + ~\.local\share\containers e ~\.config\containers
@@ -220,6 +223,12 @@ if ($isAdmin) {
      - C:\PS3\Diablo III - Reaper of Souls (ISO de PS3, 11,7 GB)
      - %LOCALAPPDATA%\koharu (3,5 GB)
      - Downloads\StremioSetup-v5.0.27_x64.exe
+     - RPCS3\dev_hdd1\caches\BLUS31438_BLUS31437 (cache do Diablo III de PS3, 1,8 GB)
+
+   Sobras de desinstaladores (achadas na varredura completa)
+     - %LOCALAPPDATA%\app_shell_cache_8311 (instalador do TikTok LIVE Studio, 0,7 GB)
+     - %LOCALAPPDATA%\equibop-updater (instalador do Equibop, 0,6 GB)
+     - C:\Program Files (x86)\Steam\millennium-crash.dmp (crash dump do Millennium, 0,5 GB)
 
    MANTIDOS de propósito — não apagar
      - %LOCALAPPDATA%\Microsoft\WinGet\Packages: NÃO é cache, são programas instalados
