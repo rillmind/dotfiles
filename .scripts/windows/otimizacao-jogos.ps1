@@ -107,6 +107,33 @@ $Ajustes = @(
     }
     # ---------- admin ----------
     @{
+        # Com o Hyper-V ligado o Windows inteiro roda sobre o hypervisor e a VBS
+        # continua ativa mesmo com as chaves de registro abaixo zeradas.
+        Nome = 'Hyper-V desligado (sobra do Podman/WSL)'
+        Admin = $true; Reinicio = $true
+        Ok = { (Get-RecursoOpcional 'Microsoft-Hyper-V-All') -ne 1 }
+        Aplicar = { Disable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -NoRestart -WarningAction SilentlyContinue | Out-Null }
+    }
+    @{
+        # Sem isso o Windows ainda sobe o hypervisor quando algum recurso pede VBS.
+        Nome = 'Hypervisor não inicia no boot'
+        Admin = $true; Reinicio = $true
+        Ok = {
+            if (-not $isAdmin) { return $null }
+            [bool]((bcdedit /enum '{current}') -match '^hypervisorlaunchtype\s+Off')
+        }
+        Aplicar = { bcdedit /set '{current}' hypervisorlaunchtype off | Out-Null }
+    }
+    @{
+        # Entrada Avançada do Windows Hello exige VBS; este PC não tem câmera IR nem leitor de digital.
+        # Desligar invalida o PIN criado com ela: rodar `certutil -DeleteHelloContainer`, sair da
+        # conta e criar um PIN novo em Configurações > Contas > Opções de entrada.
+        Nome = 'Entrada Avançada do Windows Hello (ESS) desligada'
+        Admin = $true; Reinicio = $true
+        Ok = { (Get-Reg 'HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\WindowsHello' 'Enabled') -ne 1 }
+        Aplicar = { Set-Reg 'HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\WindowsHello' 'Enabled' 0 }
+    }
+    @{
         Nome = 'Plataforma de Máquina Virtual desligada (sobra do WSL)'
         Admin = $true; Reinicio = $true
         Ok = { (Get-RecursoOpcional 'VirtualMachinePlatform') -ne 1 }
