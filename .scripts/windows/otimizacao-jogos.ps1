@@ -52,9 +52,11 @@ function Get-RecursoOpcional([string]$Nome) {
     (Get-CimInstance Win32_OptionalFeature -Filter "Name='$Nome'" -ErrorAction SilentlyContinue).InstallState
 }
 
-# Pastas de jogos de launchers oficiais excluídas da verificação em tempo real do Defender.
-# Pastas de repacks (Hydra etc.) ficam DE FORA de propósito: são vetor comum de malware.
+# Pastas de jogos excluídas da verificação em tempo real do Defender.
+# C:\Hydra (instaladores e jogos de repack) entrou por escolha: o Defender quarentena cracks e
+# atrasa a extração. Contrapartida: nada ali é verificado, então só use repackers confiáveis.
 $ExclusoesDefender = @(
+    'C:\Hydra'
     'C:\Riot Games'
     'C:\Program Files (x86)\Steam\steamapps'
     'E:\SteamLibrary', 'F:\SteamLibrary', 'G:\SteamLibrary'
