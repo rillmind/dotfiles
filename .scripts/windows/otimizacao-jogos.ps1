@@ -225,8 +225,14 @@ if ($Simular) { return }
 $pendentes = @($Ajustes | Where-Object { (& $_.Ok) -ne $true })
 if (-not $pendentes) { "`nTudo já está aplicado."; return }
 
-$resposta = Read-Host "`nAplicar os ajustes marcados? [S/n]"
-if ($resposta -match '^(n|nao|não|no)$') { 'Cancelado. Nada foi alterado.'; return }
+if (-not ($pendentes | Where-Object { (& $_.Ok) -eq $false })) {
+    # Só sobraram itens [?]: provavelmente estão certos, então o padrão é não abrir o UAC.
+    "`nNada a mudar nos itens verificados. Os marcados [?] só dá para checar como admin."
+    if ((Read-Host 'Verificar esses como admin? [s/N]') -notmatch '^(s|sim|y|yes)$') { return }
+} else {
+    $resposta = Read-Host "`nAplicar os ajustes marcados? [S/n]"
+    if ($resposta -match '^(n|nao|não|no)$') { 'Cancelado. Nada foi alterado.'; return }
+}
 
 "`n== Ajustes de usuário =="
 Invoke-Ajustes $false
