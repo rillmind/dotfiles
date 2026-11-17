@@ -102,6 +102,11 @@ hl.config({
     workspace_back_and_forth = false,
   },
 
+  -- VRR só em tela cheia (jogos): a tela do eDP-1 suporta. Em tudo (1) pode piscar no desktop.
+  misc = {
+    vrr = 2,
+  },
+
   animations = {
     enabled = false,
   },
