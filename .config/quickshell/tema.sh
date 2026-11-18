@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# tema.sh – inicia e troca os temas do quickshell. Cada pasta ao lado deste script com um shell.qml
+# é um tema (config completa e independente); o tema escolhido fica salvo e volta no próximo login.
+#
+#   tema.sh iniciar           inicia o tema salvo (exec-once do Hyprland)
+#   tema.sh trocar [nome]     troca para <nome>, ou para o próximo tema da lista
+#   tema.sh ipc <alvo> <fn>   chama um IpcHandler do tema em execução (ex: ipc launcher toggle)
+#   tema.sh ativo | lista     mostra o tema salvo | os temas disponíveis
+set -u
+
+DIR="$HOME/.config/quickshell"
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/quickshell/tema-ativo"
+
+lista() { for f in "$DIR"/*/shell.qml; do basename "$(dirname "$f")"; done; }
+ativo() {
+    local t
+    t=$(cat "$STATE" 2>/dev/null)
+    if [ -n "$t" ] && [ -f "$DIR/$t/shell.qml" ]; then echo "$t"; else lista | head -1; fi
+}
+parar() {
+    pkill -x quickshell
+    for _ in $(seq 40); do pgrep -x quickshell >/dev/null || return 0; sleep 0.05; done
+    pkill -9 -x quickshell
+}
+subir() { setsid -f quickshell -p "$DIR/$1" >/dev/null 2>&1 </dev/null; }
+
+case "${1:-}" in
+    iniciar)
+        parar
+        subir "$(ativo)"
+        ;;
+    trocar)
+        alvo="${2:-}"
+        if [ -z "$alvo" ]; then
+            atual=$(ativo)
+            alvo=$(lista | awk -v a="$atual" 'NR==1{p=$0} f{print; f=0; d=1} $0==a{f=1} END{if(!d) print p}' | head -1)
+        fi
+        [ -f "$DIR/$alvo/shell.qml" ] || { echo "tema desconhecido: $alvo (temas: $(lista | tr '\n' ' '))" >&2; exit 1; }
+        mkdir -p "$(dirname "$STATE")"
+        echo "$alvo" > "$STATE"
+        parar
+        subir "$alvo"
+        ;;
+    ipc)
+        shift
+        exec quickshell -p "$DIR/$(ativo)" ipc call "$@"
+        ;;
+    ativo) ativo ;;
+    lista) lista ;;
+    *)
+        sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'
+        exit 1
+        ;;
+esac
