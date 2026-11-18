@@ -72,6 +72,11 @@ ShellRoot {
     property bool controlCenterVisible: false
     property bool sysMonVisible: false
     property bool calendarVisible: false
+    property bool notifVisible: false
+    // um popup por vez: abrir qualquer outro fecha a central de notificações e vice-versa
+    onControlCenterVisibleChanged: if (controlCenterVisible) notifVisible = false
+    onSysMonVisibleChanged: if (sysMonVisible) notifVisible = false
+    onNotifVisibleChanged: if (notifVisible) { controlCenterVisible = false; sysMonVisible = false; calendarVisible = false }
     // tela onde os popups acima abrem (a da barra clicada). Precisa ser uma só: cada janela tem seu
     // HyprlandFocusGrab, e com janelas em duas telas um grab derruba o outro e o popup fecha sozinho
     property string popupScreen: ""
@@ -239,6 +244,19 @@ ShellRoot {
         onMenuCloseRequested: root.controlCenterVisible = false
     }
     Process { id: agsProc; command: ["ags", "toggle", "calendar"] }
+
+    // notificações (substituem o dunst): popups no canto superior direito, abaixo da barra, onde o
+    // dunst aparecia; central pelo sino da barra
+    Notifications {
+        id: notifs
+        topMargin: 44
+        rightMargin: 8
+        centerOpen: root.notifVisible
+        onCenterToggleRequested: {
+            root.popupScreen = Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : Quickshell.screens[0].name
+            root.notifVisible = !root.notifVisible
+        }
+    }
 
     // Hypr window title + class + address (para ícone antes do título e dock highlight)
     property string hyprWindowAddress: ""
@@ -466,6 +484,35 @@ ShellRoot {
         }
     }
 
+    // ── Central de notificações (direita, abaixo da barra) ─
+    Variants {
+        model: Quickshell.screens
+        PanelWindow {
+            id: notifWindow
+            property var modelData
+            screen: modelData
+            visible: root.notifVisible && root.popupScreen === modelData.name
+            WlrLayershell.layer: WlrLayer.Top
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+            anchors { top: true; right: true }
+            margins { top: 44; right: 8 }
+            implicitWidth: notifCenter.implicitWidth
+            implicitHeight: notifCenter.implicitHeight
+            color: "transparent"
+            HyprlandFocusGrab {
+                windows: [notifWindow]
+                active: notifWindow.visible
+                onCleared: root.notifVisible = false
+            }
+            NotificationCenter {
+                id: notifCenter
+                anchors.fill: parent
+                service: notifs
+            }
+        }
+    }
+
     // ── Calendar popup (centro, abaixo da barra) ─
     Variants {
         model: Quickshell.screens
@@ -555,7 +602,7 @@ ShellRoot {
     }
 
     // calendário reabre sempre no mês atual
-    onCalendarVisibleChanged: if (calendarVisible) calendarOpened()
+    onCalendarVisibleChanged: if (calendarVisible) { notifVisible = false; calendarOpened() }
     signal calendarOpened()
 
     // ── Tooltip do relógio ─────────────────────────────────
@@ -624,6 +671,11 @@ ShellRoot {
             var m = sysInfo.mem, used = (m.total - m.available) / 1048576
             return "  RAM " + used.toFixed(1) + " / " + (m.total / 1048576).toFixed(1) + " GB  ·  " + memUsage + "%"
         }
+        if (barHover === "notif") {
+            var parts = [notifs.unread > 0 ? notifs.unread + (notifs.unread === 1 ? " nova" : " novas") : "Notificações"]
+            if (notifs.dnd) parts.push("não perturbe ligado")
+            return "󰂚  " + parts.join("  ·  ") + "   (direito: não perturbe)"
+        }
         if (barHover === "batt") {
             var st = batteryStatus === "Charging" ? "carregando" : batteryStatus === "Discharging" ? "descarregando" : batteryStatus === "Full" ? "carga completa" : batteryStatus.toLowerCase()
             return "󰁹  " + batteryCapacity + "%  ·  " + st + (batteryTimeText ? "  ·  " + batteryTimeText : "")
@@ -635,7 +687,7 @@ ShellRoot {
         PanelWindow {
             property var modelData
             screen: modelData
-            visible: root.barHover !== "" && root.barHover !== "clock" && !root.controlCenterVisible && !root.sysMonVisible
+            visible: root.barHover !== "" && root.barHover !== "clock" && !root.controlCenterVisible && !root.sysMonVisible && !root.notifVisible
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
@@ -848,6 +900,28 @@ ShellRoot {
                         opacity: 0.9
                     }
                     // network 󰤨 /  / 󰤭  (click abre ControlCenter único)
+                    // notificações: número de novas ao lado; clique abre a central, direito liga o não perturbe
+                    Text {
+                        text: (notifs.dnd ? "󰂛" : notifs.unread > 0 ? "󰂞" : "󰂚") + (notifs.unread > 0 ? " " + notifs.unread : "")
+                        color: notifs.dnd ? root.colOverlay0 : notifs.unread > 0 ? root.colMauve : root.colText
+                        font.family: root.fontFamily
+                        font.pixelSize: root.fontSize
+                        font.bold: true
+                        Layout.rightMargin: 12
+                        MouseArea {
+                            anchors.fill: parent
+                            acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onEntered: root.barHover = "notif"
+                            onExited: if (root.barHover === "notif") root.barHover = ""
+                            onClicked: mouse => {
+                                if (mouse.button === Qt.RightButton) notifs.setDnd(!notifs.dnd)
+                                else if (mouse.button === Qt.MiddleButton) notifs.clearAll()
+                                else { root.popupScreen = barWindow.modelData.name; root.notifVisible = !root.notifVisible }
+                            }
+                        }
+                    }
                     Text {
                         id: networkText
                         text: root.networkIcon
@@ -932,10 +1006,10 @@ ShellRoot {
                 // clique no fundo da barra fecha popups (quando visíveis) – atrás dos ícones
                 MouseArea {
                     anchors.fill: parent
-                    enabled: root.controlCenterVisible || root.calendarVisible || root.sysMonVisible
+                    enabled: root.controlCenterVisible || root.calendarVisible || root.sysMonVisible || root.notifVisible
                     z: -1
                     propagateComposedEvents: true
-                    onClicked: { root.controlCenterVisible = false; root.calendarVisible = false; root.sysMonVisible = false }
+                    onClicked: { root.controlCenterVisible = false; root.calendarVisible = false; root.sysMonVisible = false; root.notifVisible = false }
                 }
             }
         }
