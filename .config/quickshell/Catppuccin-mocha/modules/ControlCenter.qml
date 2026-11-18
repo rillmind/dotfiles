@@ -227,6 +227,8 @@ Rectangle {
         property bool danger: false
         property color meterColor: rootCC.colMauve
         property var meter: []         // uma barra por item, cada uma de 0 a 1
+        property var action: null      // se definido, o clique roda isto em vez de abrir um submenu
+        property string arrow: "󰅂"
         default property alias extra: extraSlot.data
         Layout.fillWidth: true
         Layout.fillHeight: true
@@ -238,7 +240,7 @@ Rectangle {
         MouseArea {
             id: tileMouse
             anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-            onClicked: rootCC.page = tile.target
+            onClicked: tile.action ? tile.action() : rootCC.page = tile.target
         }
         ColumnLayout {
             id: tileCol
@@ -255,7 +257,7 @@ Rectangle {
                 Rectangle {
                     implicitWidth: 28; implicitHeight: 28; radius: 8
                     color: tileMouse.containsMouse ? rootCC.colSurface1 : rootCC.colSurface0
-                    Text { anchors.centerIn: parent; text: "󰅂"; color: rootCC.colText; font.family: rootCC.fontFamily; font.pixelSize: 14 }
+                    Text { anchors.centerIn: parent; text: tile.arrow; color: rootCC.colText; font.family: rootCC.fontFamily; font.pixelSize: 14 }
                 }
             }
             Text {
@@ -501,6 +503,16 @@ Rectangle {
                     ? (withBattery.length > 0 ? "bateria " + withBattery.map(d => Math.round(d.battery * 100) + "%").join(" · ") : connected.length + (connected.length === 1 ? " conectado" : " conectados"))
                     : rootCC.bluetooth.pairedCount + (rootCC.bluetooth.pairedCount === 1 ? " pareado" : " pareados")
             meter: withBattery.map(d => d.battery)
+        }
+        // troca a config inteira do quickshell (ver ../../tema.sh); o processo atual é encerrado pelo script
+        Tile {
+            Layout.columnSpan: 2
+            title: "TEMA"
+            icon: "󰏘"
+            arrow: "󰑓"
+            value: "Catppuccin Mocha"
+            detail: "Clique para trocar para o Gruvbox"
+            action: () => Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/tema.sh", "trocar"])
         }
     }
 

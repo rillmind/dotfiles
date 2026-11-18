@@ -42,7 +42,8 @@ Scope {
     property var usage: ({})
     FileView {
         id: usageFile
-        path: Quickshell.statePath("launcher-usage.json")
+        // arquivo comum aos temas (statePath muda com o caminho da config)
+        path: Quickshell.env("HOME") + "/.local/state/quickshell/launcher-usage.json"
         printErrors: false   // o arquivo só existe depois do primeiro app aberto
         onLoaded: { try { launcher.usage = JSON.parse(text()) || {} } catch (e) { launcher.usage = {} } }
     }
