@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # tema.sh – inicia e troca os temas do quickshell. Cada pasta ao lado deste script com um shell.qml
 # é um tema (config completa e independente); o tema escolhido fica salvo e volta no próximo login.
+# Ao iniciar e ao trocar, o aparencia.sh leva o tema para os outros apps (Hyprland, Ghostty, nvim…).
 #
 #   tema.sh iniciar           inicia o tema salvo (exec-once do Hyprland)
 #   tema.sh trocar [nome]     troca para <nome>, ou para o próximo tema da lista
@@ -27,6 +28,7 @@ subir() { setsid -f quickshell -p "$DIR/$1" >/dev/null 2>&1 </dev/null; }
 case "${1:-}" in
     iniciar)
         parar
+        "$DIR/aparencia.sh" aplicar
         subir "$(ativo)"
         ;;
     trocar)
@@ -39,6 +41,7 @@ case "${1:-}" in
         mkdir -p "$(dirname "$STATE")"
         echo "$alvo" > "$STATE"
         parar
+        "$DIR/aparencia.sh" aplicar
         subir "$alvo"
         ;;
     ipc)

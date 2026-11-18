@@ -4,13 +4,18 @@ import Quickshell
 import Quickshell.Io
 
 // Theme.qml – paleta Gruvbox (escuro/claro) usada por todo o tema. O modo fica salvo em
-// ~/.local/state/quickshell/gruvbox-modo e muda ao vivo: botão na barra, Super+Shift+L ou
+// ~/.local/state/quickshell/gruvbox-modo e muda ao vivo: card Modo na central, Super+Shift+L ou
 // `tema.sh ipc gruvbox modo`.
 Singleton {
     id: theme
 
     property bool light: false
-    function toggle() { light = !light; modeFile.setText(light ? "claro" : "escuro") }
+    // troca o modo e leva para os outros apps (bordas, terminal, nvim, GTK, wallpaper: ver aparencia.sh)
+    function toggle() {
+        light = !light
+        modeFile.setText(light ? "claro" : "escuro")
+        Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/aparencia.sh", "aplicar", light ? "gruvbox-claro" : "gruvbox-escuro"])
+    }
 
     FileView {
         id: modeFile
