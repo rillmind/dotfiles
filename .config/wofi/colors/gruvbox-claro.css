@@ -1,0 +1,37 @@
+/*
+*
+* Gruvbox claro palette
+* Maintainer: rubyowo
+*
+*/
+
+@define-color base   #fbf1c7;
+@define-color mantle #f9f5d7;
+@define-color crust  #f2e5bc;
+
+@define-color text     #3c3836;
+@define-color subtext0 #665c54;
+@define-color subtext1 #504945;
+
+@define-color surface0 #ebdbb2;
+@define-color surface1 #d5c4a1;
+@define-color surface2 #bdae93;
+
+@define-color overlay0 #a89984;
+@define-color overlay1 #928374;
+@define-color overlay2 #7c6f64;
+
+@define-color blue      #076678;
+@define-color lavender  #8f3f71;
+@define-color sapphire  #076678;
+@define-color sky       #076678;
+@define-color teal      #427b58;
+@define-color green     #79740e;
+@define-color yellow    #b57614;
+@define-color peach     #b57614;
+@define-color maroon    #9d0006;
+@define-color red       #9d0006;
+@define-color mauve     #af3a03;
+@define-color pink      #8f3f71;
+@define-color flamingo  #8f3f71;
+@define-color rosewater #504945;

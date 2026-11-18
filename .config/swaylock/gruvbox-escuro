@@ -1,0 +1,66 @@
+# swaylock - Gruvbox escuro
+# Coloque em ~/.config/swaylock/config
+
+# --- Imagem de fundo ---
+# Descomente e ajuste o caminho para usar uma imagem:
+# image=~/Pictures/wallpaper.jpg
+# scaling=fill
+
+# Fundo sólido (cor base do Mocha) quando sem imagem
+color=282828
+
+# --- Indicador de digitação ---
+show-failed-attempts
+indicator-caps-lock
+indicator-radius=100
+indicator-thickness=7
+font=JetBrains Mono
+
+# -------------------------------------------------------
+# Paleta Gruvbox escuro
+#   Base:       #282828   Mantle:     #1d2021
+#   Crust:      #1d2021   Surface0:   #3c3836
+#   Surface1:   #504945   Surface2:   #665c54
+#   Overlay0:   #7c6f64   Overlay1:   #928374
+#   Text:       #ebdbb2   Subtext1:   #d5c4a1
+#   Blue:       #83a598   Lavender:   #d3869b
+#   Mauve:      #fe8019   Pink:       #d3869b
+#   Red:        #fb4934   Peach:      #fabd2f
+#   Green:      #b8bb26   Teal:       #8ec07c
+#   Yellow:     #fabd2f   Sky:        #83a598
+# -------------------------------------------------------
+
+# --- Linha do anel (borda exterior) ---
+ring-color=3c3836
+ring-ver-color=b8bb26
+ring-wrong-color=fb4934
+ring-clear-color=fabd2f
+ring-caps-lock-color=fabd2f
+
+# --- Interior do círculo ---
+inside-color=282828
+inside-ver-color=282828
+inside-wrong-color=282828
+inside-clear-color=282828
+inside-caps-lock-color=282828
+
+# --- Linha separadora (entre inside e ring) ---
+separator-color=00000000
+
+# --- Texto do indicador ---
+text-color=ebdbb2
+text-ver-color=b8bb26
+text-wrong-color=fb4934
+text-clear-color=fabd2f
+text-caps-lock-color=fabd2f
+
+# --- Efeito de digitação (key highlight) ---
+key-hl-color=fe8019
+bs-hl-color=fb4934
+
+# --- Linha do indicador (borda interior do anel) ---
+line-color=00000000
+line-ver-color=00000000
+line-wrong-color=00000000
+line-clear-color=00000000
+line-caps-lock-color=00000000

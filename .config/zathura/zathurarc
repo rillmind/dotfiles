@@ -2,7 +2,8 @@
 # set statusbar-bg "#1e1e2e"
 # set statusbar-fg "#cdd6f4"
 
-include gruvbox-dark
+# tema do quickshell (tema-ativo → ~/.local/state/quickshell/aparencia/zathura)
+include tema-ativo
 
 set pages-per-row-spacing 1
 set pages-per-row 1

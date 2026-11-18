@@ -1,0 +1,66 @@
+# swaylock - Catppuccin Mocha
+# Coloque em ~/.config/swaylock/config
+
+# --- Imagem de fundo ---
+# Descomente e ajuste o caminho para usar uma imagem:
+# image=~/Pictures/wallpaper.jpg
+# scaling=fill
+
+# Fundo sólido (cor base do Mocha) quando sem imagem
+color=1e1e2e
+
+# --- Indicador de digitação ---
+show-failed-attempts
+indicator-caps-lock
+indicator-radius=100
+indicator-thickness=7
+font=JetBrains Mono
+
+# -------------------------------------------------------
+# Paleta Catppuccin Mocha
+#   Base:       #1e1e2e   Mantle:     #181825
+#   Crust:      #11111b   Surface0:   #313244
+#   Surface1:   #45475a   Surface2:   #585b70
+#   Overlay0:   #6c7086   Overlay1:   #7f849c
+#   Text:       #cdd6f4   Subtext1:   #bac2de
+#   Blue:       #89b4fa   Lavender:   #b4befe
+#   Mauve:      #cba6f7   Pink:       #f5c2e7
+#   Red:        #f38ba8   Peach:      #fab387
+#   Green:      #a6e3a1   Teal:       #94e2d5
+#   Yellow:     #f9e2af   Sky:        #89dceb
+# -------------------------------------------------------
+
+# --- Linha do anel (borda exterior) ---
+ring-color=313244
+ring-ver-color=a6e3a1
+ring-wrong-color=f38ba8
+ring-clear-color=fab387
+ring-caps-lock-color=f9e2af
+
+# --- Interior do círculo ---
+inside-color=1e1e2e
+inside-ver-color=1e1e2e
+inside-wrong-color=1e1e2e
+inside-clear-color=1e1e2e
+inside-caps-lock-color=1e1e2e
+
+# --- Linha separadora (entre inside e ring) ---
+separator-color=00000000
+
+# --- Texto do indicador ---
+text-color=cdd6f4
+text-ver-color=a6e3a1
+text-wrong-color=f38ba8
+text-clear-color=fab387
+text-caps-lock-color=f9e2af
+
+# --- Efeito de digitação (key highlight) ---
+key-hl-color=cba6f7
+bs-hl-color=f38ba8
+
+# --- Linha do indicador (borda interior do anel) ---
+line-color=00000000
+line-ver-color=00000000
+line-wrong-color=00000000
+line-clear-color=00000000
+line-caps-lock-color=00000000
