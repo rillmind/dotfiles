@@ -7,6 +7,10 @@ confirm-close-surface = false
 window-decoration = none
 
 theme = catppuccin-mocha.conf
+# o tema do quickshell sobrescreve a linha acima (tema-ativo → ~/.local/state/quickshell/aparencia/ghostty)
+config-file = ?tema-ativo
+# sem o aviso "configuração recarregada" a cada troca de tema
+app-notifications = no-config-reload
 
 font-size = 17
 
