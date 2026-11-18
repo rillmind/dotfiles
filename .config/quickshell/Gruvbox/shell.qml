@@ -21,9 +21,11 @@ ShellRoot {
 
     readonly property int barWidth: 46
     readonly property int popupGap: 8
-    // curva côncava onde a barra encontra o topo e a base da tela (a área das janelas parece recortada
-    // por cima da barra, como se o quickshell ficasse por baixo delas)
-    readonly property int cornerRadius: 14
+    // contorno da tela (como o quadro do Zen): a barra lateral continua numa faixa fina no topo, na
+    // direita e embaixo, e a área das janelas fica num recorte com os 4 cantos arredondados.
+    // Fica abaixo das janelas; as janelas mantêm o gaps_out do Hyprland por dentro dele.
+    readonly property int frameWidth: 14
+    readonly property int cornerRadius: 16
 
     // ── Estado ─────────────────────────────────────────────
     property int cpuUsage: 0
@@ -202,6 +204,9 @@ ShellRoot {
         id: appLauncher
         windowTitle: root.hyprWindowTitle
         windowClass: root.hyprWindowClass
+        leftInset: root.barWidth
+        frameWidth: root.frameWidth
+        cornerRadius: root.cornerRadius
         clockTooltip: open ? root.clockTooltipText() : ""
         onCalendarRequested: root.togglePopup("cal", Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : Quickshell.screens[0].name)
     }
@@ -241,8 +246,8 @@ ShellRoot {
     // notificações (substituem o dunst): popups no canto superior direito, central pelo sino
     Notifications {
         id: notifs
-        topMargin: root.popupGap
-        rightMargin: root.popupGap
+        topMargin: root.frameWidth + root.popupGap
+        rightMargin: root.frameWidth + root.popupGap
         centerOpen: root.notifVisible
         onCenterToggleRequested: root.togglePopup("notif", Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : Quickshell.screens[0].name)
     }
@@ -396,7 +401,7 @@ ShellRoot {
         WlrLayershell.exclusionMode: ExclusionMode.Ignore
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         anchors { left: true; bottom: true }
-        margins { left: root.barWidth + root.popupGap; bottom: root.popupGap }
+        margins { left: root.barWidth + root.popupGap; bottom: root.frameWidth + root.popupGap }
         color: "transparent"
         HyprlandFocusGrab {
             windows: [pop]
@@ -456,7 +461,7 @@ ShellRoot {
         SidePopup {
             // abre pela hora do launcher: fica no canto superior direito, embaixo de onde a hora estava
             anchors { left: false; bottom: false; top: true; right: true }
-            margins { left: 0; bottom: 0; top: root.popupGap; right: root.popupGap }
+            margins { left: 0; bottom: 0; top: root.frameWidth + root.popupGap; right: root.frameWidth + root.popupGap }
             shown: root.calendarVisible
             onDismissed: root.calendarVisible = false
             implicitWidth: cal.implicitWidth
@@ -634,6 +639,72 @@ ShellRoot {
         color: Theme.surface1
     }
 
+    // ── Contorno da tela ───────────────────────────────────
+    // desenho: tela inteira menos um retângulo de cantos arredondados (a área das janelas)
+    Variants {
+        model: Quickshell.screens
+        PanelWindow {
+            id: frameWindow
+            property var modelData
+            screen: modelData
+            WlrLayershell.layer: WlrLayer.Bottom          // por baixo das janelas, acima do papel de parede
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.namespace: "quickshell-contorno"
+            anchors { top: true; bottom: true; left: true; right: true }
+            mask: Region {}                                 // não pega clique
+            color: "transparent"
+
+            Shape {
+                anchors.fill: parent
+                preferredRendererType: Shape.CurveRenderer
+                ShapePath {
+                    id: framePath
+                    readonly property real w: frameWindow.width
+                    readonly property real h: frameWindow.height
+                    readonly property real x0: root.barWidth
+                    readonly property real y0: root.frameWidth
+                    readonly property real x1: w - root.frameWidth
+                    readonly property real y1: h - root.frameWidth
+                    readonly property real r: root.cornerRadius
+                    fillColor: Theme.bgHard
+                    fillRule: ShapePath.OddEvenFill
+                    strokeWidth: -1
+                    // borda de fora
+                    startX: 0; startY: 0
+                    PathLine { x: framePath.w; y: 0 }
+                    PathLine { x: framePath.w; y: framePath.h }
+                    PathLine { x: 0; y: framePath.h }
+                    PathLine { x: 0; y: 0 }
+                    // recorte das janelas, no sentido horário a partir do canto superior esquerdo
+                    PathMove { x: framePath.x0 + framePath.r; y: framePath.y0 }
+                    PathLine { x: framePath.x1 - framePath.r; y: framePath.y0 }
+                    PathArc { x: framePath.x1; y: framePath.y0 + framePath.r; radiusX: framePath.r; radiusY: framePath.r }
+                    PathLine { x: framePath.x1; y: framePath.y1 - framePath.r }
+                    PathArc { x: framePath.x1 - framePath.r; y: framePath.y1; radiusX: framePath.r; radiusY: framePath.r }
+                    PathLine { x: framePath.x0 + framePath.r; y: framePath.y1 }
+                    PathArc { x: framePath.x0; y: framePath.y1 - framePath.r; radiusX: framePath.r; radiusY: framePath.r }
+                    PathLine { x: framePath.x0; y: framePath.y0 + framePath.r }
+                    PathArc { x: framePath.x0 + framePath.r; y: framePath.y0; radiusX: framePath.r; radiusY: framePath.r }
+                }
+            }
+        }
+    }
+    // faixas invisíveis que só reservam o espaço do contorno (as janelas não entram nele)
+    component FrameReserve: PanelWindow {
+        property var modelData
+        screen: modelData
+        WlrLayershell.layer: WlrLayer.Bottom
+        WlrLayershell.namespace: "quickshell-contorno"
+        exclusiveZone: root.frameWidth
+        implicitWidth: root.frameWidth
+        implicitHeight: root.frameWidth
+        mask: Region {}
+        color: "transparent"
+    }
+    Variants { model: Quickshell.screens; FrameReserve { anchors { top: true; left: true; right: true } } }
+    Variants { model: Quickshell.screens; FrameReserve { anchors { right: true; top: true; bottom: true } } }
+    Variants { model: Quickshell.screens; FrameReserve { anchors { bottom: true; left: true; right: true } } }
+
     // ── Barra lateral ──────────────────────────────────────
     Variants {
         model: Quickshell.screens
@@ -642,36 +713,9 @@ ShellRoot {
             property var modelData
             screen: modelData
             anchors { top: true; bottom: true; left: true }
-            // a janela tem a largura da barra + a das curvas, mas só reserva (e só recebe clique) na barra
-            implicitWidth: root.barWidth + root.cornerRadius
+            implicitWidth: root.barWidth
             exclusiveZone: root.barWidth
-            mask: Region { item: barBg }
             color: "transparent"
-
-            // curvas côncavas: canto superior e inferior da área das janelas, "recortados" na barra
-            component Corner: Shape {
-                property bool atBottom: false
-                x: root.barWidth
-                y: atBottom ? barWindow.height - root.cornerRadius : 0
-                width: root.cornerRadius
-                height: root.cornerRadius
-                preferredRendererType: Shape.CurveRenderer
-                ShapePath {
-                    fillColor: Theme.bgHard
-                    strokeWidth: -1
-                    // canto colado na barra e na borda da tela; o arco tem centro no canto oposto
-                    startX: 0; startY: atBottom ? root.cornerRadius : 0
-                    PathLine { x: root.cornerRadius; y: atBottom ? root.cornerRadius : 0 }
-                    PathArc {
-                        x: 0; y: atBottom ? 0 : root.cornerRadius
-                        radiusX: root.cornerRadius; radiusY: root.cornerRadius
-                        direction: atBottom ? PathArc.Clockwise : PathArc.Counterclockwise
-                    }
-                    PathLine { x: 0; y: atBottom ? root.cornerRadius : 0 }
-                }
-            }
-            Corner {}
-            Corner { atBottom: true }
 
             // tooltip ao lado do ícone sob o mouse (ancorada na janela, ver root.hover)
             PopupWindow {
@@ -726,14 +770,14 @@ ShellRoot {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    anchors.topMargin: 6
+                    anchors.topMargin: 0
                     spacing: 4
 
                     BarIcon {
                         icon: ""   // logo do Fedora
                         size: 22
                         tint: Theme.accent
-                        Layout.preferredHeight: 38
+                        Layout.preferredHeight: 32
                         onClicked: appLauncher.toggle()
                     }
                     Separator {}
@@ -858,7 +902,7 @@ ShellRoot {
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    anchors.bottomMargin: 6
+                    anchors.bottomMargin: 0
                     spacing: 2
 
                     // player de mídia (só com algo aberto)
@@ -971,6 +1015,7 @@ ShellRoot {
                     }
                     BarIcon {
                         hoverName: "power"
+                        Layout.preferredHeight: 26
                         icon: "󰐥"
                         tint: Theme.red
                         onClicked: appLauncher.show(">")

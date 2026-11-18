@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Shapes
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
@@ -19,6 +20,10 @@ Scope {
     // janela em foco (vem do shell.qml)
     property string windowTitle: ""
     property string windowClass: ""
+    // medidas do contorno da tela (shell.qml): o launcher é a faixa de cima dele crescendo
+    property int leftInset: 46        // largura da barra lateral
+    property int frameWidth: 14
+    property int cornerRadius: 16
     // hora: só aparece aqui (com o launcher aberto); clique abre o calendário
     property string clockTooltip: ""     // dia da semana, semana e feriados (vem do shell.qml)
     signal calendarRequested()
@@ -206,8 +211,17 @@ Scope {
         WlrLayershell.keyboardFocus: launcher.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
         WlrLayershell.namespace: "quickshell-launcher"
         anchors { top: true; left: true; right: true }
-        implicitHeight: sheet.height
+        implicitHeight: barHeight + launcher.cornerRadius + dropFull
         color: "transparent"
+        // só a faixa e a aba recebem clique; o resto da janela é transparente para as janelas de baixo
+        mask: Region { item: strip; Region { item: dropClip } }
+
+        // 0 = fechado (faixa com a grossura normal do contorno), 1 = aberto (faixa com a altura do
+        // launcher, a mesma de antes); a faixa cresce em vez de algo deslizar por cima
+        property real progress: launcher.open ? 1 : 0
+        Behavior on progress { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
+        readonly property real stripH: launcher.frameWidth + (barHeight - launcher.frameWidth) * progress
+        readonly property real dropFull: dropCol.implicitHeight + 14
 
         HyprlandFocusGrab {
             windows: [win]
@@ -222,7 +236,6 @@ Scope {
                 search.text = launcher.initialText
                 search.cursorPosition = search.text.length
                 search.forceActiveFocus()
-                loadAnim.restart()
             }
         }
 
@@ -230,7 +243,7 @@ Scope {
             id: clockTip
             visible: clockMouse.containsMouse && launcher.open && launcher.clockTooltip !== ""
             anchor.window: win
-            anchor.rect.x: win.width - 14
+            anchor.rect.x: win.width - launcher.frameWidth - 8
             anchor.rect.y: win.barHeight + 6
             anchor.rect.width: 1
             anchor.rect.height: 1
@@ -255,51 +268,46 @@ Scope {
             }
         }
 
-        Item {
-            id: sheet
-            width: parent.width
-            height: win.barHeight + drop.height
-            y: launcher.open ? 0 : -height
-            Behavior on y { NumberAnimation { duration: 220; easing.type: launcher.open ? Easing.OutCubic : Easing.InCubic } }
+        // canto côncavo (área das janelas "recortada" na faixa); mirrored = canto do lado direito
+        component Concave: Shape {
+            property real r: launcher.cornerRadius
+            property bool mirrored: false
+            width: r; height: r
+            preferredRendererType: Shape.CurveRenderer
+            transform: Scale { xScale: mirrored ? -1 : 1; origin.x: r / 2 }
+            ShapePath {
+                fillColor: Theme.bgHard
+                strokeWidth: -1
+                startX: 0; startY: 0
+                PathLine { x: r; y: 0 }
+                PathArc { x: 0; y: r; radiusX: r; radiusY: r; direction: PathArc.Counterclockwise }
+                PathLine { x: 0; y: 0 }
+            }
+        }
 
-            // ── Barra ──────────────────────────────────────
-            Rectangle {
-                id: bar
+        // ── Faixa de cima do contorno, crescida ─────────────
+        Rectangle {
+            id: strip
+            x: launcher.leftInset
+            width: win.width - launcher.leftInset
+            height: win.stripH
+            color: Theme.bgHard
+            clip: true
+
+            // conteúdo desce junto com a faixa
+            Item {
+                id: barContent
                 width: parent.width
                 height: win.barHeight
-                color: Theme.bgHard
-
-                Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 1; color: Theme.surface0 }
-                // linha de "carregamento" que corre na base da barra ao abrir
-                Rectangle {
-                    id: loadLine
-                    anchors.bottom: parent.bottom
-                    height: 2
-                    color: Theme.accent
-                    SequentialAnimation {
-                        id: loadAnim
-                        PropertyAction { target: loadLine; property: "opacity"; value: 1 }
-                        PropertyAction { target: loadLine; property: "width"; value: 0 }
-                        NumberAnimation { target: loadLine; property: "width"; to: bar.width; duration: 450; easing.type: Easing.OutCubic }
-                        NumberAnimation { target: loadLine; property: "opacity"; to: 0; duration: 250 }
-                    }
-                }
+                y: win.stripH - win.barHeight
+                opacity: win.progress
 
                 RowLayout {
+                    id: barRow
                     anchors.fill: parent
-                    anchors.leftMargin: 0
-                    anchors.rightMargin: 14
-                    anchors.bottomMargin: 1
+                    anchors.leftMargin: 14
+                    anchors.rightMargin: launcher.frameWidth + 6
                     spacing: 10
-
-                    // alinhado com o ícone do sistema da barra lateral
-                    Text {
-                        Layout.preferredWidth: 46
-                        horizontalAlignment: Text.AlignHCenter
-                        text:""
-                        color: Theme.accent
-                        font.family: Theme.font; font.pixelSize: 22
-                    }
 
                     // campo de endereço
                     Rectangle {
@@ -314,7 +322,7 @@ Scope {
                         RowLayout {
                             anchors.fill: parent
                             anchors.leftMargin: 12
-                            anchors.rightMargin: 12
+                            anchors.rightMargin: 4
                             spacing: 10
                             // "favicon": o app em foco sem busca; com busca, o tipo de busca
                             Item {
@@ -375,46 +383,59 @@ Scope {
                                     font.family: Theme.font; font.pixelSize: 15
                                 }
                             }
-                        }
-                    }
-
-                    // data e hora, à direita
-                    Rectangle {
-                        id: clockBox
-                        implicitWidth: clockLabel.implicitWidth + 20
-                        implicitHeight: 32
-                        radius: 16
-                        color: clockMouse.containsMouse ? Theme.surface0 : "transparent"
-                        Text {
-                            id: clockLabel
-                            anchors.centerIn: parent
-                            text: launcher.clockText
-                            color: Theme.fg
-                            font.family: Theme.font; font.pixelSize: 15; font.bold: true
-                        }
-                        MouseArea {
-                            id: clockMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: { launcher.close(); launcher.calendarRequested() }
+                            // data e hora dentro da barra de busca, no canto direito (fundo só no hover)
+                            Rectangle {
+                                id: clockBox
+                                implicitWidth: clockLabel.implicitWidth + 18
+                                implicitHeight: 24
+                                radius: 12
+                                color: clockMouse.containsMouse ? Theme.surface1 : "transparent"
+                                Behavior on color { ColorAnimation { duration: 120 } }
+                                Text {
+                                    id: clockLabel
+                                    anchors.centerIn: parent
+                                    text: launcher.clockText
+                                    color: Theme.fg
+                                    font.family: Theme.font; font.pixelSize: 14; font.bold: true
+                                }
+                                MouseArea {
+                                    id: clockMouse
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: { launcher.close(); launcher.calendarRequested() }
+                                }
+                            }
                         }
                     }
                 }
             }
+        }
+        // cantos da área das janelas, descendo com a faixa
+        Concave { x: launcher.leftInset; y: win.stripH }
+        Concave { x: win.width - launcher.frameWidth - r; y: win.stripH; mirrored: true }
 
-            // ── Sugestões ──────────────────────────────────
+        // ── Sugestões: uma aba que sai da faixa ──────────────
+        readonly property real dropX: strip.x + barRow.x + omnibox.x
+        readonly property real dropW: omnibox.width
+        // concordância entre a faixa e a aba
+        Concave { r: 10; mirrored: true; x: win.dropX - r; y: win.stripH; visible: dropClip.height > r }
+        Concave { r: 10; x: win.dropX + win.dropW; y: win.stripH; visible: dropClip.height > r }
+        Item {
+            id: dropClip
+            x: win.dropX
+            y: win.stripH
+            width: win.dropW
+            height: win.dropFull * win.progress
+            clip: true
             Rectangle {
                 id: drop
-                anchors.top: bar.bottom
-                x: omnibox.x + omnibox.parent.x
-                width: omnibox.width
-                height: dropCol.implicitHeight + 12
-                color: Theme.bg
-                border.color: Theme.surface0
-                border.width: 1
-                bottomLeftRadius: 10
-                bottomRightRadius: 10
+                anchors.bottom: parent.bottom
+                width: parent.width
+                height: win.dropFull
+                color: Theme.bgHard
+                bottomLeftRadius: 12
+                bottomRightRadius: 12
 
                 ColumnLayout {
                     id: dropCol
