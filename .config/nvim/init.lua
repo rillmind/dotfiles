@@ -14,6 +14,8 @@ vim.opt.rtp:prepend(lazypath)
 
 require("vim-options")
 require("lazy").setup("plugins")
+-- colorscheme do tema do quickshell (Catppuccin ou Gruvbox); ver lua/tema.lua
+require("tema").aplicar()
 
 vim.keymap.set("n", "<leader>w", ":wa<CR>", { desc = "Salvar todos os buffers" })
 

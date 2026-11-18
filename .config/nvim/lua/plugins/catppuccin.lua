@@ -4,7 +4,7 @@ return {
   priority = 1000,
   config = function(_, opts)
     require("catppuccin").setup(opts)
-    vim.cmd.colorscheme("catppuccin-mocha")
+    -- o colorscheme é escolhido em lua/tema.lua (segue o tema do quickshell)
   end,
   opts = {
     transparent_background = false,

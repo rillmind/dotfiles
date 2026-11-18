@@ -60,6 +60,8 @@ Testado em modo headless: highlight e indent ativos num `.go`, gopls conectado, 
 - **`<C-1>`…`<C-9>`** (2026-11-03, `bufferline.lua`) vão para a aba N do bufferline (`<C-9>` = última). Só funcionam em terminal com o protocolo de teclado do kitty (Ghostty, kitty, Alacritty ≥ 0.13). Em terminais legados, o Ctrl+número não chega ao nvim, e se o terminal tiver um atalho próprio em Ctrl+número, ele captura antes.
 - O nvim 0.11+ já tem por padrão `grn`, `gra`, `grr`, `gri`, `K`, `[d`/`]d` e `gc` (comentários).
 
+- **Tema segue o quickshell** (2026-11-18, `lua/tema.lua`): o colorscheme vem de `~/.local/state/quickshell/aparencia/paleta` (Catppuccin Mocha, Gruvbox escuro ou claro, via `gruvbox.nvim`). O `~/.config/quickshell/aparencia.sh` chama `require("tema").aplicar()` em cada nvim aberto pelo socket. Não volte a chamar `colorscheme` no `catppuccin.lua`; o lualine usa `theme = "auto"` para acompanhar.
+
 ## 4. Pendências opcionais
 
 - Os ícones estão duplicados 3 vezes (`neo-tree.lua` ×2 e `bufferline.lua`), e o catppuccin pinta todos os `MiniIcons*` de mauve. Dá para juntar tudo num `lua/icons.lua`.
