@@ -505,13 +505,21 @@ Rectangle {
             meter: withBattery.map(d => d.battery)
         }
         // troca a config inteira do quickshell (ver ../../tema.sh); o processo atual é encerrado pelo script
+        // papel de parede do tema atual (no Gruvbox, um para o escuro e outro para o claro); ver aparencia.sh
         Tile {
-            Layout.columnSpan: 2
+            title: "PAPEL DE PAREDE"
+            icon: "󰸉"
+            arrow: "󰉋"
+            value: "Escolher imagem"
+            detail: "Fica salvo para este tema"
+            action: () => Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/aparencia.sh", "wallpaper"])
+        }
+        Tile {
             title: "TEMA"
             icon: "󰏘"
             arrow: "󰑓"
             value: "Catppuccin Mocha"
-            detail: "Clique para trocar para o Gruvbox"
+            detail: "Trocar para Gruvbox"
             action: () => Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/tema.sh", "trocar"])
         }
     }
