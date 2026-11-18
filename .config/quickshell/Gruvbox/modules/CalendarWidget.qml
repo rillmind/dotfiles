@@ -117,7 +117,7 @@ Rectangle {
                 }
             }
             Repeater {
-                model: [{ icon: "", step: -1 }, { icon: "", step: 1 }]
+                model: [{ icon: "󰅁", step: -1 }, { icon: "󰅂", step: 1 }]
                 Rectangle {
                     required property var modelData
                     implicitWidth: 28; implicitHeight: 28; radius: 8
