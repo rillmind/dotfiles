@@ -1,4 +1,4 @@
--- Cores do Hyprland que seguem o tema do quickshell (ver ~/.config/quickshell/aparencia.sh).
+-- Cores, espaços e arredondamento do Hyprland que seguem o tema do quickshell (ver ~/.config/quickshell/aparencia.sh).
 -- A paleta ativa fica em ~/.local/state/quickshell/aparencia/paleta; o aparencia.sh troca o arquivo
 -- e roda `hyprctl reload`. Sem o arquivo, fica no Catppuccin Mocha.
 
@@ -9,16 +9,25 @@ local paletas = {
     destaque      = mocha.mauve,      -- borda da janela em foco
     inativa       = mocha.surface2,   -- borda das outras janelas
     redimensionar = mocha.peach,      -- borda durante o modo de redimensionar
+    gaps_in       = 6,                -- espaço entre janelas
+    gaps_out      = 8,                -- espaço entre janelas e a borda da tela
+    rounding      = 5,                -- arredondamento das janelas
   },
   ["gruvbox-escuro"] = {
     destaque      = 0xfffe8019,       -- orange
     inativa       = 0xff504945,       -- bg2
     redimensionar = 0xfffabd2f,       -- yellow
+    gaps_in       = 8,
+    gaps_out      = 10,
+    rounding      = 10,
   },
   ["gruvbox-claro"] = {
     destaque      = 0xffaf3a03,       -- orange
     inativa       = 0xffbdae93,       -- bg3
     redimensionar = 0xffb57614,       -- yellow
+    gaps_in       = 8,
+    gaps_out      = 10,
+    rounding      = 10,
   },
 }
 

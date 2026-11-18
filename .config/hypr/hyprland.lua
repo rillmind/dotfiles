@@ -75,8 +75,8 @@ hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
 
 hl.config({
   general = {
-    gaps_in     = 6,
-    gaps_out    = 8,
+    gaps_in     = c.gaps_in,   -- espaços e arredondamento vêm da paleta do tema (paleta.lua)
+    gaps_out    = c.gaps_out,
     border_size = 2,
 
     col         = {
@@ -88,7 +88,7 @@ hl.config({
   },
 
   decoration = {
-    rounding = 5,
+    rounding = c.rounding,
 
     blur = {
       enabled = true,
