@@ -2,7 +2,8 @@
 -- Migrada do hyprland.conf antigo; backup em ~/dotfiles/.config/hypr-hyprlang-backup/
 -- Referência da API: /usr/share/hypr/stubs/hl.meta.lua e https://wiki.hypr.land/configuring/
 
-local c = require("mocha")
+-- cores das bordas seguem o tema do quickshell (Catppuccin Mocha ou Gruvbox claro/escuro)
+local c = require("paleta")
 
 ------------------
 ---- MONITORS ----
@@ -28,7 +29,7 @@ pcall(dofile, os.getenv("HOME") .. "/.local/state/hypr/monitors.lua")
 hl.on("hyprland.start", function()
   hl.exec_cmd("~/.config/hypr/desktop-portals.sh")
   hl.exec_cmd("udiskie --tray")
-  hl.exec_cmd("swaybg -i /home/raul/Nextcloud/Imagens/Wallpapers/blobs-d.png")
+  -- papel de parede: aplicado pelo tema do quickshell (tema.sh iniciar → aparencia.sh), um por tema
   hl.exec_cmd(
     [[hyprctl dispatch 'hl.dsp.dpms({ action = "disable" })' && sleep 1 && hyprctl dispatch 'hl.dsp.dpms({ action = "enable" })']])
   hl.exec_cmd("sudo systemctl start tailscaled")
@@ -79,8 +80,8 @@ hl.config({
     border_size = 2,
 
     col         = {
-      active_border   = c.mauve,
-      inactive_border = c.surface2,
+      active_border   = c.destaque,
+      inactive_border = c.inativa,
     },
 
     layout      = "dwindle",
@@ -247,7 +248,7 @@ hl.bind("XF86AudioMute", hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ tog
 
 -- Modo de redimensionar: borda laranja enquanto ativo
 hl.bind(mainMod .. " + R", function()
-  hl.config({ general = { col = { active_border = c.peach } } })
+  hl.config({ general = { col = { active_border = c.redimensionar } } })
   hl.dispatch(hl.dsp.submap("resize"))
 end)
 hl.define_submap("resize", function()
@@ -256,7 +257,7 @@ hl.define_submap("resize", function()
   hl.bind("k", hl.dsp.window.resize({ x = 0, y = -10, relative = true }), { repeating = true })
   hl.bind("j", hl.dsp.window.resize({ x = 0, y = 10, relative = true }), { repeating = true })
   hl.bind("escape", function()
-    hl.config({ general = { col = { active_border = c.mauve } } })
+    hl.config({ general = { col = { active_border = c.destaque } } })
     hl.dispatch(hl.dsp.submap("reset"))
   end)
 end)
