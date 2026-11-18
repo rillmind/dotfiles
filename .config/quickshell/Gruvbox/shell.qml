@@ -9,6 +9,7 @@ import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Shapes
 import "modules/holidays.js" as Holidays
 import qs.modules
 
@@ -20,6 +21,9 @@ ShellRoot {
 
     readonly property int barWidth: 46
     readonly property int popupGap: 8
+    // curva côncava onde a barra encontra o topo e a base da tela (a área das janelas parece recortada
+    // por cima da barra, como se o quickshell ficasse por baixo delas)
+    readonly property int cornerRadius: 14
 
     // ── Estado ─────────────────────────────────────────────
     property int cpuUsage: 0
@@ -149,7 +153,7 @@ ShellRoot {
     }
     Timer {
         interval: 2000; repeat: true; triggeredOnStart: true
-        running: root.sysMonVisible || root.barHover === "cpu" || root.barHover === "mem"
+        running: root.sysMonVisible
         onTriggered: if (!sysInfoProc.running) sysInfoProc.running = true
         onRunningChanged: if (!running) { root._lastRx = -1; root.netRxRate = 0; root.netTxRate = 0 }
     }
@@ -198,6 +202,8 @@ ShellRoot {
         id: appLauncher
         windowTitle: root.hyprWindowTitle
         windowClass: root.hyprWindowClass
+        clockTooltip: open ? root.clockTooltipText() : ""
+        onCalendarRequested: root.togglePopup("cal", Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : Quickshell.screens[0].name)
     }
     VolumeOsd { id: volumeOsd; fontFamily: Theme.font }
     DisplayManager {
@@ -213,11 +219,12 @@ ShellRoot {
         root.calendarVisible = false; root.sysMonVisible = false; root.mediaVisible = false; root.notifVisible = false; root.controlCenterVisible = true
         root.panelPageRequested(page)
     }
-    // quickshell ipc call panel open <""|network|sound|battery|displays|fans|bluetooth>
+    // quickshell ipc call panel open <""|network|sound|battery|displays|fans|bluetooth> · panel calendario
     IpcHandler {
         target: "panel"
         function open(page: string): void { root.openPanel(page) }
         function close(): void { root.controlCenterVisible = false }
+        function calendario(): void { root.togglePopup("cal", Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : Quickshell.screens[0].name) }
     }
     FanManager {
         id: fanManager
@@ -239,7 +246,6 @@ ShellRoot {
         centerOpen: root.notifVisible
         onCenterToggleRequested: root.togglePopup("notif", Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : Quickshell.screens[0].name)
     }
-    function switchTheme() { Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/tema.sh", "trocar"]) }
 
     // ── Mídia (MPRIS) ──────────────────────────────────────
     readonly property var players: Mpris.players.values
@@ -434,6 +440,9 @@ ShellRoot {
                 onRequestSetVolume: lvl => root.setVolume(lvl)
                 onRequestToggleMute: root.toggleMute()
                 onRequestRefresh: { netProc.running = true; volProc.running = true; battProc.running = true }
+                cpuUsage: root.cpuUsage
+                memUsage: root.memUsage
+                onRequestSystemMonitor: root.togglePopup("sm", ccWindow.modelData.name)
             }
             Connections {
                 target: root
@@ -445,6 +454,9 @@ ShellRoot {
     Variants {
         model: Quickshell.screens
         SidePopup {
+            // abre pela hora do launcher: fica no canto superior direito, embaixo de onde a hora estava
+            anchors { left: false; bottom: false; top: true; right: true }
+            margins { left: 0; bottom: 0; top: root.popupGap; right: root.popupGap }
             shown: root.calendarVisible
             onDismissed: root.calendarVisible = false
             implicitWidth: cal.implicitWidth
@@ -532,7 +544,6 @@ ShellRoot {
     }
     function tooltipText() {
         var h = barHover
-        if (h === "clock") return clockTooltipText()
         if (h === "net") {
             if (networkType === "wifi") return "󰤨  " + networkSsid + "  ·  sinal " + networkSignal + "%" + (networkIp ? "  ·  " + networkIp : "")
             if (networkType === "ethernet") return "󰈀  Ethernet" + (networkIp ? "  ·  " + networkIp : "")
@@ -541,15 +552,6 @@ ShellRoot {
         if (h === "vol") {
             var dev = pwSink ? (pwSink.nickname || pwSink.description || "") : ""
             return (volumeMuted ? "󰝟  Mudo" : "󰕾  " + volumeLevel + "%") + (dev ? "  ·  " + dev : "") + "   (rolar ajusta)"
-        }
-        if (h === "cpu") {
-            var c = sysInfo ? sysInfo.cpu : null
-            return "  CPU " + cpuUsage + "%" + (c && c.temp !== null ? "  ·  " + c.temp + "°C" : "") + (c && c.freq ? "  ·  " + (c.freq / 1000).toFixed(1) + " GHz" : "")
-        }
-        if (h === "mem") {
-            if (!sysInfo) return "  RAM " + memUsage + "%"
-            var m = sysInfo.mem, used = (m.total - m.available) / 1048576
-            return "  RAM " + used.toFixed(1) + " / " + (m.total / 1048576).toFixed(1) + " GB  ·  " + memUsage + "%"
         }
         if (h === "batt") {
             var st = batteryStatus === "Charging" ? "carregando" : batteryStatus === "Discharging" ? "descarregando" : batteryStatus === "Full" ? "carga completa" : batteryStatus.toLowerCase()
@@ -565,8 +567,6 @@ ShellRoot {
             if (notifs.dnd) parts.push("não perturbe ligado")
             return "󰂚  " + parts.join("  ·  ") + "   (direito: não perturbe)"
         }
-        if (h === "mode") return Theme.light ? "󰖔  Mudar para o modo escuro" : "󰖙  Mudar para o modo claro"
-        if (h === "theme") return "󰏘  Trocar para o tema Catppuccin"
         if (h === "power") return "󰐥  Energia"
         if (h.startsWith("tray:")) return h.substring(5)
         return ""
@@ -581,12 +581,12 @@ ShellRoot {
         property string icon: ""
         property string hoverName: ""
         property color tint: Theme.fg
-        property int size: 17
+        property int size: 19
         property string label: ""          // número pequeno abaixo do ícone (CPU/RAM)
         signal clicked(var mouse)
         signal wheel(var wheel)
         Layout.preferredWidth: root.barWidth
-        Layout.preferredHeight: label !== "" ? 40 : 30
+        Layout.preferredHeight: label !== "" ? 42 : 32
         Rectangle {
             anchors.centerIn: parent
             width: 34; height: parent.height - 4; radius: 6
@@ -642,8 +642,36 @@ ShellRoot {
             property var modelData
             screen: modelData
             anchors { top: true; bottom: true; left: true }
-            implicitWidth: root.barWidth
+            // a janela tem a largura da barra + a das curvas, mas só reserva (e só recebe clique) na barra
+            implicitWidth: root.barWidth + root.cornerRadius
+            exclusiveZone: root.barWidth
+            mask: Region { item: barBg }
             color: "transparent"
+
+            // curvas côncavas: canto superior e inferior da área das janelas, "recortados" na barra
+            component Corner: Shape {
+                property bool atBottom: false
+                x: root.barWidth
+                y: atBottom ? barWindow.height - root.cornerRadius : 0
+                width: root.cornerRadius
+                height: root.cornerRadius
+                preferredRendererType: Shape.CurveRenderer
+                ShapePath {
+                    fillColor: Theme.bgHard
+                    strokeWidth: -1
+                    // canto colado na barra e na borda da tela; o arco tem centro no canto oposto
+                    startX: 0; startY: atBottom ? root.cornerRadius : 0
+                    PathLine { x: root.cornerRadius; y: atBottom ? root.cornerRadius : 0 }
+                    PathArc {
+                        x: 0; y: atBottom ? 0 : root.cornerRadius
+                        radiusX: root.cornerRadius; radiusY: root.cornerRadius
+                        direction: atBottom ? PathArc.Clockwise : PathArc.Counterclockwise
+                    }
+                    PathLine { x: 0; y: atBottom ? root.cornerRadius : 0 }
+                }
+            }
+            Corner {}
+            Corner { atBottom: true }
 
             // tooltip ao lado do ícone sob o mouse (ancorada na janela, ver root.hover)
             PopupWindow {
@@ -680,10 +708,10 @@ ShellRoot {
             }
 
             Rectangle {
-                anchors.fill: parent
+                id: barBg
+                width: root.barWidth
+                height: parent.height
                 color: Theme.bgHard
-                Behavior on color { ColorAnimation { duration: 200 } }
-                Rectangle { anchors.right: parent.right; width: 1; height: parent.height; color: Theme.surface0 }
 
                 // clique no fundo da barra fecha popups – atrás dos ícones
                 MouseArea {
@@ -712,7 +740,7 @@ ShellRoot {
                     // workspaces 1..10 – só os que têm janelas e o ativo
                     ColumnLayout {
                         Layout.alignment: Qt.AlignHCenter
-                        spacing: 4
+                        spacing: 8
                         Repeater {
                             model: 10
                             Rectangle {
@@ -721,8 +749,8 @@ ShellRoot {
                                 readonly property bool isActive: root.focusedWs === index + 1
                                 visible: ws !== null || isActive
                                 Layout.alignment: Qt.AlignHCenter
-                                implicitWidth: 30
-                                implicitHeight: 26
+                                implicitWidth: 26
+                                implicitHeight: 22
                                 radius: 4
                                 color: isActive ? Theme.accent : wsMouse.containsMouse ? Theme.surface1 : Theme.surface0
                                 Behavior on color { ColorAnimation { duration: 120 } }
@@ -731,7 +759,7 @@ ShellRoot {
                                     text: index + 1
                                     color: parent.isActive ? Theme.onAccent : Theme.fg
                                     font.family: Theme.font
-                                    font.pixelSize: 14
+                                    font.pixelSize: 13
                                     font.bold: true
                                 }
                                 MouseArea {
@@ -786,13 +814,13 @@ ShellRoot {
                                 }
                                 Rectangle {
                                     anchors.centerIn: parent
-                                    width: 36; height: 36; radius: 6
+                                    width: 36; height: 36; radius: width / 2
                                     color: appItem.isActive ? Theme.surface0 : appMouse.containsMouse ? Theme.surface0 : "transparent"
                                 }
                                 IconImage {
                                     id: appIcon
                                     anchors.centerIn: parent
-                                    implicitSize: 26
+                                    implicitSize: 22   // cabe inteiro dentro do círculo
                                     source: appItem.iconPath
                                     visible: appItem.iconPath !== "" && status === Image.Ready
                                     scale: appMouse.pressed ? 0.9 : 1
@@ -859,15 +887,15 @@ ShellRoot {
                             id: trayItem
                             required property var modelData
                             Layout.preferredWidth: root.barWidth
-                            Layout.preferredHeight: 28
+                            Layout.preferredHeight: 25
                             Rectangle {
                                 anchors.centerIn: parent
-                                width: 30; height: 26; radius: 6
+                                width: 28; height: 23; radius: 6
                                 color: trayMouse.containsMouse ? Theme.surface0 : "transparent"
                             }
                             IconImage {
                                 anchors.centerIn: parent
-                                implicitSize: 18
+                                implicitSize: 15
                                 source: trayItem.modelData.icon
                             }
                             MouseArea {
@@ -895,32 +923,6 @@ ShellRoot {
 
                     Separator { visible: root.activePlayer !== null || SystemTray.items.values.length > 0 }
 
-                    // notificações: número de novas embaixo; direito liga/desliga o não perturbe
-                    BarIcon {
-                        hoverName: "notif"
-                        icon: notifs.dnd ? "󰂛" : notifs.unread > 0 ? "󰂞" : "󰂚"
-                        label: notifs.unread > 0 ? String(notifs.unread) : ""
-                        tint: notifs.dnd ? Theme.sub : notifs.unread > 0 ? Theme.accent : Theme.fg
-                        onClicked: mouse => {
-                            if (mouse.button === Qt.RightButton) notifs.setDnd(!notifs.dnd)
-                            else if (mouse.button === Qt.MiddleButton) notifs.clearAll()
-                            else root.togglePopup("notif", barWindow.modelData.name)
-                        }
-                    }
-                    BarIcon {
-                        hoverName: "cpu"
-                        icon: "󰻠"
-                        label: root.cpuUsage + "%"
-                        tint: root.cpuUsage >= 85 ? Theme.red : Theme.fg
-                        onClicked: root.togglePopup("sm", barWindow.modelData.name)
-                    }
-                    BarIcon {
-                        hoverName: "mem"
-                        icon: "󰍛"
-                        label: root.memUsage + "%"
-                        tint: root.memUsage >= 85 ? Theme.red : Theme.fg
-                        onClicked: root.togglePopup("sm", barWindow.modelData.name)
-                    }
                     BarIcon {
                         hoverName: "net"
                         icon: root.networkIcon
@@ -955,66 +957,17 @@ ShellRoot {
 
                     Separator {}
 
-                    // dia do mês + hora (clique abre o calendário)
-                    Item {
-                        id: clockItem
-                        Layout.preferredWidth: root.barWidth
-                        Layout.preferredHeight: clockCol.implicitHeight + 8
-                        Rectangle {
-                            anchors.centerIn: parent
-                            width: 36; height: parent.height; radius: 6
-                            color: clockMouse.containsMouse ? Theme.surface0 : "transparent"
-                        }
-                        Column {
-                            id: clockCol
-                            anchors.centerIn: parent
-                            spacing: 2
-                            Rectangle {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                width: 28; height: 20; radius: 4
-                                color: Theme.accent
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: Qt.formatDate(root.clockNow, "dd")
-                                    color: Theme.onAccent
-                                    font.family: Theme.font; font.pixelSize: 12; font.bold: true
-                                }
-                            }
-                            Text {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                text: Qt.formatTime(root.clockNow, "hh")
-                                color: Theme.fg
-                                font.family: Theme.font; font.pixelSize: 16; font.bold: true
-                            }
-                            Text {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                text: Qt.formatTime(root.clockNow, "mm")
-                                color: Theme.sub
-                                font.family: Theme.font; font.pixelSize: 16; font.bold: true
-                            }
-                        }
-                        MouseArea {
-                            id: clockMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onEntered: root.hover("clock", clockItem)
-                            onExited: root.unhover("clock")
-                            onClicked: root.togglePopup("cal", barWindow.modelData.name)
-                        }
-                    }
-
-                    Separator {}
-
+                    // notificações: número de novas embaixo; direito liga/desliga o não perturbe
                     BarIcon {
-                        hoverName: "mode"
-                        icon: Theme.light ? "󰖙" : "󰖔"
-                        onClicked: Theme.toggle()
-                    }
-                    BarIcon {
-                        hoverName: "theme"
-                        icon: "󰏘"
-                        onClicked: root.switchTheme()
+                        hoverName: "notif"
+                        icon: notifs.dnd ? "󰂛" : notifs.unread > 0 ? "󰂞" : "󰂚"
+                        label: notifs.unread > 0 ? String(notifs.unread) : ""
+                        tint: notifs.dnd ? Theme.sub : notifs.unread > 0 ? Theme.accent : Theme.fg
+                        onClicked: mouse => {
+                            if (mouse.button === Qt.RightButton) notifs.setDnd(!notifs.dnd)
+                            else if (mouse.button === Qt.MiddleButton) notifs.clearAll()
+                            else root.togglePopup("notif", barWindow.modelData.name)
+                        }
                     }
                     BarIcon {
                         hoverName: "power"

@@ -38,6 +38,10 @@ Rectangle {
     signal requestSetVolume(int level)
     signal requestToggleMute()
     signal requestRefresh()
+    // card do sistema: abre o painel com gráfico de CPU, memória e processos
+    property int cpuUsage: 0
+    property int memUsage: 0
+    signal requestSystemMonitor()
 
     // submenu aberto: "" (tela principal), network, sound, battery, displays, fans ou bluetooth
     property string page: ""
@@ -505,6 +509,25 @@ Rectangle {
             meter: withBattery.map(d => d.battery)
         }
         // troca a config inteira do quickshell (ver ../../tema.sh); o processo atual é encerrado pelo script
+        Tile {
+            title: "SISTEMA"
+            icon: "󰍛"
+            value: "CPU " + rootCC.cpuUsage + "% · RAM " + rootCC.memUsage + "%"
+            detail: "Processos e gráfico"
+            danger: rootCC.cpuUsage >= 85 || rootCC.memUsage >= 85
+            meter: [rootCC.cpuUsage / 100, rootCC.memUsage / 100]
+            meterColor: danger ? rootCC.colDanger : rootCC.colMauve
+            action: () => rootCC.requestSystemMonitor()
+        }
+        // modo claro/escuro do Gruvbox (antes era um botão na barra)
+        Tile {
+            title: "MODO"
+            icon: Theme.light ? "󰖙" : "󰖔"
+            arrow: "󰔎"
+            value: Theme.light ? "Claro" : "Escuro"
+            detail: Theme.light ? "Mudar para o escuro" : "Mudar para o claro"
+            action: () => Theme.toggle()
+        }
         Tile {
             Layout.columnSpan: 2
             title: "TEMA"

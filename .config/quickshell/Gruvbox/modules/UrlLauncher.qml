@@ -19,6 +19,17 @@ Scope {
     // janela em foco (vem do shell.qml)
     property string windowTitle: ""
     property string windowClass: ""
+    // hora: só aparece aqui (com o launcher aberto); clique abre o calendário
+    property string clockTooltip: ""     // dia da semana, semana e feriados (vem do shell.qml)
+    signal calendarRequested()
+    property date now: new Date()
+    Timer { interval: 1000; running: launcher.open; repeat: true; triggeredOnStart: true; onTriggered: launcher.now = new Date() }
+    readonly property string clockText: {
+        var d = now
+        var wd = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"][d.getDay()]
+        var mo = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"][d.getMonth()]
+        return wd + ", " + d.getDate() + " " + mo + "  " + Qt.formatTime(d, "hh:mm")
+    }
 
     function toggle() { open ? close() : show("") }
     property string initialText: ""
@@ -215,6 +226,35 @@ Scope {
             }
         }
 
+        PopupWindow {
+            id: clockTip
+            visible: clockMouse.containsMouse && launcher.open && launcher.clockTooltip !== ""
+            anchor.window: win
+            anchor.rect.x: win.width - 14
+            anchor.rect.y: win.barHeight + 6
+            anchor.rect.width: 1
+            anchor.rect.height: 1
+            anchor.edges: Edges.Bottom | Edges.Right
+            anchor.gravity: Edges.Bottom | Edges.Left
+            implicitWidth: clockTipText.implicitWidth + 24
+            implicitHeight: 30
+            color: "transparent"
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.bg
+                radius: 6
+                border.color: Theme.surface1
+                border.width: 1
+                Text {
+                    id: clockTipText
+                    anchors.centerIn: parent
+                    text: launcher.clockTooltip
+                    color: Theme.fg
+                    font.family: Theme.font; font.pixelSize: 12; font.bold: true
+                }
+            }
+        }
+
         Item {
             id: sheet
             width: parent.width
@@ -338,11 +378,27 @@ Scope {
                         }
                     }
 
-                    // atalhos, à direita
-                    Text {
-                        text: "↑↓ navegar   ⇥ completar   ↵ abrir   esc fechar"
-                        color: Theme.gray
-                        font.family: Theme.font; font.pixelSize: 11
+                    // data e hora, à direita
+                    Rectangle {
+                        id: clockBox
+                        implicitWidth: clockLabel.implicitWidth + 20
+                        implicitHeight: 32
+                        radius: 16
+                        color: clockMouse.containsMouse ? Theme.surface0 : "transparent"
+                        Text {
+                            id: clockLabel
+                            anchors.centerIn: parent
+                            text: launcher.clockText
+                            color: Theme.fg
+                            font.family: Theme.font; font.pixelSize: 15; font.bold: true
+                        }
+                        MouseArea {
+                            id: clockMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: { launcher.close(); launcher.calendarRequested() }
+                        }
                     }
                 }
             }
