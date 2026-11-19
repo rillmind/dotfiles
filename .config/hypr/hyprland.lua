@@ -33,7 +33,8 @@ hl.on("hyprland.start", function()
   hl.exec_cmd(
     [[hyprctl dispatch 'hl.dsp.dpms({ action = "disable" })' && sleep 1 && hyprctl dispatch 'hl.dsp.dpms({ action = "enable" })']])
   hl.exec_cmd("sudo systemctl start tailscaled")
-  hl.exec_cmd("flatpak run md.obsidian.Obsidian")
+  -- atrasado: abrir junto com o quickshell faz ele cair ao carregar o ícone do Obsidian na barra
+  hl.exec_cmd("sleep 5 && flatpak run md.obsidian.Obsidian")
   hl.exec_cmd("gammastep")
   hl.exec_cmd("bash /home/raul/.scripts/linux/NvibrantStart")
   hl.exec_cmd("nohup flatpak run com.nextcloud.desktopclient.nextcloud --background &")
