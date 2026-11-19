@@ -11,7 +11,7 @@ import "."
 // UrlLauncher.qml – launcher no estilo barra de endereço de navegador: desce uma barra fina no topo,
 // na largura toda da tela, e os apps aparecem como sugestões de pesquisa logo abaixo.
 // Sem nada digitado, a barra mostra a janela em foco como se fosse a página aberta (ícone = favicon,
-// título = URL). Mesmas funções do launcher do Catppuccin: busca aproximada, mais usados primeiro,
+// título = URL). Mesmas funções do launcher do Catppuccin: busca aproximada, mais usados primeiro nos resultados,
 // calculadora ("=2*3") e comandos do sistema (">" lista todos).
 // Teclas: Ctrl+N / ↓ desce, Ctrl+P / ↑ sobe, Tab completa, Enter abre, Esc fecha.
 Scope {
@@ -140,11 +140,7 @@ Scope {
             apps.push({ kind: "app", title: e.name, subtitle: e.genericName || e.comment || "", entry: e, score: base + Math.min(30, used * 3), used: used })
         }
         apps.sort((a, b) => (b.score - a.score) || (b.used - a.used) || a.title.localeCompare(b.title))
-        if (q === "") {
-            // como os "sites mais visitados" do navegador
-            var top = apps.filter(a => a.used > 0)
-            return (top.length > 0 ? top : apps).slice(0, 6)
-        }
+        if (q === "") return []   // sem nada digitado, só a barra (sem lista de mais usados)
         out = apps.slice(0, 40)
         for (var x of sys) {
             var pos = out.findIndex(a => a.score < x.score)
@@ -221,7 +217,7 @@ Scope {
         property real progress: launcher.open ? 1 : 0
         Behavior on progress { NumberAnimation { duration: 260; easing.type: Easing.OutCubic } }
         readonly property real stripH: launcher.frameWidth + (barHeight - launcher.frameWidth) * progress
-        readonly property real dropFull: dropCol.implicitHeight + 14
+        readonly property real dropFull: launcher.query.trim() === "" ? 0 : dropCol.implicitHeight + 14
 
         HyprlandFocusGrab {
             windows: [win]
@@ -439,14 +435,6 @@ Scope {
                     anchors.top: parent.top
                     anchors.margins: 6
                     spacing: 0
-
-                    Text {
-                        visible: launcher.query.trim() === ""
-                        text: "MAIS USADOS"
-                        color: Theme.gray
-                        font.family: Theme.font; font.pixelSize: 10; font.bold: true; font.letterSpacing: 0.5
-                        Layout.leftMargin: 10; Layout.topMargin: 4; Layout.bottomMargin: 4
-                    }
 
                     ListView {
                         id: list
