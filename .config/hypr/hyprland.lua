@@ -33,8 +33,7 @@ hl.on("hyprland.start", function()
   hl.exec_cmd(
     [[hyprctl dispatch 'hl.dsp.dpms({ action = "disable" })' && sleep 1 && hyprctl dispatch 'hl.dsp.dpms({ action = "enable" })']])
   hl.exec_cmd("sudo systemctl start tailscaled")
-  -- atrasado: abrir junto com o quickshell faz ele cair ao carregar o ícone do Obsidian na barra
-  hl.exec_cmd("sleep 5 && flatpak run md.obsidian.Obsidian")
+  hl.exec_cmd("flatpak run md.obsidian.Obsidian")
   hl.exec_cmd("gammastep")
   hl.exec_cmd("bash /home/raul/.scripts/linux/NvibrantStart")
   hl.exec_cmd("nohup flatpak run com.nextcloud.desktopclient.nextcloud --background &")
@@ -45,7 +44,9 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("swayidle -w before-sleep swaylock")
   -- hl.exec_cmd("waybar")
   -- tema salvo do quickshell (pastas em ~/.config/quickshell; troca com SUPER+SHIFT+T)
-  hl.exec_cmd("~/.config/quickshell/tema.sh iniciar")
+  -- sobe depois que a janela do Obsidian aparece (até 15s): carregar o ícone dele faz o quickshell
+  -- cair, e o tema.sh reinicia sozinho quando isso acontece
+  hl.exec_cmd([[for i in $(seq 30); do hyprctl clients | grep -qiE 'class: .*obsidian' && break; sleep 0.5; done; ~/.config/quickshell/tema.sh iniciar]])
   hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
   hl.exec_cmd([[hyprctl dispatch 'hl.dsp.dpms({ action = "enable" })']])
   hl.exec_cmd("hyprctl setcursor Bibata-Modern-Classic 24")
