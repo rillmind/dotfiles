@@ -411,16 +411,13 @@ Scope {
                 }
             }
         }
-        // cantos da área das janelas, descendo com a faixa
-        Concave { x: launcher.leftInset; y: win.stripH }
-        Concave { x: win.width - launcher.frameWidth - r; y: win.stripH; mirrored: true }
+        // cantos da área das janelas, descendo com a faixa e com as sugestões
+        Concave { x: launcher.leftInset; y: win.stripH + dropClip.height }
+        Concave { x: win.width - launcher.frameWidth - r; y: win.stripH + dropClip.height; mirrored: true }
 
-        // ── Sugestões: uma aba que sai da faixa ──────────────
-        readonly property real dropX: strip.x + barRow.x + omnibox.x
-        readonly property real dropW: omnibox.width
-        // concordância entre a faixa e a aba
-        Concave { r: 10; mirrored: true; x: win.dropX - r; y: win.stripH; visible: dropClip.height > r }
-        Concave { r: 10; x: win.dropX + win.dropW; y: win.stripH; visible: dropClip.height > r }
+        // ── Sugestões: a faixa continua descendo na largura toda, da barra lateral ao contorno ──
+        readonly property real dropX: launcher.leftInset
+        readonly property real dropW: win.width - launcher.leftInset - launcher.frameWidth
         Item {
             id: dropClip
             x: win.dropX
@@ -434,8 +431,6 @@ Scope {
                 width: parent.width
                 height: win.dropFull
                 color: Theme.bgHard
-                bottomLeftRadius: 12
-                bottomRightRadius: 12
 
                 ColumnLayout {
                     id: dropCol
