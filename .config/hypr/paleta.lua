@@ -17,7 +17,7 @@ local paletas = {
     destaque      = 0xfffe8019,       -- orange
     inativa       = 0xff504945,       -- bg2
     redimensionar = 0xfffabd2f,       -- yellow
-    gaps_in       = 8,
+    gaps_in       = 0,
     gaps_out      = 0,                -- janelas coladas no contorno e na barra do quickshell
     rounding      = 10,
   },
@@ -25,7 +25,7 @@ local paletas = {
     destaque      = 0xffaf3a03,       -- orange
     inativa       = 0xffbdae93,       -- bg3
     redimensionar = 0xffb57614,       -- yellow
-    gaps_in       = 8,
+    gaps_in       = 0,
     gaps_out      = 0,                -- janelas coladas no contorno e na barra do quickshell
     rounding      = 10,
   },
