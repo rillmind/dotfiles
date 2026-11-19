@@ -23,7 +23,20 @@ parar() {
     for _ in $(seq 40); do pgrep -x quickshell >/dev/null || return 0; sleep 0.05; done
     pkill -9 -x quickshell
 }
-subir() { setsid -f quickshell -p "$DIR/$1" >/dev/null 2>&1 </dev/null; }
+# sobe o tema e o reinicia se ele cair com crash (SIGSEGV/SIGABRT/SIGBUS = saída 139/134/135);
+# saída normal ou pkill (SIGTERM, 143) encerram o laço. Mais de 5 crashes em 1 min: desiste.
+subir() {
+    setsid -f bash -c '
+        crashes=0; inicio=$(date +%s)
+        while :; do
+            quickshell -p "$1"; rc=$?
+            case $rc in 134|135|139) ;; *) exit 0 ;; esac
+            agora=$(date +%s)
+            [ $((agora - inicio)) -gt 60 ] && { crashes=0; inicio=$agora; }
+            crashes=$((crashes + 1)); [ $crashes -gt 5 ] && exit 1
+            sleep 1
+        done' _ "$DIR/$1" >/dev/null 2>&1 </dev/null
+}
 
 case "${1:-}" in
     iniciar)
