@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # aparencia.sh – leva o tema do quickshell para o resto do sistema: bordas do Hyprland, Ghostty,
-# Neovim, tmux, btop, zathura, yazi, swaylock, wofi, apps GTK (claro/escuro) e papel de parede.
+# Neovim, tmux, btop, zathura, yazi, swaylock, wofi, Obsidian, apps GTK (claro/escuro) e papel de parede.
 #
 # Paletas: catppuccin-mocha (tema Catppuccin-mocha), gruvbox-escuro e gruvbox-claro (tema Gruvbox).
 # As configs dos apps apontam para links "tema-ativo" que levam a ~/.local/state/quickshell/aparencia;
@@ -16,6 +16,7 @@ CFG="$HOME/.config"
 ST="${XDG_STATE_HOME:-$HOME/.local/state}/quickshell"
 AP="$ST/aparencia"
 WALL_PADRAO="$HOME/Nextcloud/Imagens/Wallpapers/blobs-d.png"
+OBSIDIAN_VAULT="$HOME/Documentos/Obsidian"
 mkdir -p "$AP"
 
 paleta_atual() {
@@ -41,6 +42,15 @@ aplicar_wallpaper() {
     pkill -x swaybg
     setsid -f swaybg -i "$img" -m fill >/dev/null 2>&1 </dev/null
     echo "$img" > "$AP/wallpaper-atual"
+}
+
+# Obsidian: tema, claro/escuro e cor de destaque do vault principal (o resto do appearance.json fica igual).
+# Reescreve no mesmo arquivo (sem mv) para o Obsidian aberto perceber a mudança.
+aplicar_obsidian() {
+    local f="$OBSIDIAN_VAULT/.obsidian/appearance.json" novo
+    [ -f "$f" ] || return 0
+    novo=$(jq --arg t "$1" --arg m "$2" --arg a "$3" '.cssTheme = $t | .theme = $m | .accentColor = $a' "$f") || return 0
+    [ "$novo" = "$(cat "$f")" ] || printf '%s\n' "$novo" > "$f"
 }
 
 aplicar() {
@@ -80,6 +90,11 @@ aplicar() {
         done
         tmux source-file "$CFG/tmux/visual.conf"
     fi
+    case "$p" in   # tema · modo (obsidian = escuro, moonstone = claro) · destaque
+        catppuccin-mocha) aplicar_obsidian "Catppuccin" obsidian "#cba6f7" ;;
+        gruvbox-escuro)   aplicar_obsidian "Obsidian gruvbox" obsidian "#fe8019" ;;
+        gruvbox-claro)    aplicar_obsidian "Obsidian gruvbox" moonstone "#af3a03" ;;
+    esac
     # apps GTK4/libadwaita (Nautilus, Mission Center) e o Zen seguem o color-scheme
     gsettings set org.gnome.desktop.interface color-scheme "$([ $escuro = 1 ] && echo prefer-dark || echo prefer-light)"
     aplicar_wallpaper "$(wallpaper_de "$p")"
