@@ -32,10 +32,10 @@ Rectangle {
     property double bornAt: Date.now()
     property bool replyFocus: replyField.activeFocus
 
-    // tempo na tela: crítica fica até fechar; senão o pedido pelo app ou 5 s (baixa) / 10 s (normal), como no dunst
+    // tempo na tela: crítica fica até fechar; senão o pedido pelo app ou 5 s
     readonly property int timeout: !popup || critical ? 0
                                    : n && n.expireTimeout > 0 ? n.expireTimeout   // já em ms
-                                   : urgency === NotificationUrgency.Low ? 5000 : 10000
+                                   : 5000
 
     implicitHeight: col.implicitHeight + 24 * s
     radius: 8 * card.s

@@ -19,7 +19,7 @@ Scope {
     // posição dos popups (cada tema ajusta no shell.qml)
     property int topMargin: 8
     property int rightMargin: 8
-    readonly property real escala: 1.5        // tamanho dos popups (1 = original)
+    readonly property real escala: 1.35        // tamanho dos popups (1 = original)
     readonly property int popupWidth: 380 * escala
     readonly property int maxHistory: 50
 
