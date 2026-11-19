@@ -13,6 +13,9 @@ Rectangle {
     property var service: null
     property string notifKey: ""
     property bool popup: false
+    // tamanho: os popups usam o dobro (Notifications.qml); a central fica no tamanho normal
+    property real escala: 1
+    readonly property real s: popup ? escala : 1
     // dados do histórico (central); no popup vêm da notificação viva
     property var entry: null
 
@@ -34,8 +37,8 @@ Rectangle {
                                    : n && n.expireTimeout > 0 ? n.expireTimeout   // já em ms
                                    : urgency === NotificationUrgency.Low ? 5000 : 10000
 
-    implicitHeight: col.implicitHeight + 24
-    radius: 8
+    implicitHeight: col.implicitHeight + 24 * s
+    radius: 8 * card.s
     color: popup ? Theme.bg : (cardMouse.containsMouse ? Theme.surface0 : Theme.tile)
     border.color: critical ? Theme.red : popup ? Theme.surface1 : "transparent"
     border.width: critical ? 2 : 1
@@ -70,13 +73,13 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.margins: 12
-        spacing: 12
+        anchors.margins: 12 * card.s
+        spacing: 12 * card.s
 
         // imagem da notificação (capa, avatar) ou ícone do app
         Item {
             Layout.alignment: Qt.AlignTop
-            implicitWidth: 40; implicitHeight: 40
+            implicitWidth: 40 * card.s; implicitHeight: 40 * card.s
             Image {
                 id: img
                 anchors.fill: parent
@@ -98,8 +101,8 @@ Rectangle {
                 visible: img.visible && card.icon !== ""
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                anchors.margins: -4
-                implicitSize: 18
+                anchors.margins: -4 * card.s
+                implicitSize: 18 * card.s
                 source: img.visible ? card.icon : ""
             }
             Text {
@@ -107,36 +110,36 @@ Rectangle {
                 visible: !img.visible && !ico.visible
                 text: "󰂚"
                 color: card.critical ? Theme.red : Theme.accent
-                font.family: Theme.font; font.pixelSize: 26
+                font.family: Theme.font; font.pixelSize: 26 * card.s
             }
         }
 
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: 3
+            spacing: 3 * card.s
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: 6
+                spacing: 6 * card.s
                 Text {
                     text: card.app || "Notificação"
                     color: card.critical ? Theme.red : Theme.sub
-                    font.family: Theme.font; font.pixelSize: 11; font.bold: true
+                    font.family: Theme.font; font.pixelSize: 11 * card.s; font.bold: true
                     elide: Text.ElideRight
-                    Layout.maximumWidth: 180
+                    Layout.maximumWidth: 180 * card.s
                 }
                 Text {
                     text: "·  " + (card.service ? card.service.ago(card.time) : "")
                     color: Theme.gray
-                    font.family: Theme.font; font.pixelSize: 11
+                    font.family: Theme.font; font.pixelSize: 11 * card.s
                 }
                 Item { Layout.fillWidth: true }
                 // fechar (popup: some; central: apaga)
                 Rectangle {
-                    implicitWidth: 20; implicitHeight: 20; radius: 4
+                    implicitWidth: 20 * card.s; implicitHeight: 20 * card.s; radius: 4 * card.s
                     opacity: cardMouse.containsMouse || closeMouse.containsMouse ? 1 : 0
                     color: closeMouse.containsMouse ? Theme.surface1 : "transparent"
-                    Text { anchors.centerIn: parent; text: "󰅖"; color: Theme.sub; font.family: Theme.font; font.pixelSize: 13 }
+                    Text { anchors.centerIn: parent; text: "󰅖"; color: Theme.sub; font.family: Theme.font; font.pixelSize: 13 * card.s }
                     MouseArea {
                         id: closeMouse
                         anchors.fill: parent
@@ -150,7 +153,7 @@ Rectangle {
                 visible: text !== ""
                 text: card.summary
                 color: Theme.fg
-                font.family: Theme.font; font.pixelSize: 13; font.bold: true
+                font.family: Theme.font; font.pixelSize: 13 * card.s; font.bold: true
                 wrapMode: Text.Wrap
                 maximumLineCount: 2
                 elide: Text.ElideRight
@@ -162,7 +165,7 @@ Rectangle {
                 textFormat: Text.StyledText
                 color: Theme.sub
                 linkColor: Theme.accent
-                font.family: Theme.font; font.pixelSize: 12
+                font.family: Theme.font; font.pixelSize: 12 * card.s
                 wrapMode: Text.Wrap
                 maximumLineCount: card.popup ? 4 : 3
                 elide: Text.ElideRight
@@ -174,20 +177,20 @@ Rectangle {
             Flow {
                 visible: card.actions.length > 0
                 Layout.fillWidth: true
-                Layout.topMargin: 6
-                spacing: 6
+                Layout.topMargin: 6 * card.s
+                spacing: 6 * card.s
                 Repeater {
                     model: card.actions
                     Rectangle {
                         required property var modelData
-                        implicitWidth: actText.implicitWidth + 20; implicitHeight: 26; radius: 5
+                        implicitWidth: actText.implicitWidth + 20 * card.s; implicitHeight: 26 * card.s; radius: 5 * card.s
                         color: actMouse.containsMouse ? Theme.accent : Theme.surface0
                         Text {
                             id: actText
                             anchors.centerIn: parent
                             text: modelData.text
                             color: actMouse.containsMouse ? Theme.onAccent : Theme.fg
-                            font.family: Theme.font; font.pixelSize: 11; font.bold: true
+                            font.family: Theme.font; font.pixelSize: 11 * card.s; font.bold: true
                         }
                         MouseArea {
                             id: actMouse
@@ -204,17 +207,17 @@ Rectangle {
             Rectangle {
                 visible: card.popup && !!card.n && card.n.hasInlineReply
                 Layout.fillWidth: true
-                Layout.topMargin: 6
-                implicitHeight: 28; radius: 5
+                Layout.topMargin: 6 * card.s
+                implicitHeight: 28 * card.s; radius: 5 * card.s
                 color: Theme.surface0
                 border.color: replyField.activeFocus ? Theme.accent : "transparent"
                 TextInput {
                     id: replyField
                     anchors.fill: parent
-                    anchors.leftMargin: 8; anchors.rightMargin: 8
+                    anchors.leftMargin: 8 * card.s; anchors.rightMargin: 8 * card.s
                     verticalAlignment: TextInput.AlignVCenter
                     color: Theme.fg
-                    font.family: Theme.font; font.pixelSize: 12
+                    font.family: Theme.font; font.pixelSize: 12 * card.s
                     clip: true
                     onAccepted: if (text !== "" && card.n) { card.n.sendInlineReply(text); card.service.remove(card.notifKey) }
                     Keys.onEscapePressed: focus = false
@@ -222,10 +225,10 @@ Rectangle {
                 Text {
                     visible: replyField.text === ""
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left; anchors.leftMargin: 8
+                    anchors.left: parent.left; anchors.leftMargin: 8 * card.s
                     text: card.n && card.n.inlineReplyPlaceholder ? card.n.inlineReplyPlaceholder : "Responder…"
                     color: Theme.gray
-                    font.family: Theme.font; font.pixelSize: 12
+                    font.family: Theme.font; font.pixelSize: 12 * card.s
                 }
                 MouseArea { anchors.fill: parent; cursorShape: Qt.IBeamCursor; onClicked: replyField.forceActiveFocus() }
             }
