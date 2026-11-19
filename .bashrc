@@ -9,3 +9,7 @@ export PATH=/home/raul/.opencode/bin:$PATH
 export PATH="$HOME/Miniforge3/bin:$PATH"
 . "$HOME/.cargo/env"
 . "/home/raul/.deno/env"
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/raul/.local/bin:$PATH"
