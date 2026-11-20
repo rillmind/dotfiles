@@ -63,7 +63,7 @@
     (button :class "pm-btn pm-shutdown" :onclick "systemctl poweroff"      "⏻  Desligar")
     (button :class "pm-btn pm-reboot"   :onclick "systemctl reboot"        "↺  Reiniciar")
     (button :class "pm-btn pm-suspend"  :onclick "systemctl suspend"       "⏾  Suspender")
-    (button :class "pm-btn pm-lock"     :onclick "swaylock"                "  Bloquear")
+    (button :class "pm-btn pm-lock"     :onclick "~/.config/quickshell-bloqueio/bloquear.sh"                "  Bloquear")
     (button :class "pm-btn pm-logout"   :onclick "hyprctl dispatch 'hl.dsp.exit()'"   "  Sair")))
 
 (defwidget system_widget []

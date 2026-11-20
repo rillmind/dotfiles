@@ -42,7 +42,7 @@ hl.on("hyprland.start", function()
   -- hl.exec_cmd("dunst")  -- notificações agora são do quickshell (modules/Notifications.qml de cada tema)
   hl.exec_cmd("ckb-next -b")
   hl.exec_cmd("/usr/lib/polkit-kde-authentication-agent-1")
-  hl.exec_cmd("swayidle -w before-sleep swaylock")
+  hl.exec_cmd("swayidle -w before-sleep ~/.config/quickshell-bloqueio/bloquear.sh")
   -- hl.exec_cmd("waybar")
   -- tema salvo do quickshell (pastas em ~/.config/quickshell; troca com SUPER+SHIFT+T)
   -- sobe depois que a janela do Obsidian aparece (até 15s): carregar o ícone dele faz o quickshell
@@ -110,6 +110,7 @@ hl.config({
   -- VRR só em tela cheia (jogos): a tela do eDP-1 suporta. Em tudo (1) pode piscar no desktop.
   misc = {
     vrr = 2,
+    allow_session_lock_restore = true,  -- a tela de bloqueio (quickshell-bloqueio) pode subir de novo se cair
   },
 
   animations = {
@@ -213,7 +214,7 @@ hl.on("monitor.added", function()
 end)
 
 hl.bind("SUPER + E", hl.dsp.exec_cmd("nautilus"))
-hl.bind("SUPER + U", hl.dsp.exec_cmd("swaylock"))
+hl.bind("SUPER + U", hl.dsp.exec_cmd("~/.config/quickshell-bloqueio/bloquear.sh"))
 hl.bind("SUPER + I", hl.dsp.exec_cmd("codium ~/.config/hypr/"))
 hl.bind("SUPER + V", hl.dsp.exec_cmd("eww open --toggle calendar"))
 hl.bind("SUPER + O", hl.dsp.exec_cmd("eww open --toggle powermenu"))

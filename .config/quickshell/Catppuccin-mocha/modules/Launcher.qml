@@ -82,7 +82,7 @@ Scope {
     }
 
     readonly property var systemCommands: [
-        { key: "lock",     title: "Lock screen",       glyph: "󰌾", words: "bloquear lock tela swaylock",            cmd: ["swaylock"],                             confirm: false },
+        { key: "lock",     title: "Lock screen",       glyph: "󰌾", words: "bloquear lock tela swaylock",            cmd: [Quickshell.env("HOME") + "/.config/quickshell-bloqueio/bloquear.sh"],                             confirm: false },
         { key: "suspend",  title: "Suspend",           glyph: "󰒲", words: "suspender suspend dormir sleep",          cmd: ["systemctl", "suspend"],                 confirm: false },
         { key: "logout",   title: "Log off",           glyph: "󰍃", words: "sair logout log off encerrar sessão exit", cmd: ["hyprctl", "dispatch", "hl.dsp.exit()"], confirm: true },
         { key: "reboot",   title: "Reboot",            glyph: "󰜉", words: "reiniciar reboot restart",                cmd: ["systemctl", "reboot"],                  confirm: true },

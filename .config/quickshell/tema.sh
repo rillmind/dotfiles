@@ -18,10 +18,11 @@ ativo() {
     t=$(cat "$STATE" 2>/dev/null)
     if [ -n "$t" ] && [ -f "$DIR/$t/shell.qml" ]; then echo "$t"; else lista | head -1; fi
 }
+# só as instâncias de tema (a tela de bloqueio, em ~/.config/quickshell-bloqueio, fica de fora)
 parar() {
-    pkill -x quickshell
-    for _ in $(seq 40); do pgrep -x quickshell >/dev/null || return 0; sleep 0.05; done
-    pkill -9 -x quickshell
+    pkill -f "^quickshell -p $DIR/"
+    for _ in $(seq 40); do pgrep -f "^quickshell -p $DIR/" >/dev/null || return 0; sleep 0.05; done
+    pkill -9 -f "^quickshell -p $DIR/"
 }
 # sobe o tema e o reinicia se ele cair com crash (SIGSEGV/SIGABRT/SIGBUS = saída 139/134/135);
 # saída normal ou pkill (SIGTERM, 143) encerram o laço. Mais de 5 crashes em 1 min: desiste.
