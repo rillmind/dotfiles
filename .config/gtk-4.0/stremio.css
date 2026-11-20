@@ -1,6 +1,6 @@
-/* Barra superior dos apps GTK4/libadwaita (headerbar) praticamente invisível: no Hyprland quem
-   move, fecha e organiza as janelas é o compositor, então título, menu e botões não fazem falta.
-   Flatpaks leem este arquivo via `flatpak override --user --filesystem=xdg-config/gtk-4.0:ro`. */
+/* Stremio: barra superior (headerbar) praticamente invisível; o Hyprland move e fecha a janela.
+   Copiado para ~/.var/app/com.stremio.Stremio/config/gtk-4.0/gtk.css, e o flatpak do Stremio não
+   recebe o ~/.config/gtk-4.0 do sistema (flatpak override --nofilesystem=xdg-config/gtk-4.0). */
 headerbar,
 .titlebar {
   min-height: 0;
