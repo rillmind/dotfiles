@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # aparencia.sh – leva o tema do quickshell para o resto do sistema: bordas do Hyprland, Ghostty,
-# Neovim, tmux, btop, zathura, yazi, swaylock, wofi, Obsidian, apps GTK (claro/escuro) e papel de parede.
+# Neovim, tmux, btop, zathura, yazi, swaylock, wofi, Obsidian, apps GTK4 (cores e claro/escuro) e papel de parede.
 #
 # Paletas: catppuccin-mocha (tema Catppuccin-mocha), gruvbox-escuro e gruvbox-claro (tema Gruvbox).
 # As configs dos apps apontam para links "tema-ativo" que levam a ~/.local/state/quickshell/aparencia;
@@ -71,6 +71,8 @@ aplicar() {
     ln -sfn "$CFG/swaylock/$p" "$AP/swaylock"
     ln -sfn "$CFG/wofi/colors/$p.css" "$AP/wofi.css"
     ln -sfn "$CFG/tmux/temas/$p.conf" "$AP/tmux.conf"
+    # GTK4: link relativo dentro da pasta, para os flatpaks (que só enxergam ~/.config/gtk-4.0) seguirem
+    ln -sfn "temas/$p.css" "$CFG/gtk-4.0/gtk.css"
 
     # ── recarrega o que está aberto ──
     hyprctl reload >/dev/null 2>&1                         # bordas (hypr/paleta.lua lê o arquivo paleta)
@@ -95,7 +97,7 @@ aplicar() {
         gruvbox-escuro)   aplicar_obsidian "Obsidian gruvbox" obsidian "#fe8019" ;;
         gruvbox-claro)    aplicar_obsidian "Obsidian gruvbox" moonstone "#af3a03" ;;
     esac
-    # apps GTK4/libadwaita (Nautilus, Mission Center) e o Zen seguem o color-scheme
+    # apps GTK4/libadwaita (Nautilus, Mission Center): cores do gtk.css acima + claro/escuro; o Zen segue o color-scheme
     gsettings set org.gnome.desktop.interface color-scheme "$([ $escuro = 1 ] && echo prefer-dark || echo prefer-light)"
     aplicar_wallpaper "$(wallpaper_de "$p")"
     # yazi, swaylock e wofi leem o tema ao abrir
