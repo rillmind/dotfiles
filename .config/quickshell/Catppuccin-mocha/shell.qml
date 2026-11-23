@@ -20,8 +20,8 @@ ShellRoot {
     property color colMauve: "#cba6f7"
     property color colRed: "#f38ba8"
     property color colOverlay0: "#6c7086"
-    // waybar window bg rgba(30,30,46,0.7) → #B31e1e2e
-    property color colBarBg: "#B31e1e2e"
+    // opaca (base do mocha)
+    property color colBarBg: "#1e1e2e"
 
     property string fontFamily: "JetBrainsMono Nerd Font"
     // waybar: 18px → solicitado 19px (OS 22)
@@ -1076,7 +1076,7 @@ ShellRoot {
                 width: implicitWidth
                 height: implicitHeight
                 radius: 20 // raio dos ícones (14) + respiro (6): cantos concêntricos
-                color: "#1e1e2e" // catppuccin mocha base, opaco
+                color: "#A61e1e2e" // catppuccin mocha base com alpha para vidro fosco
                 border.color: "#313244"
                 border.width: 1
                 // sombra sutil
