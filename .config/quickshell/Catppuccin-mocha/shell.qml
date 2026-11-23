@@ -907,7 +907,7 @@ ShellRoot {
                         font.family: root.fontFamily
                         font.pixelSize: root.fontSize
                         font.bold: true
-                        Layout.rightMargin: 12
+                        Layout.rightMargin: 4
                         MouseArea {
                             anchors.fill: parent
                             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
@@ -921,6 +921,16 @@ ShellRoot {
                                 else { root.popupScreen = barWindow.modelData.name; root.notifVisible = !root.notifVisible }
                             }
                         }
+                    }
+                    // " | " entre as notificações e a rede
+                    Text {
+                        text: " | "
+                        color: root.colText
+                        font.family: root.fontFamily
+                        font.pixelSize: root.fontSize
+                        font.bold: true
+                        Layout.rightMargin: 4
+                        opacity: 0.9
                     }
                     Text {
                         id: networkText
