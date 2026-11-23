@@ -12,11 +12,11 @@ V="$HOME/.config/vinho"
 # fuzzel; sem ele, o wofi com as mesmas cores
 menu_apps() {
     if command -v fuzzel >/dev/null; then fuzzel --config "$V/fuzzel.ini"
-    else wofi --conf /dev/null --style "$V/wofi.css" --show drun --location bottom --width 520 --lines 9; fi
+    else wofi --conf /dev/null --style "$V/wofi.css" --show drun --location center --width 520 --lines 9; fi
 }
 menu_lista() {
     if command -v fuzzel >/dev/null; then fuzzel --config "$V/fuzzel.ini" --dmenu --lines 5 --width 20
-    else wofi --conf /dev/null --style "$V/wofi.css" --dmenu --location bottom --width 300 --lines 6; fi
+    else wofi --conf /dev/null --style "$V/wofi.css" --dmenu --location center --width 300 --lines 6; fi
 }
 # se já há um menu aberto, o atalho só o fecha
 fechar_menu() { pkill -x 'fuzzel|wofi'; }
