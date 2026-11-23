@@ -29,9 +29,12 @@ cursor-style-blink = true
 
 adjust-cell-width = 0
 
-# esquerda,direita (em pontos): folga à direita parecida com o respiro que a barra lateral do tmux deixa (14 px)
-window-padding-x = 1,8
+# esquerda,direita em pontos (aqui 2 px e 10 px): a folga à direita acompanha o respiro de 14 px que a
+# divisória da barra lateral do tmux deixa à esquerda do texto; a sobra de células soma à direita
+window-padding-x = 2,8
+window-padding-y = 0
 
+# não centraliza a sobra: com balance, ela vira uma faixa no topo e embaixo
 window-padding-balance = false
 
 # Cola texto e avisa o tmux, que cola imagem no Claude Code (ver ~/.scripts/linux/tmux-paste-image.sh)
