@@ -254,15 +254,32 @@ ShellRoot {
             }
             Rectangle { anchors.fill: parent; color: root.c.fundo; opacity: root.c.veu }
             MouseArea { anchors.fill: parent; onClicked: root.fechar() }
+            // troca de página: dois dedos para os lados (ou para cima/baixo) e roda do mouse
             WheelHandler {
-                property double ultimo: 0
+                acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+                orientation: Qt.Horizontal
+                onWheel: event => gesto.rolar(event)
+            }
+            WheelHandler {
                 acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
                 orientation: Qt.Vertical
-                onWheel: event => {
-                    var agora = Date.now(), d = event.angleDelta.y || event.angleDelta.x
-                    if (Math.abs(d) < 15 || agora - ultimo < 350) return   // uma página por gesto
-                    ultimo = agora
-                    paginas.irPara(paginas.currentIndex + (d < 0 ? 1 : -1), false)
+                onWheel: event => gesto.rolar(event)
+            }
+            // um gesto = uma página: soma o movimento até o limiar e só libera depois de uma pausa
+            Timer {
+                id: gesto
+                property real soma: 0
+                property bool trocou: false
+                interval: 150
+                onTriggered: { soma = 0; trocou = false }
+                function rolar(event) {
+                    var x = event.angleDelta.x, y = event.angleDelta.y
+                    restart()
+                    if (trocou) return
+                    soma += Math.abs(x) > Math.abs(y) ? x : y
+                    if (Math.abs(soma) < 60) return
+                    trocou = true
+                    paginas.irPara(paginas.currentIndex + (soma < 0 ? 1 : -1), false)
                 }
             }
         }
