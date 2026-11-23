@@ -1,0 +1,12 @@
+/* Menuzinho da bandeja: só a caixa dos ícones aparece, o resto da janela é transparente */
+* { font-family: "JetBrains Mono", "JetBrainsMono Nerd Font", monospace; font-size: 13px; border-radius: 0; min-height: 0; box-shadow: none; text-shadow: none; }
+window#waybar { background: transparent; border: none; }
+window#waybar.hidden { opacity: 0; }
+#tray { background: #1c0b12; border: 2px solid #8c2f4b; padding: 8px 12px; }
+#tray > .needs-attention { background: #35151f; }
+menu { background: #28111a; color: #e8d5cf; border: 1px solid #8c2f4b; padding: 2px; }
+menuitem { padding: 5px 8px; }
+menuitem:hover { background: #5a2236; color: #f6e9e2; }
+menuitem:disabled { color: #8a646c; }
+tooltip { background: #28111a; border: 1px solid #8c2f4b; }
+tooltip label { color: #e8d5cf; padding: 4px; }

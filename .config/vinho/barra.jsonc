@@ -5,10 +5,11 @@
   "height": 26,
   "spacing": 0,
   "modules-left": ["hyprland/workspaces"],
-  "modules-right": ["tray", "cpu", "memory", "network", "wireplumber", "battery", "clock"],
+  "modules-right": ["cpu", "memory", "network", "wireplumber", "battery", "clock", "custom/bandeja"],
 
   "hyprland/workspaces": { "format": "{id}", "sort-by": "id" },
-  "tray": { "icon-size": 14, "spacing": 8 },
+  // setinha: abre/fecha a bandeja (bandeja.jsonc) no monitor clicado
+  "custom/bandeja": { "format": "▲", "tooltip": false, "on-click": "~/.config/vinho/vinho.sh bandeja" },
   "cpu": { "interval": 5, "format": "cpu {usage}%" },
   "memory": { "interval": 10, "format": "| mem {percentage}%" },
   "network": {
