@@ -17,7 +17,7 @@ font-size = 17
 font-family = JetbrainsMono Nerd Font
 # cantos dos quadrados da barra do tmux (~/.config/tmux/fonte)
 font-codepoint-map = U+F8E0-U+F8E1=Tmux Cantos
-font-codepoint-map = U+F8C0-U+F8C9,U+F8D0-U+F8DB,U+F8E2-U+F8E7=Tmux Lateral
+font-codepoint-map = U+F8C0-U+F8C9,U+F8D0-U+F8DB,U+F8E2-U+F8ED=Tmux Lateral
 
 mouse-hide-while-typing
 

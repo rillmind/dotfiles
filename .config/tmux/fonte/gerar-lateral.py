@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gera TmuxLateral.ttf: quadrados numerados da barra lateral, mais baixos que a linha para sobrar um
 vão entre eles. U+F8D0-F8D9: miolo com o algarismo vazado; U+F8E2/F8E3: bordas. U+F8C0-F8C9, F8DA-F8DB e
-F8E4-F8E7: ícone e número do servidor.
+F8E4-F8E7: ícone e número do servidor. U+F8E8-F8ED: bordas de cantos retos.
 
 Precisa do fonttools.  Uso: gerar-lateral.py <JetBrainsMono-Bold.ttf> <saida.ttf>
 """
@@ -19,18 +19,18 @@ T, B = TOPO - VAO, BASE + VAO
 SUP, INF = TOPO + 14, BASE - 14   # peças emendadas passam um tico do limite, para não aparecer o risco
 
 
-def borda(esq, topo=T, base=B):
+def borda(esq, topo=T, base=B, reto=False):
     """topo/base no limite da célula (SUP/INF) = canto reto, para emendar com a linha vizinha."""
     x = (lambda v: v) if esq else (lambda v: LARG - v)
     e, d = LARG / 2, LARG
     pen = TTGlyphPen(None)
     pen.moveTo((x(d), base))
-    if base == INF:
+    if reto or base == INF:
         pen.lineTo((x(e), base))
     else:
         pen.lineTo((x(e + RAIO), base))
         pen.qCurveTo((x(e), base), (x(e), base + RAIO))
-    if topo == SUP:
+    if reto or topo == SUP:
         pen.lineTo((x(e), topo))
     else:
         pen.lineTo((x(e), topo - RAIO))
@@ -75,12 +75,18 @@ g.update({"icone": miolo("icone"), "icone2": miolo("icone", base=INF),
           "esq_c": borda(True, base=INF), "dir_c": borda(False, base=INF),
           "esq_b": borda(True, topo=SUP), "dir_b": borda(False, topo=SUP)})
 g.update({f"b{n}": miolo(n, topo=SUP) for n in range(10)})
+# as mesmas bordas com cantos retos (tema Vinho)
+for nome, args in (("", {}), ("_c", {"base": INF}), ("_b", {"topo": SUP})):
+    g[f"esq{nome}_r"] = borda(True, reto=True, **args)
+    g[f"dir{nome}_r"] = borda(False, reto=True, **args)
 g["vazio"] = TTGlyphPen(None).glyph()
 fb = FontBuilder(1000, isTTF=True)
 fb.setupGlyphOrder(list(g))
 # o ASCII vazio e as alturas x/maiúscula (iguais às da JetBrains Mono) evitam que o Ghostty a reescale
 fb.setupCharacterMap({**{c: "vazio" for c in range(32, 127)}, 0xF8E2: "esq", 0xF8E3: "dir", 0xF8DA: "icone", 0xF8DB: "icone2",
                       0xF8E4: "esq_c", 0xF8E5: "dir_c", 0xF8E6: "esq_b", 0xF8E7: "dir_b",
+                      0xF8E8: "esq_r", 0xF8E9: "dir_r", 0xF8EA: "esq_c_r", 0xF8EB: "dir_c_r",
+                      0xF8EC: "esq_b_r", 0xF8ED: "dir_b_r",
                       **{0xF8C0 + n: f"b{n}" for n in range(10)}, **{0xF8D0 + n: f"n{n}" for n in range(10)}})
 fb.setupGlyf(g)
 fb.setupHorizontalMetrics({n: (600, getattr(v, "xMin", 0) or 0) for n, v in g.items()})

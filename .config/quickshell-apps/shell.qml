@@ -48,6 +48,7 @@ ShellRoot {
         "catppuccin-mocha": { fundo: "#1e1e2e", sup: "#313244", texto: "#cdd6f4", sub: "#a6adc8", destaque: "#cba6f7", veu: 0.55 },
         "vinho":            { fundo: "#1c0b12", sup: "#35151f", texto: "#e8d5cf", sub: "#b08d94", destaque: "#c4527a", veu: 0.55 }
     })
+    readonly property real arred: paleta === "vinho" ? 0 : 1   // o Vinho é todo quadrado
     readonly property var c: paletas[paleta] || paletas["gruvbox-escuro"]
 
     // ── Apps ─────────────────────────────────────────────────────────────────────────────
@@ -141,7 +142,7 @@ ShellRoot {
         Rectangle {
             anchors.fill: parent
             visible: ic.caminho === ""
-            radius: width / 5
+            radius: width / 5 * root.arred
             color: root.c.sup
             Text {
                 anchors.centerIn: parent
@@ -176,7 +177,7 @@ ShellRoot {
                         anchors.centerIn: parent
                         width: 150 * janela.u
                         height: 156 * janela.u
-                        radius: 16 * janela.u
+                        radius: 16 * janela.u * root.arred
                         color: root.c.destaque
                         opacity: mouse.pressed ? 0.35 : item.atual ? 0.28 : mouse.containsMouse ? 0.18 : 0
                     }
@@ -201,7 +202,7 @@ ShellRoot {
                         visible: root.janelas[item.modelData.id] !== undefined
                         anchors.horizontalCenter: parent.horizontalCenter
                         y: 166 * janela.u
-                        width: 5 * janela.u; height: width; radius: width / 2
+                        width: 5 * janela.u; height: width; radius: width / 2 * root.arred
                         color: root.c.destaque
                     }
                     MouseArea {
@@ -298,7 +299,7 @@ ShellRoot {
                 y: 41 * janela.u
                 width: 320 * janela.u
                 height: 34 * janela.u
-                radius: height / 2
+                radius: height / 2 * root.arred
                 color: Qt.alpha(root.c.sup, 0.9)
                 border.width: campo.text !== "" ? 2 : 1
                 border.color: campo.text !== "" ? root.c.destaque : Qt.alpha(root.c.texto, 0.12)
@@ -405,7 +406,7 @@ ShellRoot {
                         width: 26 * janela.u; height: 22 * janela.u
                         Rectangle {
                             anchors.centerIn: parent
-                            width: 9 * janela.u; height: width; radius: width / 2
+                            width: 9 * janela.u; height: width; radius: width / 2 * root.arred
                             color: root.c.destaque
                             opacity: parent.index === paginas.currentIndex ? 1 : 0.35
                         }
@@ -421,7 +422,7 @@ ShellRoot {
                 anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: 15 * janela.u }
                 width: itens.width + 20 * janela.u
                 height: 90 * janela.u
-                radius: 22 * janela.u
+                radius: 22 * janela.u * root.arred
                 color: Qt.alpha(root.c.sup, 0.6)
                 MouseArea { anchors.fill: parent }   // clique entre os ícones não fecha
                 Row {
@@ -443,7 +444,7 @@ ShellRoot {
                             Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: 2
-                                radius: 14 * janela.u
+                                radius: 14 * janela.u * root.arred
                                 color: root.c.destaque
                                 opacity: dm.containsMouse ? 0.14 : 0
                             }
@@ -458,7 +459,7 @@ ShellRoot {
                             Rectangle {
                                 visible: !!d.modelData && root.janelas[d.modelData.id] !== undefined
                                 anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: 3 * janela.u }
-                                width: 5 * janela.u; height: width; radius: width / 2
+                                width: 5 * janela.u; height: width; radius: width / 2 * root.arred
                                 color: root.c.destaque
                             }
                             MouseArea {

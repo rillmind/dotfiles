@@ -75,3 +75,7 @@
   --error-fg-color: #15070d;
   --error-color: #e0566f;
 }
+
+/* tudo quadrado neste tema */
+:root { --window-radius: 0px; }
+* { border-radius: 0; }

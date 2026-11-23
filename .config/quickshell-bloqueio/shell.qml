@@ -28,6 +28,7 @@ ShellRoot {
         "catppuccin-mocha": { fundo: "#1e1e2e", texto: "#cdd6f4", sub: "#a6adc8", anel: "#313244", tecla: "#cba6f7", apagar: "#f38ba8", ver: "#a6e3a1", errado: "#f38ba8", limpo: "#fab387" },
         "vinho":            { fundo: "#1c0b12", texto: "#e8d5cf", sub: "#b08d94", anel: "#35151f", tecla: "#c4527a", apagar: "#e0566f", ver: "#a3ad7a", errado: "#e0566f", limpo: "#d9a862" }
     })
+    readonly property bool reto: paleta === "vinho"   // o Vinho é todo quadrado: o anel vira um quadrado
     readonly property var c: paletas[paleta] || paletas["gruvbox-escuro"]
     readonly property string fonte: "JetBrainsMono Nerd Font"
 
@@ -214,12 +215,31 @@ ShellRoot {
 
             Rectangle {   // miolo
                 anchors.centerIn: parent
-                width: anel.raio * 2 - anel.grossura; height: width; radius: width / 2
+                width: anel.raio * 2 - anel.grossura; height: width; radius: root.reto ? 0 : width / 2
                 color: root.c.fundo
                 opacity: 0.8
             }
+            Rectangle {
+                anchors.fill: parent
+                visible: root.reto
+                color: "transparent"
+                border.width: anel.grossura
+                border.color: root.corAnel
+            }
+            Rectangle {   // destaque da tecla no quadrado: um trecho de um dos lados
+                readonly property int lado: Math.floor(root.hlAngulo / 90) % 4
+                readonly property real trecho: 26
+                readonly property real pos: (root.hlAngulo % 90) / 90 * (anel.width - trecho)
+                visible: root.reto && root.hlVisivel && root.estado !== "verificando" && root.estado !== "errado"
+                color: root.hlApagar ? root.c.apagar : root.c.tecla
+                width: lado % 2 ? anel.grossura : trecho
+                height: lado % 2 ? trecho : anel.grossura
+                x: lado % 2 === 0 ? pos : lado === 1 ? anel.width - anel.grossura : 0
+                y: lado % 2 === 1 ? pos : lado === 2 ? anel.height - anel.grossura : 0
+            }
             Shape {
                 anchors.fill: parent
+                visible: !root.reto
                 preferredRendererType: Shape.CurveRenderer
                 ShapePath {
                     strokeColor: root.corAnel
@@ -230,7 +250,7 @@ ShellRoot {
             }
             Shape {   // destaque da tecla
                 anchors.fill: parent
-                visible: root.hlVisivel && root.estado !== "verificando" && root.estado !== "errado"
+                visible: !root.reto && root.hlVisivel && root.estado !== "verificando" && root.estado !== "errado"
                 preferredRendererType: Shape.CurveRenderer
                 ShapePath {
                     strokeColor: root.hlApagar ? root.c.apagar : root.c.tecla

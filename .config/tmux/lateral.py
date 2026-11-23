@@ -16,7 +16,7 @@ import subprocess
 import sys
 
 LARG = 3
-L, R = "", ""
+
 HOOKS = ("window-linked window-unlinked window-resized session-created session-renamed "
          "session-window-changed window-pane-changed pane-exited alert-bell alert-activity "
          "after-kill-pane after-swap-window after-move-window after-resize-pane after-select-layout").split()
@@ -36,10 +36,18 @@ def rgb(op, fundo=False):
     return "\033[%d;2;%d;%d;%dm" % (48 if fundo else 38, *(int(h[i:i + 2], 16) for i in (0, 2, 4)))
 
 
+@functools.lru_cache(None)
+def bordas():
+    """(esq, dir) do quadrado, da metade de cima e da de baixo do bloco do servidor; @cantos vem do tema."""
+    base = 0xF8E8 if tmux("show", "-gqv", "@cantos").strip() == "retos" else 0xF8E2
+    return [chr(base + i) for i in range(6)]
+
+
 def quadrado(texto, cor):
     f = rgb("@thm_mantle", True) + rgb(cor)
     if len(texto) == 1 and texto.isdigit():     # algarismo vazado no glifo (fonte Tmux Lateral)
-        return f"{f}{L}{chr(0xF8D0 + int(texto))}{R}\033[0m"
+        e, d = bordas()[:2]
+        return f"{f}{e}{chr(0xF8D0 + int(texto))}{d}\033[0m"
     return f"{f}\033[1m{texto[:3]:^3}\033[0m"    # 10 em diante e sessões com nome: só o texto
 
 
@@ -105,10 +113,11 @@ def desenhar():
             tela += f"\033[{i + 1};1H" + quadrado(idx, cor)
         verde, nome = rgb("@thm_mantle", True) + rgb("@thm_green"), j["nome"]
         tela += f"\033[{b['h'] - 1};1H{verde}"
+        e, d, cima_e, cima_d, baixo_e, baixo_d = bordas()
         if len(nome) == 1 and nome.isdigit():   # ícone e número num bloco só
-            tela += "\uf8e4\uf8db\uf8e5" + f"\033[{b['h']};1H\uf8e6{chr(0xF8C0 + int(nome))}\uf8e7\033[0m"
+            tela += f"{cima_e}\uf8db{cima_d}\033[{b['h']};1H{baixo_e}{chr(0xF8C0 + int(nome))}{baixo_d}\033[0m"
         else:
-            tela += f"{L}\uf8da{R}" + f"\033[{b['h']};1H" + quadrado(nome, "@thm_green")
+            tela += f"{e}\uf8da{d}" + f"\033[{b['h']};1H" + quadrado(nome, "@thm_green")
         tmux("display-message", "-I", "-t", b["id"], entrada=tela)
 
 
