@@ -120,7 +120,10 @@ hl.config({
 })
 
 -- vidro fosco para quickshell (barra + popups + dock) – catppuccin mocha
--- hl.layer_rule({ match = { namespace = "quickshell" }, blur = true, ignore_alpha = 0.2 })
+if c.desfoque then
+  hl.layer_rule({ match = { namespace = "^quickshell$" }, blur = true, ignore_alpha = 0.2 })
+  hl.config({ decoration = { blur = c.desfoque } })
+end
 
 hl.curve("myBezier", { type = "bezier", points = { { 0.05, 0.9 }, { 0.1, 1.05 } } })
 hl.curve("myBezier2", { type = "bezier", points = { { 0.65, 0 }, { 0.35, 1 } } })

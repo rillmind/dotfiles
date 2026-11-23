@@ -12,6 +12,7 @@ local paletas = {
     gaps_in       = 6,                -- espaço entre janelas
     gaps_out      = 8,                -- espaço entre janelas e a borda da tela
     rounding      = 5,                -- arredondamento das janelas
+    desfoque      = { size = 8, passes = 4 },   -- vidro fosco da barra do quickshell (as do Gruvbox são opacas)
   },
   ["gruvbox-escuro"] = {
     destaque      = 0xfffe8019,       -- orange
