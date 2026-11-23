@@ -834,8 +834,13 @@ ShellRoot {
                     anchors.bottomMargin: 10
                     clip: true
 
+                    // centrado na altura da barra inteira (e não no vão entre os workspaces e a bandeja);
+                    // só desloca se fosse encostar neles
                     Column {
-                        anchors.centerIn: parent
+                        id: appsCol
+                        readonly property real sobra: parent.height - height
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        y: Math.round(sobra < 0 ? sobra / 2 : Math.max(0, Math.min(sobra, (barBg.height - height) / 2 - parent.y)))
                         spacing: 4
                         Repeater {
                             model: root.workspaceClients
