@@ -90,8 +90,8 @@ aplicar() {
     done
     # tmux: o plugin catppuccin "congela" cores no primeiro carregamento (opções set -o), então
     # limpa as opções dele e relê só o visual (~/.config/tmux/visual.conf)
-    # barra do tmux por tema: lateral no Catppuccin, no topo nos outros (guardada também sem tmux aberto)
-    local barra=topo; [ "$p" = catppuccin-mocha ] && barra=lateral
+    # barra do tmux por tema: no topo no Gruvbox, lateral nos outros (guardada também sem tmux aberto)
+    local barra=lateral; case "$p" in gruvbox-*) barra=topo ;; esac
     echo "$barra" > "${XDG_STATE_HOME:-$HOME/.local/state}/tmux-barra"
     if tmux info >/dev/null 2>&1; then
         for o in $( { tmux show-options -g; tmux show-options -gw; } | awk '$1 ~ /^@(catppuccin|_ctp|thm)_/ {print $1}' | sort -u); do
