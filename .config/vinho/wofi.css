@@ -1,0 +1,11 @@
+/* wofi no tema Vinho: só entra se o fuzzel não estiver instalado */
+* { font-family: "JetBrains Mono", "JetBrainsMono Nerd Font", monospace; font-size: 15px; border-radius: 0; box-shadow: none; outline: none; }
+window { background-color: #1c0b12; border: 2px solid #8c2f4b; }
+#outer-box { padding: 10px 14px; }
+#input { background-color: #28111a; color: #e8d5cf; border: none; padding: 6px; margin-bottom: 6px; }
+#input image { color: #c4527a; }
+#scroll, #inner-box { background-color: transparent; }
+#entry { padding: 5px; }
+#entry:selected { background-color: #5a2236; }
+#text { color: #c9aaab; }
+#text:selected { color: #f6e9e2; }

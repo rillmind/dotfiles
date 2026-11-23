@@ -9,7 +9,17 @@
 set -u
 V="$HOME/.config/vinho"
 
-menu() { fuzzel --config "$V/fuzzel.ini" "$@"; }
+# fuzzel; sem ele, o wofi com as mesmas cores
+menu_apps() {
+    if command -v fuzzel >/dev/null; then fuzzel --config "$V/fuzzel.ini"
+    else wofi --conf /dev/null --style "$V/wofi.css" --show drun --location bottom --width 520 --lines 9; fi
+}
+menu_lista() {
+    if command -v fuzzel >/dev/null; then fuzzel --config "$V/fuzzel.ini" --dmenu --lines 5 --width 20
+    else wofi --conf /dev/null --style "$V/wofi.css" --dmenu --location bottom --width 300 --lines 6; fi
+}
+# se já há um menu aberto, o atalho só o fecha
+fechar_menu() { pkill -x 'fuzzel|wofi'; }
 parar() {
     pkill -f "^waybar -c $V/"; pkill -f "^dunst -conf $V/"
     for _ in $(seq 40); do pgrep -f "^(waybar -c|dunst -conf) $V/" >/dev/null || return 0; sleep 0.05; done
@@ -24,12 +34,12 @@ case "${1:-}" in
         ;;
     parar) parar ;;
     launcher)
-        pkill -x fuzzel && exit 0
-        if command -v fuzzel >/dev/null; then menu; else exec wofi --show drun; fi
+        fechar_menu && exit 0
+        menu_apps
         ;;
     energia)
-        pkill -x fuzzel && exit 0
-        op=$(printf '%s\n' Bloquear Suspender Sair Reiniciar Desligar | menu --dmenu --lines 5 --width 20) || exit 0
+        fechar_menu && exit 0
+        op=$(printf '%s\n' Bloquear Suspender Sair Reiniciar Desligar | menu_lista) || exit 0
         case "$op" in
             Bloquear) exec "$0" bloquear ;;
             Suspender) systemctl suspend ;;
