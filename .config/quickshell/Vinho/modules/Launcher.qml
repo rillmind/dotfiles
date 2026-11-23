@@ -1,12 +1,14 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import "."
 
-// Launcher.qml – lançador do Vinho: só texto, quadrado, no centro da tela.
+// Launcher.qml – lançador do Vinho: quadrado, no centro da tela. Ícones tingidos de vinho; o do item
+// selecionado fica nas cores dele.
 // Busca aproximada por nome, nome genérico, palavras-chave e id, sem diferenciar maiúsculas nem acentos,
 // com os mais usados primeiro; "=2*3" calcula (Enter copia) e ">" lista os comandos do sistema.
 // Teclas: Ctrl+N/↓/Tab desce, Ctrl+P/↑/Shift+Tab sobe, PageUp/PageDown, Ctrl+U limpa, Enter abre, Esc fecha.
@@ -75,20 +77,20 @@ Scope {
     }
     readonly property string qsDir: Quickshell.env("HOME") + "/.config/quickshell"
     readonly property var systemCommands: [
-        { key: "lock",     title: "Bloquear",        words: "lock tela trancar",               cmd: [Quickshell.env("HOME") + "/.config/quickshell-bloqueio/bloquear.sh"] },
-        { key: "suspend",  title: "Suspender",       words: "suspend dormir sleep",            cmd: ["systemctl", "suspend"] },
-        { key: "logout",   title: "Sair",            words: "logout encerrar sessao exit",     cmd: ["hyprctl", "dispatch", lua ? "hl.dsp.exit()" : "exit"], confirm: true },
-        { key: "reboot",   title: "Reiniciar",       words: "reboot restart",                  cmd: ["systemctl", "reboot"], confirm: true },
-        { key: "poweroff", title: "Desligar",        words: "shutdown poweroff",               cmd: ["systemctl", "poweroff"], confirm: true },
-        { key: "central",  title: "Central",         words: "painel controle control center",  panel: "" },
-        { key: "rede",     title: "Rede",            words: "wifi internet network",           panel: "network" },
-        { key: "som",      title: "Som",             words: "volume audio sound",              panel: "sound" },
-        { key: "bt",       title: "Bluetooth",       words: "fone",                            panel: "bluetooth" },
-        { key: "telas",    title: "Telas",           words: "monitor display resolucao",       panel: "displays" },
-        { key: "notif",    title: "Notificações",    words: "avisos",                          panel: "notificacoes" },
-        { key: "cal",      title: "Calendário",      words: "data feriado",                    panel: "calendario" },
-        { key: "tema",     title: "Trocar tema",     words: "aparencia theme",                 cmd: [qsDir + "/tema.sh", "trocar"] },
-        { key: "fundo",    title: "Papel de parede", words: "wallpaper imagem",                cmd: [qsDir + "/aparencia.sh", "wallpaper"] }
+        { key: "lock", glyph: "󰌾",     title: "Bloquear",        words: "lock tela trancar",               cmd: [Quickshell.env("HOME") + "/.config/quickshell-bloqueio/bloquear.sh"] },
+        { key: "suspend", glyph: "󰒲",  title: "Suspender",       words: "suspend dormir sleep",            cmd: ["systemctl", "suspend"] },
+        { key: "logout", glyph: "󰍃",   title: "Sair",            words: "logout encerrar sessao exit",     cmd: ["hyprctl", "dispatch", lua ? "hl.dsp.exit()" : "exit"], confirm: true },
+        { key: "reboot", glyph: "󰜉",   title: "Reiniciar",       words: "reboot restart",                  cmd: ["systemctl", "reboot"], confirm: true },
+        { key: "poweroff", glyph: "󰐥", title: "Desligar",        words: "shutdown poweroff",               cmd: ["systemctl", "poweroff"], confirm: true },
+        { key: "central", glyph: "󰒓",  title: "Central",         words: "painel controle control center",  panel: "" },
+        { key: "rede", glyph: "󰤨",     title: "Rede",            words: "wifi internet network",           panel: "network" },
+        { key: "som", glyph: "󰕾",      title: "Som",             words: "volume audio sound",              panel: "sound" },
+        { key: "bt", glyph: "󰂯",       title: "Bluetooth",       words: "fone",                            panel: "bluetooth" },
+        { key: "telas", glyph: "󰍹",    title: "Telas",           words: "monitor display resolucao",       panel: "displays" },
+        { key: "notif", glyph: "󰂚",    title: "Notificações",    words: "avisos",                          panel: "notificacoes" },
+        { key: "cal", glyph: "󰃭",      title: "Calendário",      words: "data feriado",                    panel: "calendario" },
+        { key: "tema", glyph: "󰏘",     title: "Trocar tema",     words: "aparencia theme",                 cmd: [qsDir + "/tema.sh", "trocar"] },
+        { key: "fundo", glyph: "󰸉",    title: "Papel de parede", words: "wallpaper imagem",                cmd: [qsDir + "/aparencia.sh", "wallpaper"] }
     ]
     // calculadora segura: só números, operadores e parênteses
     function calc(expr) {
@@ -265,6 +267,50 @@ Scope {
                         anchors.leftMargin: 8
                         anchors.rightMargin: 8
                         spacing: 12
+                        Item {
+                            id: ic
+                            implicitWidth: 22; implicitHeight: 22
+                            readonly property bool app: row.modelData.kind === "app"
+                            readonly property string caminho: app && row.modelData.entry.icon ? Quickshell.iconPath(row.modelData.entry.icon, true) : ""
+                            // carga síncrona: a assíncrona de ícones do tema já derrubou o quickshell
+                            Image {
+                                id: img
+                                anchors.fill: parent
+                                sourceSize: Qt.size(64, 64)
+                                fillMode: Image.PreserveAspectFit
+                                asynchronous: false
+                                smooth: true; mipmap: true
+                                source: ic.caminho
+                                visible: row.isSel
+                            }
+                            MultiEffect {
+                                anchors.fill: parent
+                                visible: ic.caminho !== "" && !row.isSel
+                                source: img
+                                brightness: 0.1
+                                colorization: 0.9
+                                colorizationColor: Theme.accent
+                            }
+                            Rectangle {     // app sem ícone: inicial
+                                anchors.fill: parent
+                                visible: ic.app && ic.caminho === ""
+                                color: Theme.surface0
+                                border.color: Theme.frame
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: row.modelData.title.charAt(0).toUpperCase()
+                                    color: row.isSel ? Theme.bright : Theme.accent
+                                    font.family: Theme.font; font.pixelSize: 13; font.bold: true
+                                }
+                            }
+                            Text {          // comando do sistema ou conta
+                                anchors.centerIn: parent
+                                visible: !ic.app
+                                text: row.modelData.kind === "calc" ? "󰃬" : row.modelData.kind === "sys" ? row.modelData.command.glyph : ""
+                                color: row.isSel ? Theme.bright : row.modelData.kind === "sys" && row.modelData.command.confirm ? Theme.red : Theme.accent
+                                font.family: Theme.font; font.pixelSize: 18
+                            }
+                        }
                         Text {
                             text: launcher.realce(row.modelData.title)
                             textFormat: Text.StyledText
