@@ -35,10 +35,11 @@ criar_bandeja() {    # monitor
     setsid -f waybar -c "$B$1.jsonc" -s "$V/bandeja.css" >/dev/null 2>&1 </dev/null
 }
 parar() {
-    pkill -f "^waybar -c $V/"; pkill -f "^dunst -conf $V/"
+    pkill -f "^waybar -c $V/"
+    pkill -x dunst     # qualquer um: um app que notifica cedo faz o D-Bus subir o dunst sem a nossa config
     pkill -f "^waybar -c $B"
-    for _ in $(seq 40); do pgrep -f "^(waybar -c|dunst -conf) $V/" >/dev/null || return 0; sleep 0.05; done
-    pkill -9 -f "^(waybar -c|dunst -conf) $V/"
+    for _ in $(seq 40); do { pgrep -f "^waybar -c $V/" || pgrep -x dunst; } >/dev/null || return 0; sleep 0.05; done
+    pkill -9 -f "^waybar -c $V/"; pkill -9 -x dunst
 }
 
 case "${1:-}" in
