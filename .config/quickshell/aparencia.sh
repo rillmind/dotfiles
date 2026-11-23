@@ -76,7 +76,7 @@ aplicar() {
     ln -sfn "$CFG/wofi/colors/$p.css" "$AP/wofi.css"
     ln -sfn "$CFG/tmux/temas/$p.conf" "$AP/tmux.conf"
     # GTK4: link relativo dentro da pasta, para os flatpaks (que só enxergam ~/.config/gtk-4.0) seguirem
-    ln -sfn "temas/$p.css" "$CFG/gtk-4.0/gtk.css"
+    [ -d "$CFG/gtk-4.0/temas" ] && ln -sfn "temas/$p.css" "$CFG/gtk-4.0/gtk.css"
 
     # ── recarrega o que está aberto ──
     hyprctl reload >/dev/null 2>&1                         # bordas (hypr/paleta.lua lê o arquivo paleta)

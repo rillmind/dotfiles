@@ -117,9 +117,11 @@ ShellRoot {
     }
     Timer { id: testeTimer; interval: 900; onTriggered: root.falhou("") }   // no teste, toda senha "erra"
 
+    // sem o swaylock instalado, usa direto o "login" (é o que o arquivo dele inclui)
+    FileView { id: pamSwaylock; path: "/etc/pam.d/swaylock"; blockLoading: true; printErrors: false }
     PamContext {
         id: pam
-        config: "swaylock"          // /etc/pam.d/swaylock (inclui o login)
+        config: pamSwaylock.text() !== "" ? "swaylock" : "login"
         onPamMessage: {
             if (responseRequired) respond(root.senha)
             else if (messageIsError) root.mensagem = message

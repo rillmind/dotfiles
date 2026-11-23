@@ -14,7 +14,10 @@ if [ "${1:-}" = "--laco" ]; then
         quickshell -p "$DIR"; rc=$?
         case $rc in 134|135|139) ;; *) break ;; esac
         crashes=$((crashes + 1))
-        [ $crashes -gt 5 ] && { swaylock; break; }
+        if [ $crashes -gt 5 ]; then
+            command -v swaylock >/dev/null && { swaylock; break; }
+            crashes=0; sleep 1      # sem swaylock: continua tentando, com a tela travada
+        fi
     done
     rm -f "$MARCA"
     exit 0
