@@ -174,7 +174,6 @@
   },
   "custom/powermenu": {
     "format": "  ",
-    "on-click": "eww open --toggle powermenu",
     "tooltip": false
   },
   "custom/bluetooth": {
