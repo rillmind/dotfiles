@@ -1,6 +1,7 @@
 // quickshell-apps – menu de apps em tela cheia, igual à grade do GNOME (com Blur my Shell): papel de
 // parede desfocado, busca no topo, páginas de ícones e dock embaixo. Sem prévias de workspaces.
-// Instância própria, separada dos temas.
+// Instância própria, separada dos temas,
+// mas segue as cores da paleta ativa.
 //
 //   apps.sh iniciar   sobe a instância (autostart do Hyprland); apps.sh toggle  abre/fecha (Super+A)
 //
@@ -31,6 +32,22 @@ ShellRoot {
         onFileChanged: reload()
         onLoaded: root.wallpaper = text().trim()
     }
+
+    // ── Paleta ativa (idem): tinge o véu, a busca, a dock, o realce e os pontinhos ───────
+    property string paleta: "gruvbox-escuro"
+    FileView {
+        path: root.estado + "/aparencia/paleta"
+        watchChanges: true
+        printErrors: false
+        onFileChanged: reload()
+        onLoaded: root.paleta = text().trim()
+    }
+    readonly property var paletas: ({
+        "gruvbox-escuro":   { fundo: "#1d2021", sup: "#3c3836", texto: "#ebdbb2", sub: "#a89984", destaque: "#fe8019", veu: 0.55 },
+        "gruvbox-claro":    { fundo: "#fbf1c7", sup: "#ebdbb2", texto: "#3c3836", sub: "#665c54", destaque: "#af3a03", veu: 0.72 },
+        "catppuccin-mocha": { fundo: "#1e1e2e", sup: "#313244", texto: "#cdd6f4", sub: "#a6adc8", destaque: "#cba6f7", veu: 0.55 }
+    })
+    readonly property var c: paletas[paleta] || paletas["gruvbox-escuro"]
 
     // ── Apps ─────────────────────────────────────────────────────────────────────────────
     // todos os .desktop, menos os NoDisplay (que nem o GNOME mostra), em ordem alfabética
@@ -124,12 +141,12 @@ ShellRoot {
             anchors.fill: parent
             visible: ic.caminho === ""
             radius: width / 5
-            color: "#4a4a4f"
+            color: root.c.sup
             Text {
                 anchors.centerIn: parent
                 text: ic.app ? ic.app.name.charAt(0).toUpperCase() : ""
                 font { family: root.fonte; pixelSize: ic.width * 0.5; bold: true }
-                color: "white"
+                color: root.c.destaque
             }
         }
     }
@@ -159,8 +176,8 @@ ShellRoot {
                         width: 150 * janela.u
                         height: 156 * janela.u
                         radius: 16 * janela.u
-                        color: "white"
-                        opacity: mouse.pressed ? 0.22 : mouse.containsMouse ? 0.12 : item.atual ? 0.16 : 0
+                        color: root.c.destaque
+                        opacity: mouse.pressed ? 0.35 : item.atual ? 0.28 : mouse.containsMouse ? 0.18 : 0
                     }
                     Icone {
                         id: icone
@@ -176,7 +193,7 @@ ShellRoot {
                         horizontalAlignment: Text.AlignHCenter
                         text: item.modelData.name
                         font { family: root.fonte; pixelSize: 14.5 * janela.u }
-                        color: "white"
+                        color: root.c.texto
                         elide: Text.ElideRight
                     }
                     Rectangle {   // pontinho: app aberto
@@ -184,7 +201,7 @@ ShellRoot {
                         anchors.horizontalCenter: parent.horizontalCenter
                         y: 166 * janela.u
                         width: 5 * janela.u; height: width; radius: width / 2
-                        color: "white"
+                        color: root.c.destaque
                     }
                     MouseArea {
                         id: mouse
@@ -216,7 +233,7 @@ ShellRoot {
             opacity: root.aberto ? 1 : 0
             Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
 
-            Rectangle { anchors.fill: parent; color: "#1d2021" }
+            Rectangle { anchors.fill: parent; color: root.c.fundo }
             // papel de parede reduzido e desfocado
             Image {
                 id: papel
@@ -235,7 +252,7 @@ ShellRoot {
                 blurMax: 64
                 blurMultiplier: 1.5
             }
-            Rectangle { anchors.fill: parent; color: "black"; opacity: 0.4 }
+            Rectangle { anchors.fill: parent; color: root.c.fundo; opacity: root.c.veu }
             MouseArea { anchors.fill: parent; onClicked: root.fechar() }
             WheelHandler {
                 property double ultimo: 0
@@ -264,9 +281,9 @@ ShellRoot {
                 width: 320 * janela.u
                 height: 34 * janela.u
                 radius: height / 2
-                color: "#353535"
-                border.width: 1
-                border.color: "#1fffffff"
+                color: Qt.alpha(root.c.sup, 0.9)
+                border.width: campo.text !== "" ? 2 : 1
+                border.color: campo.text !== "" ? root.c.destaque : Qt.alpha(root.c.texto, 0.12)
                 MouseArea { anchors.fill: parent; onClicked: campo.forceActiveFocus() }
 
                 Text {
@@ -275,13 +292,13 @@ ShellRoot {
                     anchors.verticalCenter: parent.verticalCenter
                     text: ""
                     font { family: "JetBrainsMono Nerd Font"; pixelSize: 14 * janela.u }
-                    color: "#c8c8c8"
+                    color: root.c.destaque
                 }
                 TextInput {
                     id: campo
                     anchors { left: lupa.right; leftMargin: 12 * janela.u; right: parent.right; rightMargin: 14 * janela.u; verticalCenter: parent.verticalCenter }
                     font { family: root.fonte; pixelSize: 15 * janela.u }
-                    color: "white"
+                    color: root.c.texto
                     clip: true
                     focus: true
                     cursorVisible: text !== ""
@@ -295,7 +312,7 @@ ShellRoot {
                         visible: campo.text === ""
                         text: "Digite para pesquisar"
                         font: campo.font
-                        color: "#a8a8a8"
+                        color: root.c.sub
                     }
                     Keys.onPressed: event => {
                         var k = event.key, c = paginas.colunas
@@ -357,7 +374,7 @@ ShellRoot {
                 visible: root.lista.length === 0
                 text: "Nenhum resultado"
                 font { family: root.fonte; pixelSize: 22 * janela.u }
-                color: "#d0d0d0"
+                color: root.c.sub
             }
 
             Row {   // indicador de páginas
@@ -371,7 +388,7 @@ ShellRoot {
                         Rectangle {
                             anchors.centerIn: parent
                             width: 9 * janela.u; height: width; radius: width / 2
-                            color: "white"
+                            color: root.c.destaque
                             opacity: parent.index === paginas.currentIndex ? 1 : 0.35
                         }
                         MouseArea { anchors.fill: parent; onClicked: paginas.irPara(parent.index, false) }
@@ -387,7 +404,7 @@ ShellRoot {
                 width: itens.width + 20 * janela.u
                 height: 90 * janela.u
                 radius: 22 * janela.u
-                color: "#59202020"
+                color: Qt.alpha(root.c.sup, 0.6)
                 MouseArea { anchors.fill: parent }   // clique entre os ícones não fecha
                 Row {
                     id: itens
@@ -403,13 +420,13 @@ ShellRoot {
                                 visible: !d.modelData
                                 anchors.centerIn: parent
                                 width: 1; height: 56 * janela.u
-                                color: "#40ffffff"
+                                color: Qt.alpha(root.c.texto, 0.25)
                             }
                             Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: 2
                                 radius: 14 * janela.u
-                                color: "white"
+                                color: root.c.destaque
                                 opacity: dm.containsMouse ? 0.14 : 0
                             }
                             Icone {
@@ -424,7 +441,7 @@ ShellRoot {
                                 visible: !!d.modelData && root.janelas[d.modelData.id] !== undefined
                                 anchors { horizontalCenter: parent.horizontalCenter; bottom: parent.bottom; bottomMargin: 3 * janela.u }
                                 width: 5 * janela.u; height: width; radius: width / 2
-                                color: "white"
+                                color: root.c.destaque
                             }
                             MouseArea {
                                 id: dm
