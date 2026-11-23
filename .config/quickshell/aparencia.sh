@@ -104,7 +104,7 @@ aplicar() {
         catppuccin-mocha) aplicar_obsidian "Catppuccin" obsidian "#cba6f7" ;;
         gruvbox-escuro)   aplicar_obsidian "Obsidian gruvbox" obsidian "#fe8019" ;;
         gruvbox-claro)    aplicar_obsidian "Obsidian gruvbox" moonstone "#af3a03" ;;
-        vinho)            aplicar_obsidian "" obsidian "#c4527a" ;;
+        vinho)            aplicar_obsidian "Vinho" obsidian "#8c2f4b" ;;
     esac
     # apps GTK4/libadwaita (Nautilus, Mission Center): cores do gtk.css acima + claro/escuro; o Zen segue o color-scheme
     gsettings set org.gnome.desktop.interface color-scheme "$([ $escuro = 1 ] && echo prefer-dark || echo prefer-light)"
