@@ -15,6 +15,8 @@ app-notifications = no-config-reload
 font-size = 17
 
 font-family = JetbrainsMono Nerd Font
+# cantos dos quadrados da barra do tmux (~/.config/tmux/fonte)
+font-codepoint-map = U+F8E0-U+F8E1=Tmux Cantos
 
 mouse-hide-while-typing
 
