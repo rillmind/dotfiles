@@ -31,6 +31,16 @@ local paletas = {
   },
 }
 
+paletas["vinho"] = {
+  destaque      = 0xff8c2f4b,       -- vinho
+  inativa       = 0xff35151f,
+  redimensionar = 0xffd9a862,       -- dourado
+  gaps_in       = 0,
+  gaps_out      = 0,
+  rounding      = 0,
+  fundo         = 0xff15070d,       -- sem papel de parede: cor sólida
+}
+
 local nome = "catppuccin-mocha"
 local f = io.open((os.getenv("XDG_STATE_HOME") or (os.getenv("HOME") .. "/.local/state")) .. "/quickshell/aparencia/paleta", "r")
 if f then

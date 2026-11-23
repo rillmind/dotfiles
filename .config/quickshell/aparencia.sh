@@ -2,7 +2,8 @@
 # aparencia.sh – leva o tema do quickshell para o resto do sistema: bordas do Hyprland, Ghostty,
 # Neovim, tmux, btop, zathura, yazi, swaylock, wofi, Obsidian, apps GTK4 (cores e claro/escuro) e papel de parede.
 #
-# Paletas: catppuccin-mocha (tema Catppuccin-mocha), gruvbox-escuro e gruvbox-claro (tema Gruvbox).
+# Paletas: catppuccin-mocha (tema Catppuccin-mocha), gruvbox-escuro e gruvbox-claro (tema Gruvbox),
+# vinho (tema Vinho; sem papel de parede escolhido, o fundo é a cor sólida do Hyprland).
 # As configs dos apps apontam para links "tema-ativo" que levam a ~/.local/state/quickshell/aparencia;
 # só esses arquivos de estado mudam numa troca, o repositório de dotfiles fica igual.
 #
@@ -22,6 +23,7 @@ mkdir -p "$AP"
 paleta_atual() {
     case "$("$QS/tema.sh" ativo)" in
         Gruvbox) [ "$(cat "$ST/gruvbox-modo" 2>/dev/null)" = claro ] && echo gruvbox-claro || echo gruvbox-escuro ;;
+        Vinho) echo vinho ;;
         *) echo catppuccin-mocha ;;
     esac
 }
@@ -33,10 +35,11 @@ wallpaper_de() {
         f=$(cat "$AP/wallpaper-$k" 2>/dev/null)
         [ -f "$f" ] && { echo "$f"; return; }
     done
-    echo "$WALL_PADRAO"
+    [ "$1" = vinho ] || echo "$WALL_PADRAO"
 }
 aplicar_wallpaper() {
     local img="$1"
+    if [ -z "$img" ]; then pkill -x swaybg; : > "$AP/wallpaper-atual"; return; fi   # cor sólida do Hyprland
     # não reinicia o swaybg à toa (evita piscar quando só o resto do tema muda)
     if [ "$(cat "$AP/wallpaper-atual" 2>/dev/null)" = "$img" ] && pgrep -x swaybg >/dev/null; then return; fi
     pkill -x swaybg
@@ -59,6 +62,7 @@ aplicar() {
         catppuccin-mocha) ghostty="catppuccin-mocha.conf"; zathura="catppuccin-mocha"; btop="$CFG/btop/themes/catppuccin_mocha.theme" ;;
         gruvbox-escuro)   ghostty="Gruvbox Dark";          zathura="gruvbox-dark";     btop="/usr/share/btop/themes/gruvbox_dark.theme" ;;
         gruvbox-claro)    ghostty="Gruvbox Light";         zathura="gruvbox-light";    btop="/usr/share/btop/themes/gruvbox_light.theme"; escuro=0 ;;
+        vinho)            ghostty="vinho";                 zathura="vinho";            btop="$CFG/btop/themes/vinho.theme" ;;
         *) echo "paleta desconhecida: $p" >&2; return 1 ;;
     esac
 
@@ -86,7 +90,7 @@ aplicar() {
     done
     # tmux: o plugin catppuccin "congela" cores no primeiro carregamento (opções set -o), então
     # limpa as opções dele e relê só o visual (~/.config/tmux/visual.conf)
-    # barra do tmux por tema: lateral no Catppuccin, no topo no Gruvbox (guardada também sem tmux aberto)
+    # barra do tmux por tema: lateral no Catppuccin, no topo nos outros (guardada também sem tmux aberto)
     local barra=topo; [ "$p" = catppuccin-mocha ] && barra=lateral
     echo "$barra" > "${XDG_STATE_HOME:-$HOME/.local/state}/tmux-barra"
     if tmux info >/dev/null 2>&1; then
@@ -100,6 +104,7 @@ aplicar() {
         catppuccin-mocha) aplicar_obsidian "Catppuccin" obsidian "#cba6f7" ;;
         gruvbox-escuro)   aplicar_obsidian "Obsidian gruvbox" obsidian "#fe8019" ;;
         gruvbox-claro)    aplicar_obsidian "Obsidian gruvbox" moonstone "#af3a03" ;;
+        vinho)            aplicar_obsidian "" obsidian "#c4527a" ;;
     esac
     # apps GTK4/libadwaita (Nautilus, Mission Center): cores do gtk.css acima + claro/escuro; o Zen segue o color-scheme
     gsettings set org.gnome.desktop.interface color-scheme "$([ $escuro = 1 ] && echo prefer-dark || echo prefer-light)"
@@ -123,5 +128,5 @@ case "${1:-}" in
     aplicar) aplicar "${2:-}" ;;
     wallpaper) escolher_wallpaper ;;
     paleta) paleta_atual ;;
-    *) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+    *) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac

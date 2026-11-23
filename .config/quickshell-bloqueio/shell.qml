@@ -25,7 +25,8 @@ ShellRoot {
     readonly property var paletas: ({
         "gruvbox-escuro":   { fundo: "#1d2021", texto: "#ebdbb2", sub: "#a89984", anel: "#3c3836", tecla: "#fe8019", apagar: "#fb4934", ver: "#b8bb26", errado: "#fb4934", limpo: "#fabd2f" },
         "gruvbox-claro":    { fundo: "#fbf1c7", texto: "#3c3836", sub: "#7c6f64", anel: "#ebdbb2", tecla: "#af3a03", apagar: "#9d0006", ver: "#79740e", errado: "#9d0006", limpo: "#b57614" },
-        "catppuccin-mocha": { fundo: "#1e1e2e", texto: "#cdd6f4", sub: "#a6adc8", anel: "#313244", tecla: "#cba6f7", apagar: "#f38ba8", ver: "#a6e3a1", errado: "#f38ba8", limpo: "#fab387" }
+        "catppuccin-mocha": { fundo: "#1e1e2e", texto: "#cdd6f4", sub: "#a6adc8", anel: "#313244", tecla: "#cba6f7", apagar: "#f38ba8", ver: "#a6e3a1", errado: "#f38ba8", limpo: "#fab387" },
+        "vinho":            { fundo: "#1c0b12", texto: "#e8d5cf", sub: "#b08d94", anel: "#35151f", tecla: "#c4527a", apagar: "#e0566f", ver: "#a3ad7a", errado: "#e0566f", limpo: "#d9a862" }
     })
     readonly property var c: paletas[paleta] || paletas["gruvbox-escuro"]
     readonly property string fonte: "JetBrainsMono Nerd Font"

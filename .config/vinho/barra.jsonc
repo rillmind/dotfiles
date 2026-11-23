@@ -1,0 +1,36 @@
+// Barra inferior do tema Vinho. Só texto: não depende de Nerd Font.
+{
+  "layer": "top",
+  "position": "bottom",
+  "height": 26,
+  "spacing": 0,
+  "modules-left": ["hyprland/workspaces"],
+  "modules-right": ["tray", "cpu", "memory", "network", "wireplumber", "battery", "clock"],
+
+  "hyprland/workspaces": { "format": "{id}", "sort-by": "id" },
+  "tray": { "icon-size": 14, "spacing": 8 },
+  "cpu": { "interval": 5, "format": "cpu {usage}%" },
+  "memory": { "interval": 10, "format": "| mem {percentage}%" },
+  "network": {
+    "interval": 10,
+    "format-wifi": "| wifi {signalStrength}%",
+    "format-ethernet": "| cabo",
+    "format-disconnected": "| sem rede",
+    "tooltip-format": "{ifname}: {ipaddr}",
+    "tooltip-format-wifi": "{essid} · {ipaddr}"
+  },
+  "wireplumber": {
+    "format": "| vol {volume}%",
+    "format-muted": "| mudo",
+    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+  },
+  // sem bateria (desktop), o módulo some sozinho
+  "battery": {
+    "interval": 30,
+    "states": { "aviso": 25, "critico": 10 },
+    "format": "| bat {capacity}%",
+    "format-charging": "| bat {capacity}%+",
+    "format-plugged": "| bat {capacity}%+"
+  },
+  "clock": { "format": "| {:%d/%m %H:%M}", "tooltip-format": "<tt>{calendar}</tt>" }
+}

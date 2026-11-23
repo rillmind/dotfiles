@@ -1,0 +1,40 @@
+set notification-error-bg       "rgba(28,11,18,1)"     # bg
+set notification-error-fg       "rgba(224,86,111,1)"    # bright:red
+set notification-warning-bg     "rgba(28,11,18,1)"     # bg
+set notification-warning-fg     "rgba(217,168,98,1)"   # bright:yellow
+set notification-bg             "rgba(28,11,18,1)"     # bg
+set notification-fg             "rgba(163,173,122,1)"   # bright:green
+
+set completion-bg               "rgba(74,29,44,1)"     # bg2
+set completion-fg               "rgba(232,213,207,1)"  # fg
+set completion-group-bg         "rgba(53,21,31,1)"     # bg1
+set completion-group-fg         "rgba(138,100,108,1)"  # gray
+set completion-highlight-bg     "rgba(147,163,192,1)"  # bright:blue
+set completion-highlight-fg     "rgba(74,29,44,1)"     # bg2
+
+# Define the color in index mode
+set index-bg                    "rgba(74,29,44,1)"     # bg2
+set index-fg                    "rgba(232,213,207,1)"  # fg
+set index-active-bg             "rgba(147,163,192,1)"  # bright:blue
+set index-active-fg             "rgba(74,29,44,1)"     # bg2
+
+set inputbar-bg                 "rgba(28,11,18,1)"     # bg
+set inputbar-fg                 "rgba(232,213,207,1)"  # fg
+
+set statusbar-bg                "rgba(74,29,44,1)"     # bg2
+set statusbar-fg                "rgba(232,213,207,1)"  # fg
+
+set highlight-color             "rgba(217,168,98,0.5)" # bright:yellow
+set highlight-active-color      "rgba(196,82,122,0.5)" # bright:orange
+
+set default-bg                  rgba(28,11,18,1)     # bg
+set default-fg                  "rgba(232,213,207,1)"  # fg
+set render-loading              true
+set render-loading-bg           "rgba(28,11,18,1)"     # bg
+set render-loading-fg           "rgba(232,213,207,1)"  # fg
+
+# Recolor book content's color
+set recolor-lightcolor          "rgba(28,11,18,1)"     # bg
+set recolor-darkcolor           "rgba(232,213,207,1)"  # fg
+set recolor                     "true"
+set recolor-keephue             "true"                 # keep original color

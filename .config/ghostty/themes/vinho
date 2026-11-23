@@ -1,0 +1,23 @@
+# Vinho – cores do Ghostty
+background = #1c0b12
+foreground = #e8d5cf
+cursor-color = #c4527a
+cursor-text = #1c0b12
+selection-background = #5a2236
+selection-foreground = #f6e9e2
+palette = 0=#35151f
+palette = 1=#e0566f
+palette = 2=#a3ad7a
+palette = 3=#d9a862
+palette = 4=#93a3c0
+palette = 5=#c4527a
+palette = 6=#8fb0a4
+palette = 7=#d8bfba
+palette = 8=#8a646c
+palette = 9=#ee7489
+palette = 10=#b9c48d
+palette = 11=#e8bf80
+palette = 12=#abbad4
+palette = 13=#dc7396
+palette = 14=#a6c6ba
+palette = 15=#f6e9e2

@@ -2,7 +2,7 @@
 -- Migrada do hyprland.conf antigo; backup em ~/dotfiles/.config/hypr-hyprlang-backup/
 -- Referência da API: /usr/share/hypr/stubs/hl.meta.lua e https://wiki.hypr.land/configuring/
 
--- cores das bordas seguem o tema do quickshell (Catppuccin Mocha ou Gruvbox claro/escuro)
+-- cores das bordas seguem o tema do quickshell (Catppuccin Mocha, Gruvbox claro/escuro ou Vinho)
 local c = require("paleta")
 
 ------------------
@@ -120,6 +120,11 @@ hl.config({
 
 -- vidro fosco para quickshell (barra + popups + dock) – catppuccin mocha
 -- hl.layer_rule({ match = { namespace = "quickshell" }, blur = true, ignore_alpha = 0.2 })
+
+-- tema sem papel de parede (Vinho): cor sólida no lugar do fundo padrão do Hyprland
+if c.fundo then
+  hl.config({ misc = { background_color = c.fundo, disable_hyprland_logo = true, disable_splash_rendering = true } })
+end
 
 hl.curve("myBezier", { type = "bezier", points = { { 0.05, 0.9 }, { 0.1, 1.05 } } })
 hl.curve("myBezier2", { type = "bezier", points = { { 0.65, 0 }, { 0.35, 1 } } })
@@ -239,7 +244,7 @@ hl.bind("CTRL + SHIFT + Escape", hl.dsp.exec_cmd("flatpak run io.missioncenter.M
 -- hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd([[grim -g "$(slurp)" "$HOME/Pictures/screenshots/$(date +'%s_grim.png')"]]))
 hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd([[grim -g "$(slurp -d)" - | wl-copy]]))
 
--- quickshell: troca de tema (Catppuccin-mocha ⇄ Gruvbox) e modo claro/escuro do Gruvbox
+-- quickshell: troca de tema (Catppuccin-mocha → Gruvbox → Vinho) e modo claro/escuro do Gruvbox
 hl.bind("SUPER + SHIFT + T", hl.dsp.exec_cmd("~/.config/quickshell/tema.sh trocar"))
 hl.bind("SUPER + SHIFT + L", hl.dsp.exec_cmd("~/.config/quickshell/tema.sh ipc gruvbox modo"))
 

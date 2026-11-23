@@ -45,7 +45,8 @@ ShellRoot {
     readonly property var paletas: ({
         "gruvbox-escuro":   { fundo: "#1d2021", sup: "#3c3836", texto: "#ebdbb2", sub: "#a89984", destaque: "#fe8019", veu: 0.55 },
         "gruvbox-claro":    { fundo: "#fbf1c7", sup: "#ebdbb2", texto: "#3c3836", sub: "#665c54", destaque: "#af3a03", veu: 0.72 },
-        "catppuccin-mocha": { fundo: "#1e1e2e", sup: "#313244", texto: "#cdd6f4", sub: "#a6adc8", destaque: "#cba6f7", veu: 0.55 }
+        "catppuccin-mocha": { fundo: "#1e1e2e", sup: "#313244", texto: "#cdd6f4", sub: "#a6adc8", destaque: "#cba6f7", veu: 0.55 },
+        "vinho":            { fundo: "#1c0b12", sup: "#35151f", texto: "#e8d5cf", sub: "#b08d94", destaque: "#c4527a", veu: 0.55 }
     })
     readonly property var c: paletas[paleta] || paletas["gruvbox-escuro"]
 

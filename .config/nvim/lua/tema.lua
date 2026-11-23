@@ -8,6 +8,7 @@ local arquivo = (vim.env.XDG_STATE_HOME or (vim.env.HOME .. "/.local/state")) ..
 local esquemas = {
 	["catppuccin-mocha"] = { background = "dark", colorscheme = "catppuccin-mocha" },
 	["gruvbox-escuro"] = { background = "dark", colorscheme = "gruvbox" },
+	["vinho"] = { background = "dark", colorscheme = "vinho" },
 	["gruvbox-claro"] = { background = "light", colorscheme = "gruvbox" },
 }
 

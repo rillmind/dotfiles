@@ -1,0 +1,66 @@
+# swaylock - vinho
+# Coloque em ~/.config/swaylock/config
+
+# --- Imagem de fundo ---
+# Descomente e ajuste o caminho para usar uma imagem:
+# image=~/Pictures/wallpaper.jpg
+# scaling=fill
+
+# Fundo sólido (cor base do Mocha) quando sem imagem
+color=1c0b12
+
+# --- Indicador de digitação ---
+show-failed-attempts
+indicator-caps-lock
+indicator-radius=100
+indicator-thickness=7
+font=JetBrains Mono
+
+# -------------------------------------------------------
+# Paleta vinho
+#   Base:       #1c0b12   Mantle:     #15070d
+#   Crust:      #15070d   Surface0:   #35151f
+#   Surface1:   #4a1d2c   Surface2:   #5f2c3c
+#   Overlay0:   #754852   Overlay1:   #8a646c
+#   Text:       #e8d5cf   Subtext1:   #d8bfba
+#   Blue:       #93a3c0   Lavender:   #c99ab8
+#   Mauve:      #c4527a   Pink:       #c99ab8
+#   Red:        #e0566f   Peach:      #d9a862
+#   Green:      #a3ad7a   Teal:       #8fb0a4
+#   Yellow:     #d9a862   Sky:        #93a3c0
+# -------------------------------------------------------
+
+# --- Linha do anel (borda exterior) ---
+ring-color=35151f
+ring-ver-color=a3ad7a
+ring-wrong-color=e0566f
+ring-clear-color=d9a862
+ring-caps-lock-color=d9a862
+
+# --- Interior do círculo ---
+inside-color=1c0b12
+inside-ver-color=1c0b12
+inside-wrong-color=1c0b12
+inside-clear-color=1c0b12
+inside-caps-lock-color=1c0b12
+
+# --- Linha separadora (entre inside e ring) ---
+separator-color=00000000
+
+# --- Texto do indicador ---
+text-color=e8d5cf
+text-ver-color=a3ad7a
+text-wrong-color=e0566f
+text-clear-color=d9a862
+text-caps-lock-color=d9a862
+
+# --- Efeito de digitação (key highlight) ---
+key-hl-color=c4527a
+bs-hl-color=e0566f
+
+# --- Linha do indicador (borda interior do anel) ---
+line-color=00000000
+line-ver-color=00000000
+line-wrong-color=00000000
+line-clear-color=00000000
+line-caps-lock-color=00000000

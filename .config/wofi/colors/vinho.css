@@ -1,0 +1,37 @@
+/*
+*
+* vinho palette
+* Maintainer: rubyowo
+*
+*/
+
+@define-color base   #1c0b12;
+@define-color mantle #15070d;
+@define-color crust  #15070d;
+
+@define-color text     #e8d5cf;
+@define-color subtext0 #c9aaab;
+@define-color subtext1 #d8bfba;
+
+@define-color surface0 #35151f;
+@define-color surface1 #4a1d2c;
+@define-color surface2 #5f2c3c;
+
+@define-color overlay0 #754852;
+@define-color overlay1 #8a646c;
+@define-color overlay2 #b08d94;
+
+@define-color blue      #93a3c0;
+@define-color lavender  #c99ab8;
+@define-color sapphire  #93a3c0;
+@define-color sky       #93a3c0;
+@define-color teal      #8fb0a4;
+@define-color green     #a3ad7a;
+@define-color yellow    #d9a862;
+@define-color peach     #d9a862;
+@define-color maroon    #e0566f;
+@define-color red       #e0566f;
+@define-color mauve     #c4527a;
+@define-color pink      #c99ab8;
+@define-color flamingo  #c99ab8;
+@define-color rosewater #d8bfba;
