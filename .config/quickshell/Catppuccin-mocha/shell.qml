@@ -1076,7 +1076,7 @@ ShellRoot {
                 width: implicitWidth
                 height: implicitHeight
                 radius: 20 // raio dos ícones (14) + respiro (6): cantos concêntricos
-                color: "#A61e1e2e" // catppuccin mocha base com alpha para vidro fosco
+                color: "#1e1e2e" // catppuccin mocha base, opaco
                 border.color: "#313244"
                 border.width: 1
                 // sombra sutil
