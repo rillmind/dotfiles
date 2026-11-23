@@ -25,7 +25,7 @@ if [ "$forcar" = 0 ] && [ -d "$CFG/quickshell" ] && [ "$(readlink -f "$CFG/hypr"
 fi
 
 if [ "$pacotes" = 1 ]; then
-    sudo dnf install -y waybar fuzzel dunst swaylock grim slurp wl-clipboard brightnessctl wireplumber jetbrains-mono-fonts
+    sudo dnf install -y waybar fuzzel dunst swaylock grim slurp wl-clipboard brightnessctl wireplumber procps-ng jetbrains-mono-fonts
     if ! command -v ghostty >/dev/null; then
         sudo dnf install -y 'dnf-command(copr)' || true
         sudo dnf copr enable -y scottames/ghostty

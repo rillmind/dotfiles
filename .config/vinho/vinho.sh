@@ -11,15 +11,40 @@ set -u
 V="$HOME/.config/vinho"
 B="${XDG_RUNTIME_DIR:-/tmp}/vinho-bandeja-"
 
-# fuzzel; sem ele, o wofi com as mesmas cores
+# Sem o fuzzel, usa o wofi com as mesmas cores, sempre sem diferenciar maiúsculas. O modo drun dele não
+# serve: procura também no caminho do arquivo ("local" acha tudo de ~/.local) e lê até .desktop.bak.
+wofi_lista() { wofi --conf /dev/null --style "$V/wofi.css" --dmenu --insensitive --location center "$@"; }
+# "nome<TAB>arquivo" dos apps visíveis; o mesmo app em ~/.local vale por cima do sistema
+listar_apps() {
+    local d
+    for d in "${XDG_DATA_HOME:-$HOME/.local/share}" "$HOME/.local/share/flatpak/exports/share" \
+             /var/lib/flatpak/exports/share /usr/local/share /usr/share; do
+        find "$d/applications" -maxdepth 1 -name '*.desktop' 2>/dev/null
+    done | awk -F/ '!visto[$NF]++' | xargs -rd '\n' gawk -F= -v l="${LANG%%.*}" '
+        BEGINFILE { dentro = x = 0; n = nl = "" }
+        /^\[/ { dentro = ($0 == "[Desktop Entry]") }
+        !dentro { next }
+        $1 == "Name" { n = substr($0, 6) }
+        $1 == "Name[" l "]" { nl = substr($0, length($1) + 2) }
+        $1 == "Type" && $2 != "Application" { x = 1 }
+        ($1 == "NoDisplay" || $1 == "Hidden") && $2 == "true" { x = 1 }
+        ENDFILE { if (!x && n != "") print (nl != "" ? nl : n) "\t" FILENAME }' | sort -f |
+        awk -F'\t' '{ k = ++v[$1]; print $1 (k > 1 ? " (" k ")" : "") "\t" $2 }'
+}
 menu_apps() {
-    if command -v fuzzel >/dev/null; then fuzzel --config "$V/fuzzel.ini"
-    else wofi --conf /dev/null --style "$V/wofi.css" --show drun --location center --width 520 --lines 9; fi
+    if command -v fuzzel >/dev/null; then fuzzel --config "$V/fuzzel.ini"; return; fi
+    local lista nome arq
+    lista=$(listar_apps)
+    nome=$(cut -f1 <<<"$lista" | wofi_lista --prompt Apps --width 520 --lines 9) || return 0
+    # só abre o que está na lista: texto solto não executa nada
+    arq=$(awk -F'\t' -v n="$nome" '$1 == n { print $2; exit }' <<<"$lista")
+    [ -n "$arq" ] && setsid -f gtk-launch "$(basename "$arq" .desktop)" >/dev/null 2>&1 </dev/null
 }
 menu_lista() {
     if command -v fuzzel >/dev/null; then fuzzel --config "$V/fuzzel.ini" --dmenu --lines 5 --width 20
-    else wofi --conf /dev/null --style "$V/wofi.css" --dmenu --location center --width 300 --lines 6; fi
+    else wofi_lista --prompt Energia --width 300 --lines 6; fi
 }
+confirmar() { [ "$(printf '%s\n' Cancelar "$1" | menu_lista)" = "$1" ]; }    # Enter sozinho cancela
 # se já há um menu aberto, o atalho só o fecha
 fechar_menu() { pkill -x 'fuzzel|wofi'; }
 # a bandeja é outra waybar, uma por monitor, que fica viva e escondida: se ela fosse fechada, os apps
@@ -66,9 +91,9 @@ case "${1:-}" in
         case "$op" in
             Bloquear) exec "$0" bloquear ;;
             Suspender) systemctl suspend ;;
-            Sair) hyprctl dispatch exit 2>/dev/null | grep -qx ok || hyprctl dispatch 'hl.dsp.exit()' ;;
-            Reiniciar) systemctl reboot ;;
-            Desligar) systemctl poweroff ;;
+            Sair) confirmar "Sair" || exit 0; hyprctl dispatch exit 2>/dev/null | grep -qx ok || hyprctl dispatch 'hl.dsp.exit()' ;;
+            Reiniciar) confirmar "Reiniciar" || exit 0; systemctl reboot ;;
+            Desligar) confirmar "Desligar" || exit 0; systemctl poweroff ;;
         esac
         ;;
     bloquear)
