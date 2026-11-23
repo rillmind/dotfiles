@@ -86,11 +86,15 @@ aplicar() {
     done
     # tmux: o plugin catppuccin "congela" cores no primeiro carregamento (opções set -o), então
     # limpa as opções dele e relê só o visual (~/.config/tmux/visual.conf)
+    # barra do tmux por tema: lateral no Catppuccin, no topo no Gruvbox (guardada também sem tmux aberto)
+    local barra=topo; [ "$p" = catppuccin-mocha ] && barra=lateral
+    echo "$barra" > "${XDG_STATE_HOME:-$HOME/.local/state}/tmux-barra"
     if tmux info >/dev/null 2>&1; then
         for o in $( { tmux show-options -g; tmux show-options -gw; } | awk '$1 ~ /^@(catppuccin|_ctp|thm)_/ {print $1}' | sort -u); do
             tmux set -gu "$o" 2>/dev/null; tmux set -gwu "$o" 2>/dev/null
         done
         tmux source-file "$CFG/tmux/visual.conf"
+        tmux run-shell "$CFG/tmux/lateral.py usar $barra"
     fi
     case "$p" in   # tema · modo (obsidian = escuro, moonstone = claro) · destaque
         catppuccin-mocha) aplicar_obsidian "Catppuccin" obsidian "#cba6f7" ;;

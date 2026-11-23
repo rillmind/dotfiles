@@ -6,6 +6,7 @@ número de cada aba num quadrado e o servidor (sessão) embaixo. Ver lateral.con
   lateral.py clique Y SESSAO   vai para a aba desenhada na linha Y
   lateral.py desligar          remove as barras e volta para a barra do topo
   lateral.py alternar          troca entre lateral e topo e guarda a escolha (Ctrl+Shift+B)
+  lateral.py usar BARRA        muda para "lateral" ou "topo" e guarda (o aparencia.sh chama a cada tema)
   lateral.py inicio            liga a lateral se for a escolha guardada (chamado pelo .tmux.conf)
 """
 import fcntl
@@ -144,14 +145,21 @@ ESTADO = os.path.join(os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/
 CONF = os.path.expanduser("~/.config/tmux/lateral.conf")
 
 
-def alternar():
-    ligada = tmux("show", "-gqv", "@lateral").strip() == "1"
+def ligada():
+    return tmux("show", "-gqv", "@lateral").strip() == "1"
+
+
+def usar(barra):
     with open(ESTADO, "w") as f:
-        f.write("topo" if ligada else "lateral")
-    if ligada:
+        f.write(barra)
+    if barra == "topo" and ligada():
         subprocess.run([os.path.realpath(__file__), "desligar"])
-    else:
+    elif barra == "lateral" and not ligada():
         tmux("source-file", CONF)      # liga os binds e chama `ligar`
+
+
+def alternar():
+    usar("topo" if ligada() else "lateral")
 
 
 def inicio():
@@ -164,7 +172,9 @@ def inicio():
 
 
 if __name__ == "__main__":
-    # estes dois chamam o próprio script de novo: não podem segurar a trava
+    # estes chamam o próprio script de novo: não podem segurar a trava
+    if sys.argv[1:] in (["usar", "lateral"], ["usar", "topo"]):
+        sys.exit(usar(sys.argv[2]))
     if sys.argv[1:] in (["alternar"], ["inicio"]):
         sys.exit({"alternar": alternar, "inicio": inicio}[sys.argv[1]]())
     servidor = os.environ.get("TMUX", "x").split(",")[0].replace("/", "_")
