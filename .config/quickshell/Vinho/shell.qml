@@ -1,3 +1,4 @@
+//@ pragma UseQApplication
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Io
@@ -26,12 +27,19 @@ ShellRoot {
     // ── Popups: um por vez, na tela da barra clicada ───────
     property string popup: ""        // "" | cc | sm | cal | media | notif | tray
     property string ccPage: ""
+    property string ccItem: ""       // item da barra que abriu a central (fica realçado)
+    onPopupChanged: if (popup !== "cc") ccItem = ""
+    // clicar em qualquer utilidade da barra abre a central na tela principal; de novo, fecha
+    function toggleCentral(item, screenName) {
+        togglePopup("cc", screenName, "")
+        ccItem = popup === "cc" ? item : ""
+    }
     property string popupScreen: ""
     readonly property string focusedScreen: Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : Quickshell.screens[0].name
     signal panelPageRequested(string page)
     function togglePopup(name, screenName, page) {
         var p = page || ""
-        if (popup === name && popupScreen === screenName && (name !== "cc" || ccPage === p)) { popup = ""; return }
+        if (popup === name && popupScreen === screenName && (name !== "cc" || p === "" || ccPage === p)) { popup = ""; return }
         popupScreen = screenName
         popup = name
         if (name === "cc") { ccPage = p; panelPageRequested(p) }
@@ -42,6 +50,7 @@ ShellRoot {
         function open(page: string): void { root.openPanel(page) }
         function close(): void { root.popup = "" }
         function calendario(): void { root.togglePopup("cal", root.focusedScreen) }
+        function central(item: string): void { root.toggleCentral(item, root.focusedScreen) }
         function popup(nome: string): void { root.togglePopup(nome, root.focusedScreen) }
     }
 
@@ -341,8 +350,8 @@ ShellRoot {
     Timer { interval: 1000; running: true; repeat: true; onTriggered: root.clockNow = new Date() }
     function tooltipText() {
         var h = barHover
-        if (h === "cpu") return "processos e gráfico"
-        if (h === "mem") return "processos e gráfico"
+        if (h === "cpu") return "direito: processos e gráfico"
+        if (h === "mem") return "direito: processos e gráfico"
         if (h === "net") return networkType === "wifi" ? networkSsid + " · sinal " + networkSignal + "%" + (networkIp ? " · " + networkIp : "")
                               : networkType === "ethernet" ? "cabo" + (networkIp ? " · " + networkIp : "") : "sem conexão"
         if (h === "vol") return (pwSink ? (pwSink.nickname || pwSink.description || "") + " · " : "") + "rolar ajusta · direito silencia"
@@ -541,29 +550,30 @@ ShellRoot {
                     name: "cpu"
                     text: "cpu " + root.cpuUsage + "%"
                     tint: root.cpuUsage >= 90 ? Theme.red : Theme.soft
-                    aberto: root.popup === "sm" && root.popupScreen === barWindow.scr
-                    onClicked: root.togglePopup("sm", barWindow.scr)
+                    aberto: (root.popup === "sm" || (root.popup === "cc" && root.ccItem === "cpu")) && root.popupScreen === barWindow.scr
+                    onClicked: m => { if (m.button === Qt.LeftButton) root.toggleCentral("cpu", barWindow.scr); else root.togglePopup("sm", barWindow.scr) }
                 }
                 Info {
                     name: "mem"
                     text: "mem " + root.memUsage + "%"
                     tint: root.memUsage >= 90 ? Theme.red : Theme.soft
-                    onClicked: root.togglePopup("sm", barWindow.scr)
+                    aberto: root.popup === "cc" && root.ccItem === "mem" && root.popupScreen === barWindow.scr
+                    onClicked: m => { if (m.button === Qt.LeftButton) root.toggleCentral("mem", barWindow.scr); else root.togglePopup("sm", barWindow.scr) }
                 }
                 Info {
                     name: "net"
                     text: root.networkType === "wifi" ? "wifi " + root.networkSignal + "%" : root.networkType === "ethernet" ? "cabo" : "sem rede"
                     tint: root.networkType === "disconnected" ? Theme.gray : Theme.soft
-                    aberto: root.popup === "cc" && root.ccPage === "network" && root.popupScreen === barWindow.scr
-                    onClicked: m => root.togglePopup("cc", barWindow.scr, m.button === Qt.RightButton ? "bluetooth" : "network")
+                    aberto: root.popup === "cc" && root.ccItem === "net" && root.popupScreen === barWindow.scr
+                    onClicked: m => { if (m.button === Qt.LeftButton) root.toggleCentral("net", barWindow.scr); else root.togglePopup("cc", barWindow.scr, "network") }
                 }
                 Info {
                     name: "vol"
                     visible: root.pwReady
                     text: root.volumeMuted ? "mudo" : "vol " + root.volumeLevel + "%"
                     tint: root.volumeMuted ? Theme.gray : Theme.soft
-                    aberto: root.popup === "cc" && root.ccPage === "sound" && root.popupScreen === barWindow.scr
-                    onClicked: m => { if (m.button === Qt.LeftButton) root.togglePopup("cc", barWindow.scr, "sound"); else root.toggleMute() }
+                    aberto: root.popup === "cc" && root.ccItem === "vol" && root.popupScreen === barWindow.scr
+                    onClicked: m => { if (m.button === Qt.LeftButton) root.toggleCentral("vol", barWindow.scr); else root.toggleMute() }
                     onWheel: d => root.setVolume(root.volumeLevel + d * 5)
                 }
                 Info {
@@ -571,8 +581,8 @@ ShellRoot {
                     visible: root.hasBattery
                     text: "bat " + root.batteryCapacity + "%" + (root.onAc ? "+" : "")
                     tint: root.onAc ? Theme.green : root.batteryCapacity <= 10 ? Theme.red : root.batteryCapacity <= 25 ? Theme.yellow : Theme.soft
-                    aberto: root.popup === "cc" && root.ccPage === "battery" && root.popupScreen === barWindow.scr
-                    onClicked: root.togglePopup("cc", barWindow.scr, "battery")
+                    aberto: root.popup === "cc" && root.ccItem === "batt" && root.popupScreen === barWindow.scr
+                    onClicked: m => { if (m.button === Qt.LeftButton) root.toggleCentral("batt", barWindow.scr); else root.togglePopup("cc", barWindow.scr, "battery") }
                 }
                 Info {
                     name: "clock"
