@@ -97,8 +97,6 @@ hl.config({
     blur = {
       enabled = true,
       xray    = false,
-      size    = 8,
-      passes  = 3,   -- desfoque forte (estilo GNOME) no menu de apps; não há janelas transparentes
     },
   },
 
@@ -123,9 +121,6 @@ hl.config({
 
 -- vidro fosco para quickshell (barra + popups + dock) – catppuccin mocha
 -- hl.layer_rule({ match = { namespace = "quickshell" }, blur = true, ignore_alpha = 0.2 })
-
--- menu de apps (Super+A): fundo desfocado, estilo GNOME
-hl.layer_rule({ match = { namespace = "quickshell-apps" }, blur = true })
 
 hl.curve("myBezier", { type = "bezier", points = { { 0.05, 0.9 }, { 0.1, 1.05 } } })
 hl.curve("myBezier2", { type = "bezier", points = { { 0.65, 0 }, { 0.35, 1 } } })
@@ -233,8 +228,9 @@ hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + space", hl.dsp.exec_cmd("~/.config/quickshell/tema.sh ipc launcher toggle"))
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = "maximized" }))
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
--- menu de apps em tela cheia (~/.config/quickshell-apps)
-hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("~/.config/quickshell-apps/apps.sh toggle"))
+hl.bind(mainMod .. " + A", hl.dsp.window.move({ workspace = "special:special" }))
+-- menu de apps em tela cheia (~/.config/quickshell-apps); SUPER mesmo, não o mainMod (Alt)
+hl.bind("SUPER + A", hl.dsp.exec_cmd("~/.config/quickshell-apps/apps.sh toggle"))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("~/.config/quickshell/tema.sh ipc launcher power"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("eww open --toggle overview && eww update selected=_none"))
@@ -286,7 +282,6 @@ hl.bind(mainMod .. " + K", hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + J", hl.dsp.focus({ direction = "down" }))
 
 hl.bind(mainMod .. " + minus", hl.dsp.workspace.toggle_special("special"))
-hl.bind(mainMod .. " + SHIFT + minus", hl.dsp.window.move({ workspace = "special:special" }))  -- era Super+A
 
 -- Workspaces 1-10 (tecla 0 = workspace 10)
 for i = 1, 10 do
