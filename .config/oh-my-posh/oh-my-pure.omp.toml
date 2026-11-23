@@ -1,4 +1,5 @@
 console_title_template = '{{if .Root}}(Admin){{end}} {{.PWD}}'
+pwd = 'osc7' # informa o diretório atual ao terminal (WezTerm abre abas/painéis nele)
 version = 4
 
 [transient_prompt]

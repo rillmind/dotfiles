@@ -18,13 +18,20 @@
     Executa direto, sem estimativa nem pergunta (usado internamente após o UAC;
     útil também para agendar).
 
+.PARAMETER Silencioso
+    Junto com -Confirmado, para rodar sem ninguém olhando (o initSystem.ps1 usa):
+    não fecha app aberto (o cache dele fica para a próxima), não esvazia a Lixeira
+    e não espera Enter no fim. O resultado fica no log.
+
 .EXAMPLE
     pwsh -File limpeza-sistema.ps1            # estima, pergunta, executa como admin
     pwsh -File limpeza-sistema.ps1 -Simular   # só estima
+    pwsh -File limpeza-sistema.ps1 -Confirmado -Silencioso   # como admin, sem interação
 #>
 param(
     [switch]$Simular,
     [switch]$Confirmado,
+    [switch]$Silencioso,
     # Perfil do usuário capturado antes da elevação, para não limpar o perfil errado
     # caso o UAC peça credenciais de outra conta de administrador.
     [string]$Perfil = $env:USERPROFILE
@@ -57,6 +64,19 @@ function Limpar-Conteudo([string]$Path, [string]$Descricao) {
     }
 }
 
+# Temp: no modo -Silencioso só o que tem mais de um dia. Logo depois do login há apps
+# rodando de arquivos extraídos ali (ex.: os _MEI* de executáveis PyInstaller).
+function Limpar-Temp([string]$Path, [string]$Descricao) {
+    if (-not $Silencioso) { return Limpar-Conteudo $Path $Descricao }
+    if (-not (Test-Path -LiteralPath $Path)) { return }
+    $limite = (Get-Date).AddDays(-1)
+    $velhos = @(Get-ChildItem -LiteralPath $Path -Force -ErrorAction SilentlyContinue | Where-Object LastWriteTime -lt $limite)
+    Registrar ([long]($velhos | ForEach-Object {
+        if ($_.PSIsContainer) { Get-Tamanho $_.FullName } else { $_.Length }
+    } | Measure-Object -Sum).Sum) "$Descricao (mais de 1 dia)"
+    if (-not $script:Seco) { $velhos | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue }
+}
+
 # Apaga a pasta inteira.
 function Remover-Pasta([string]$Path, [string]$Descricao) {
     if (-not (Test-Path -LiteralPath $Path)) { return }
@@ -64,23 +84,68 @@ function Remover-Pasta([string]$Path, [string]$Descricao) {
     if (-not $script:Seco) { Remove-Item -LiteralPath $Path -Recurse -Force -ErrorAction SilentlyContinue }
 }
 
+# Fecha os processos para soltarem os arquivos de cache. Devolve $false se algum
+# continuar aberto: no modo -Silencioso nada é fechado e o cache do app fica de fora.
+function Liberar([string[]]$Processos) {
+    $abertos = Get-Process $Processos -ErrorAction SilentlyContinue
+    if (-not $abertos) { return $true }
+    if ($Silencioso) { return $false }
+    if (-not $script:Seco) { $abertos | Stop-Process -Force; Start-Sleep 2 }
+    return $true
+}
+
+# Cache de um app que não é fechado à força (navegador, Discord...): só limpa com ele
+# fechado. As pastas aceitam curinga (perfis de navegador).
+function Limpar-App([string]$Descricao, [string[]]$Processos, [string[]]$Pastas) {
+    if (Get-Process $Processos -ErrorAction SilentlyContinue) {
+        if ($script:Seco) { "            aberto, fica de fora: $Descricao" }
+        return
+    }
+    $achadas = @($Pastas | ForEach-Object { Get-Item -Path $_ -Force -ErrorAction SilentlyContinue })
+    if (-not $achadas) { return }
+    Registrar ([long]($achadas | ForEach-Object { Get-Tamanho $_.FullName } | Measure-Object -Sum).Sum) $Descricao
+    if (-not $script:Seco) {
+        $achadas | ForEach-Object { Get-ChildItem -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue } |
+            Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+    }
+}
+
 function Invoke-Limpeza {
     # ── 1. Caches de apps ───────────────────────────────────────────────────
     "== Caches de apps =="
-    # Os apps precisam estar fechados para soltar os arquivos de cache.
-    if (-not $script:Seco) { Get-Process Spotify, Stremio -ErrorAction SilentlyContinue | Stop-Process -Force; Start-Sleep 2 }
-    Limpar-Conteudo "$Local\Spotify\Data"            'Spotify (cache de músicas)'
-    Limpar-Conteudo "$Local\Spotify\Storage"         'Spotify (storage)'
-    Limpar-Conteudo "$Local\Stremio\stremio-cache"   'Stremio (cache de streaming)'
+    if (Liberar 'Spotify') {
+        Limpar-Conteudo "$Local\Spotify\Data"            'Spotify (cache de músicas)'
+        Limpar-Conteudo "$Local\Spotify\Storage"         'Spotify (storage)'
+    }
+    if (Liberar 'Stremio', 'stremio-runtime', 'stremio-shell-ng') {
+        Limpar-Conteudo "$Local\Stremio\stremio-cache"   'Stremio (cache de streaming)'
+    }
     # Celestial (skins do LoL): é cache, mas ele baixa tudo de novo depois. Comente se incomodar.
     Remover-Pasta   "$Roaming\com.divineskins.celestial\storage"     'Celestial (storage)'
     Remover-Pasta   "$Roaming\com.divineskins.celestial\lmdb-hashes" 'Celestial (hashes)'
+    # Navegadores e apps Electron: cache de páginas, de scripts e da GPU. Login, abas e
+    # configurações ficam. Shaders (NVIDIA\DXCache, D3DSCache) ficam de propósito: sem
+    # eles os jogos recompilam tudo e engasgam nas primeiras partidas.
+    $chromium = 'Cache', 'Code Cache', 'GPUCache'
+    Limpar-App 'Chrome'   'chrome'   ($chromium | ForEach-Object { "$Local\Google\Chrome\User Data\*\$_" })
+    Limpar-App 'Thorium'  'thorium'  ($chromium | ForEach-Object { "$Local\Thorium\User Data\*\$_" })
+    Limpar-App 'Zen'      'zen'      "$Local\zen\Profiles\*\cache2", "$Local\zen\Profiles\*\startupCache"
+    Limpar-App 'Discord'  'Discord'  ($chromium | ForEach-Object { "$Roaming\discord\$_" })
+    Limpar-App 'Obsidian' 'Obsidian' ($chromium | ForEach-Object { "$Roaming\obsidian\$_" })
+    Limpar-App 'VSCodium' 'VSCodium' ($chromium | ForEach-Object { "$Roaming\VSCodium\$_" })
+    Limpar-App 'Steam (páginas da loja)' 'steam', 'steamwebhelper' "$Local\Steam\htmlcache"
+    Limpar-App 'Hydra'    'Hydra'    "$Roaming\hydralauncher\Cache"
+    Limpar-App 'Riot Client' 'Riot Client', 'RiotClientServices', 'RiotClientUx', 'RiotClientUxRender' `
+        "$Roaming\Riot Client\Cache", "$Roaming\riot-client-ux\Cache"
 
     # ── 2. Temporários e dumps ──────────────────────────────────────────────
     "`n== Temporários =="
-    Limpar-Conteudo "$Local\Temp"        'Temp do usuário'
+    Limpar-Temp     "$Local\Temp"        'Temp do usuário'
     Limpar-Conteudo "$Local\CrashDumps"  'Crash dumps'
-    Limpar-Conteudo 'C:\Windows\Temp'    'Temp do Windows'
+    Limpar-Temp     'C:\Windows\Temp'    'Temp do Windows'
+    Limpar-Conteudo "$Local\Microsoft\Windows\INetCache" 'Cache de internet do Windows'
+    Limpar-Conteudo 'C:\ProgramData\Microsoft\Windows\WER\ReportArchive' 'Relatórios de erro (enviados)'
+    Limpar-Conteudo 'C:\ProgramData\Microsoft\Windows\WER\ReportQueue'   'Relatórios de erro (na fila)'
 
     # ── 3. Instaladores acumulados ──────────────────────────────────────────
     "`n== Instaladores de driver =="
@@ -99,6 +164,9 @@ function Invoke-Limpeza {
     if (-not $script:Seco) { Stop-Service wuauserv, bits -Force -ErrorAction SilentlyContinue }
     Limpar-Conteudo 'C:\Windows\SoftwareDistribution\Download' 'Windows Update (downloads)'
     if (-not $script:Seco) { Start-Service wuauserv, bits -ErrorAction SilentlyContinue }
+    # Otimização de Entrega: pedaços de atualização guardados para repassar a outros PCs.
+    Registrar (Get-Tamanho 'C:\Windows\ServiceProfiles\NetworkService\AppData\Local\Microsoft\Windows\DeliveryOptimization\Cache') 'Otimização de Entrega'
+    if (-not $script:Seco) { Delete-DeliveryOptimizationCache -Force -ErrorAction SilentlyContinue }
 
     # ── 5. Sobras de apps já desinstalados ──────────────────────────────────
     # Só apaga se o app NÃO estiver instalado. Se você reinstalar um deles, os dados ficam.
@@ -121,9 +189,12 @@ function Invoke-Limpeza {
     }
 
     # ── 6. Lixeira ──────────────────────────────────────────────────────────
-    "`n== Lixeira =="
-    Registrar (Get-Tamanho 'C:\$Recycle.Bin') 'Lixeira'
-    if (-not $script:Seco) { Clear-RecycleBin -Force -ErrorAction SilentlyContinue }
+    # Fica de fora no modo -Silencioso: não é cache, e o que foi apagado sem querer ainda volta.
+    if (-not $Silencioso) {
+        "`n== Lixeira =="
+        Registrar (Get-Tamanho 'C:\$Recycle.Bin') 'Lixeira'
+        if (-not $script:Seco) { Clear-RecycleBin -Force -ErrorAction SilentlyContinue }
+    }
 
     # ── 7. Inicialização automática ─────────────────────────────────────────
     # Desativa pelo mesmo mecanismo do Gerenciador de Tarefas (reversível por lá).
@@ -162,7 +233,7 @@ function Invoke-Execucao {
 if ($Confirmado) {
     if (-not $isAdmin) { Write-Error '-Confirmado precisa ser rodado como administrador.'; return }
     Invoke-Execucao
-    Read-Host "`nEnter para fechar" | Out-Null
+    if (-not $Silencioso) { Read-Host "`nEnter para fechar" | Out-Null }
     return
 }
 

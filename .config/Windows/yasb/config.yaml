@@ -25,7 +25,7 @@ bars:
       windows_app_bar: true
     dimensions:
       width: 100%
-      height: 35
+      height: 38 # igual à barra do quickshell (Catppuccin-mocha)
     padding:
       top: 0
       left: 0
@@ -50,7 +50,6 @@ bars:
         #- microphone
         - volume
         - battery
-        #- notifications
         #- power_menu
 widgets:
   glazewm_workspaces:
@@ -71,7 +70,7 @@ widgets:
   home:
     type: yasb.home.HomeWidget
     options:
-      label: ""
+      label: "\uF17A" # logo do Windows (no quickshell: logo do Fedora)
       menu_list:
         - title: User Home
           path: "~"
@@ -92,7 +91,7 @@ widgets:
   clock:
     type: yasb.clock.ClockWidget
     options:
-      label: "{dia %d | %H:%M}<span>{alarm}</span>"
+      label: "{Dia %d | %H:%M}<span>{alarm}</span>"
       label_alt: "{%a, %d %b %H:%M}"
       timezones: []
       calendar:
@@ -111,15 +110,14 @@ widgets:
   volume:
     type: yasb.volume.VolumeWidget
     options:
-      label: 
-      label_alt: 
+      label: "{icon}"
+      label_alt: "{icon} {level}"
       tooltip: true
-      volume_icons:
-        - "\uE74F"
-        - "\uE992"
-        - "\uE993"
-        - "\uE994"
-        - "\uE995"
+      icons:
+        muted: "\uEEE8"
+        "32": "\uF026"
+        "65": "\uF028"
+        "100": "\uF028"
       callbacks:
         on_left: toggle_volume_menu
         on_right: toggle_mute
@@ -140,8 +138,11 @@ widgets:
   notifications:
     type: yasb.notifications.NotificationsWidget
     options:
-      label: ""
-      label_alt: ""
+      label: "{icon}"
+      label_alt: "{icon} {count}"
+      icons:
+        default: "\U000F009A"
+        new: "\U000F009E"
       hide_empty: false
       tooltip: false
       callbacks:
@@ -265,8 +266,8 @@ widgets:
       label_alt: "[class_name='{win[class_name]}' exe='{win[process][name]}' hwnd={win[hwnd]}]"
       label_no_window: ""
       label_icon: true
-      label_icon_size: 16
-      max_length: 32
+      label_icon_size: 17
+      max_length: 48
       max_length_ellipsis: "..."
       monitor_exclusive: false
   systray:
@@ -364,6 +365,7 @@ widgets:
         - "󰤢" # Fair signal
         - "󰤥" # Good signal
         - "󰤨" # Excellent signal
+      ethernet_icon: "" # nf-fa-ethernet
       callbacks:
         on_left: toggle_wifi_menu
         on_middle: do_nothing
@@ -377,17 +379,17 @@ widgets:
       time_remaining_natural: False
       hide_unsupported: True # Oculta campos sem suporte de hardware
       charging_options:
-        icon_format: "{charging_icon}"
+        icon_format: "{icon}{charging_icon}"
         blink_charging_icon: true
         blink_interval: 500
       status_thresholds:
-        critical: 10
-        low: 25
-        medium: 75
-        high: 95
+        critical: 14
+        low: 39
+        medium: 59
+        high: 79
         full: 100
       status_icons:
-        icon_charging: ""
+        icon_charging: "\U000F140B"
         icon_critical: ""
         icon_low: ""
         icon_medium: ""

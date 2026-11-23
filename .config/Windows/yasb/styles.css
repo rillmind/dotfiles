@@ -32,12 +32,13 @@
   --ctp-mantle: #181825;
   --ctp-crust: #11111b;
 
-  --yasb-bar-bg: rgba(36, 36, 36, 0.9);
-  --yasb-surface-alt: rgb(61, 61, 61);
-  --yasb-bar-border: #303030;
-  --yasb-popup-bg: rgba(36, 36, 36, 0.9);
-  --yasb-dialog-bg: rgb(43, 43, 43);
-  --yasb-dialog-surface: rgb(32, 32, 32);
+  /* fundo da barra igual ao do quickshell: base com 70% de opacidade */
+  --yasb-bar-bg: rgba(30, 30, 46, 0.7);
+  --yasb-surface-alt: #45475a;
+  --yasb-bar-border: #45475a;
+  --yasb-popup-bg: rgba(30, 30, 46, 0.95);
+  --yasb-dialog-bg: #1e1e2e;
+  --yasb-dialog-surface: #181825;
   --yasb-white-alpha-03: rgba(255, 255, 255, 0.03);
   --yasb-white-alpha-04: rgba(255, 255, 255, 0.04);
   --yasb-white-alpha-05: rgba(255, 255, 255, 0.05);
@@ -55,11 +56,12 @@
   --yasb-fg: rgba(255, 255, 255, 0.9);
   --yasb-fg-muted: rgb(134, 134, 134);
   --yasb-icon-fg: rgba(255, 255, 255, 0.9);
-  --yasb-tooltip-bg: rgba(31, 31, 31, 0.95);
-  --yasb-tooltip-border: rgb(44, 44, 44);
-  --yasb-accent: #4cc2ff;
-  --yasb-accent-hover: #40ace2;
-  --yasb-accent-fg: #000000;
+  --yasb-tooltip-bg: #1e1e2e;
+  --yasb-tooltip-border: #45475a;
+  /* destaque do tema: mauve, como no quickshell */
+  --yasb-accent: #cba6f7;
+  --yasb-accent-hover: #b4befe;
+  --yasb-accent-fg: #1e1e2e;
   --icons-font: "JetBrainsMono Nerd Font";
   --icons-font-fallback:
     "JetBrainsMono Nerd Font", "JetBrainsMono NFP",
@@ -69,7 +71,7 @@
 
 /* Global Defaults */
 * {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 600;
   font-family: var(--icons-font-fallback);
   color: var(--ctp-text);
@@ -77,15 +79,14 @@
 
 /* Bar */
 .yasb-bar {
-  background-color: var(--ctp-base);
-  border-bottom: 1px solid var(--yasb-bar-border);
-  padding: 0px 12px;
+  background-color: var(--yasb-bar-bg);
+  padding: 0px 8px 0px 0px;
 }
 
 /* Tooltip */
 .tooltip {
   background-color: var(--yasb-tooltip-bg);
-  border-radius: 4px;
+  border-radius: 10px;
   color: var(--ctp-text);
   padding: 5px 10px;
   font-size: 12px;
@@ -194,6 +195,10 @@
 /* Home Menu */
 .home-widget:hover {
   background-color: var(--yasb-white-alpha-08);
+}
+/* logo do sistema maior que o resto, como no quickshell (22px contra 19px) */
+.home-widget .label {
+  font-size: 22px;
 }
 .home-menu {
   background-color: var(--yasb-popup-bg);
@@ -564,17 +569,17 @@
   background-color: #313244;
   border: none;
   border-radius: 5px;
-  padding: 0px 3px;
-  margin: 0 4px;
+  padding: 1px 5px;
+  margin: 0 5px;
   color: #cdd6f4;
 }
 
 .glazewm-workspaces .ws-btn.active_populated {
-  color: #1e1e2e;
+  color: #313244;
   background-color: #cba6f7;
 }
 .glazewm-workspaces .ws-btn.active_empty {
-  color: #1e1e2e;
+  color: #313244;
   background-color: #cba6f7;
 }
 
@@ -582,13 +587,18 @@
   color: #cdd6f4;
 }
 
+/* como no quickshell: workspaces vazios ficam escondidos (só aparecem os com janelas e o ativo) */
 .glazewm-workspaces .ws-btn.empty {
-  color: #7d8b9d;
+  max-width: 0px;
+  min-width: 0px;
+  padding: 0px;
+  margin: 0px;
+  color: transparent;
+  background-color: transparent;
 }
 
 .glazewm-workspaces .ws-btn:hover,
-.glazewm-workspaces .ws-btn.populated:hover,
-.glazewm-workspaces .ws-btn.empty:hover {
+.glazewm-workspaces .ws-btn.populated:hover {
   color: #1e1e2e;
   background-color: #cba6f7;
 }
@@ -765,7 +775,10 @@
   padding-right: 4px;
   padding-bottom: 0;
 }
-/* System Tray */
+/* título 2px menor que a barra, como no quickshell */
+.active-window-widget .label {
+  font-size: 17px;
+}/* System Tray */
 .systray {
   padding-right: 2px;
 }

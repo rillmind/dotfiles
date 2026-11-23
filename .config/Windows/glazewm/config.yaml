@@ -93,7 +93,7 @@ window_behavior:
       shown_on_top: true
 
     fullscreen:
-      maximized: true
+      maximized: false
       shown_on_top: true
 
 workspaces:
@@ -106,25 +106,6 @@ workspaces:
   - name: "7"
   - name: "8"
   - name: "9"
-
-window_rules:
-  - commands: ["ignore"]
-    match:
-      - window_process: { equals: "zebar" }
-      - window_title: { regex: "[Pp]icture.in.[Pp]icture" }
-        window_class: { regex: "Chrome_WidgetWin_1|MozillaDialogClass" }
-      - window_process: { equals: "PowerToys" }
-        window_class: { regex: 'HwndWrapper\[PowerToys\.PowerAccent.*?\]' }
-      - window_process: { equals: "PowerToys" }
-        window_title: { regex: ".*? - Peek" }
-      - window_process: { equals: "Lively" }
-        window_class: { regex: "HwndWrapper" }
-      - window_process: { equals: "EXCEL" }
-        window_class: { not_regex: "XLMAIN" }
-      - window_process: { equals: "WINWORD" }
-        window_class: { not_regex: "OpusApp" }
-      - window_process: { equals: "POWERPNT" }
-        window_class: { not_regex: "PPTFrameClass" }
 
 binding_modes:
   - name: "resize"
@@ -232,7 +213,7 @@ keybindings:
     bindings: ["alt+shift+w"]
 
   # Launch Terminal
-  - commands: ["shell-exec pwsh"]
+  - commands: ["shell-exec %ProgramFiles%/WezTerm/wezterm-gui.exe"]
     bindings: ["alt+enter"]
 
   # Workspace Navigation
@@ -292,3 +273,36 @@ keybindings:
     bindings: ["alt+shift+8"]
   - commands: ["move --workspace 9", "focus --workspace 9"]
     bindings: ["alt+shift+9"]
+
+window_rules:
+  - commands: ["ignore"]
+    match:
+      - window_process: { equals: "zebar" }
+      - window_title: { regex: "[Pp]icture.in.[Pp]icture" }
+        window_class: { regex: "Chrome_WidgetWin_1|MozillaDialogClass" }
+      - window_process: { equals: "PowerToys" }
+        window_class: { regex: 'HwndWrapper\[PowerToys\.PowerAccent.*?\]' }
+      - window_process: { equals: "PowerToys" }
+        window_title: { regex: ".*? - Peek" }
+      - window_process: { equals: "Lively" }
+        window_class: { regex: "HwndWrapper" }
+      - window_process: { equals: "EXCEL" }
+        window_class: { not_regex: "XLMAIN" }
+      - window_process: { equals: "WINWORD" }
+        window_class: { not_regex: "OpusApp" }
+      - window_process: { equals: "POWERPNT" }
+        window_class: { not_regex: "PPTFrameClass" }
+      - window_process: { equals: "League of Legends" }
+      - window_process: { equals: "LeagueClientUx" }
+      - window_process: { equals: "VALORANT-Win64-Shipping" }
+      - window_process: { equals: "RiotClientServices" }
+      - window_process: { equals: "NightmareCircus" }
+      - window_process: { equals: "Dimraeth" }
+      - window_process: { equals: "Blasphemous" }
+      - window_process: { equals: "Northgard" }
+      - window_process: { equals: "Bloodborne" }
+      - window_process: { equals: "Bloodborne™" }
+      - window_process: { regex: "Bloodborne" }
+      - window_process: { regex: "VALORANT" }
+      - window_process: { regex: "God of war" }
+      - window_process: { equals: "007 First Light" }

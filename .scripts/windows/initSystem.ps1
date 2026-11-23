@@ -4,7 +4,8 @@
 
 Start-Process syncthing -ArgumentList "--no-browser" -WindowStyle Hidden
 Start-Process -FilePath "C:\Program Files\glzr.io\GlazeWM\glazewm.exe"
-yasb
+# Tema salvo (barra + papel de parede); hoje o Catppuccin, com o YASB.
+& "$PSScriptRoot\tema.ps1" iniciar | Out-Null
 Start-Process -FilePath "C:\Program Files (x86)\Thermal Control Center\tcc-g15.exe" -Verb RunAs
 
 # Preferências (NumLock etc.): silencioso, só pede UAC se algo de admin tiver sido revertido.
@@ -15,6 +16,13 @@ Start-Process -FilePath "C:\Program Files (x86)\Thermal Control Center\tcc-g15.e
 if ((& "$PSScriptRoot\otimizacao-jogos.ps1" -Simular) -match '^\[mudar\]') {
     Start-Process pwsh -ArgumentList '-NoExit', '-NoProfile', '-File', "`"$PSScriptRoot\otimizacao-jogos.ps1`""
 }
+
+# Limpeza de cache do sistema e dos apps: em segundo plano, como admin (um UAC), sem
+# fechar app aberto nem esvaziar a Lixeira. O resultado fica em
+# %LOCALAPPDATA%\limpeza-sistema\logs.
+Start-Process pwsh -Verb RunAs -WindowStyle Hidden -ArgumentList '-NoProfile', '-ExecutionPolicy', 'Bypass',
+    '-File', "`"$PSScriptRoot\limpeza-sistema.ps1`"", '-Confirmado', '-Silencioso', '-Perfil', "`"$env:USERPROFILE`"" `
+    -ErrorAction SilentlyContinue  # UAC recusado: fica para a próxima
 
 # Em desuso:
 
