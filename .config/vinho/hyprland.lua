@@ -1,13 +1,14 @@
--- Hyprland mínimo do tema Vinho (Hyprland >= 0.57). Não depende de mais nada do dotfiles além desta
--- pasta; o instalar.sh o liga em ~/.config/hypr/hyprland.lua. Mesmos atalhos do setup completo.
-local vinho = "~/.config/vinho/vinho.sh "
+-- Hyprland mínimo com o tema Vinho do quickshell (Hyprland >= 0.57), para um PC recém-instalado: o
+-- instalar.sh o liga em ~/.config/hypr/hyprland.lua. Mesmos atalhos do setup completo.
+local tema = "~/.config/quickshell/tema.sh "
+local bloquear = "~/.config/quickshell-bloqueio/bloquear.sh"
 local mainMod = "ALT"
 
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 })
 
 hl.on("hyprland.start", function()
   hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
-  hl.exec_cmd(vinho .. "iniciar")
+  hl.exec_cmd(tema .. "iniciar")
 end)
 
 hl.config({
@@ -17,7 +18,7 @@ hl.config({
   },
   decoration = { rounding = 0, blur = { enabled = false }, shadow = { enabled = false } },
   animations = { enabled = false },
-  misc = { background_color = 0xff15070d, disable_hyprland_logo = true, disable_splash_rendering = true },
+  misc = { background_color = 0xff15070d, disable_hyprland_logo = true, disable_splash_rendering = true, allow_session_lock_restore = true },
   input = {
     kb_layout = "br,us", kb_options = "grp:win_space_toggle", numlock_by_default = true,
     accel_profile = "flat", sensitivity = 0.1, follow_mouse = 1,
@@ -27,10 +28,10 @@ hl.config({
 
 -- programas
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd("ghostty --config-file=$HOME/.config/vinho/ghostty.conf"))
-hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(vinho .. "launcher"))
-hl.bind("SUPER + A", hl.dsp.exec_cmd(vinho .. "launcher"))
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(vinho .. "energia"))
-hl.bind("SUPER + U", hl.dsp.exec_cmd(vinho .. "bloquear"))
+hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(tema .. "ipc launcher toggle"))
+hl.bind("SUPER + A", hl.dsp.exec_cmd(tema .. "ipc launcher toggle"))
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(tema .. "ipc launcher power"))
+hl.bind("SUPER + U", hl.dsp.exec_cmd(bloquear))
 hl.bind("SUPER + E", hl.dsp.exec_cmd("nautilus"))
 hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd([[grim -g "$(slurp -d)" - | wl-copy]]))
 

@@ -64,8 +64,8 @@ Fundo `#1c0b12` · texto `#e8d5cf` · cursor `#c4527a` · seleção `#5a2236` / 
 
 ## Onde estão
 
-- Esta pasta: barra (`barra.css`, `bandeja.css`), launcher (`fuzzel.ini`, `wofi.css`), avisos (`dunstrc`),
-  terminal (`cores-ghostty`), bloqueio (`swaylock.conf`) e Hyprland (`hyprland.lua`, `hyprland.conf`)
+- Barra, launcher, painéis e notificações: `~/.config/quickshell/Vinho/modules/Theme.qml`
+- Esta pasta: terminal (`cores-ghostty`) e Hyprland mínimo (`hyprland.lua`, `hyprland.conf`)
 - Em `~/.config`: `ghostty/themes/vinho`, `tmux/temas/vinho.conf`, `gtk-4.0/temas/vinho.css`,
   `yazi/temas/vinho.toml`, `zathura/vinho`, `btop/themes/vinho.theme`, `swaylock/vinho`,
   `wofi/colors/vinho.css`, `nvim/colors/vinho.lua` e `hypr/paleta.lua`
