@@ -15,6 +15,7 @@ from fontTools.ttLib import TTFont
 LARG, TOPO, BASE = 617, 1020, -300      # 617 = a célula de 14 px na fonte 17 (o Ghostty arredonda 13,6 para cima)
 VAO = 132                     # folga em cima e embaixo (1320 = 30 px; 132 = 3 px)
 RAIO = 230
+DESL = 44                     # bloco 1 px para a esquerda (617 = 14 px): compensa a folga de 2 px do Ghostty
 T, B = TOPO - VAO, BASE + VAO
 SUP, INF = TOPO + 14, BASE - 14   # peças emendadas passam um tico do limite, para não aparecer o risco
 
@@ -22,7 +23,7 @@ SUP, INF = TOPO + 14, BASE - 14   # peças emendadas passam um tico do limite, p
 def borda(esq, topo=T, base=B, reto=False):
     """topo/base no limite da célula (SUP/INF) = canto reto, para emendar com a linha vizinha."""
     x = (lambda v: v) if esq else (lambda v: LARG - v)
-    e, d = LARG / 2, LARG
+    e, d = LARG / 2 + (-DESL if esq else DESL), LARG
     pen = TTGlyphPen(None)
     pen.moveTo((x(d), base))
     if reto or base == INF:
@@ -58,12 +59,14 @@ def miolo(n, topo=T, base=B):
     if n == "icone":            # >_ centrado na célula e no bloco
         m = (T + B) / 2
         e = 88                  # espessura do traço
-        poli(pen, (20, m + 250 - e), (20 + e * .7, m + 250), (310, m + 20), (310, m - 20),
+        # centro deslocado junto com o bloco; um pouco mais estreito para o furo não sair da célula
+        furo = TransformPen(pen, (513 / 577, 0, 0, 1, LARG / 2 - DESL - LARG / 2 * 513 / 577, 0))
+        poli(furo, (20, m + 250 - e), (20 + e * .7, m + 250), (310, m + 20), (310, m - 20),
              (20 + e * .7, m - 250), (20, m - 250 + e), (190, m))
-        poli(pen, (320, m - 250 + e), (LARG - 20, m - 250 + e), (LARG - 20, m - 250), (320, m - 250))
+        poli(furo, (320, m - 250 + e), (LARG - 20, m - 250 + e), (LARG - 20, m - 250), (320, m - 250))
         return pen.glyph()
     g = cmap[ord(str(n))]
-    dx = (LARG - gs[g].width * k) / 2
+    dx = (LARG - gs[g].width * k) / 2 - DESL
     gs[g].draw(TransformPen(Cu2QuPen(pen, 1), (k, 0, 0, k, dx, 0)))
     return pen.glyph()
 
