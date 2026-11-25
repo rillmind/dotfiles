@@ -2,7 +2,7 @@
 -- Migrada do hyprland.conf antigo; backup em ~/dotfiles/.config/hypr-hyprlang-backup/
 -- Referência da API: /usr/share/hypr/stubs/hl.meta.lua e https://wiki.hypr.land/configuring/
 
--- cores das bordas seguem o tema do quickshell (Catppuccin Mocha ou Gruvbox claro/escuro)
+-- cores das bordas seguem o tema do quickshell (Catppuccin Mocha, Gruvbox claro/escuro ou Vinho)
 local c = require("paleta")
 
 ------------------
@@ -35,13 +35,15 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("sudo systemctl start tailscaled")
   hl.exec_cmd("flatpak run md.obsidian.Obsidian")
   hl.exec_cmd("gammastep")
-  hl.exec_cmd("bash /home/raul/.scripts/linux/NvibrantStart")
+  -- vibrância da TV: aplica no login e sempre que o HDMI é conectado (valor no script)
+  hl.exec_cmd("~/.config/hypr/scripts/nvibrant-hdmi.sh")
   hl.exec_cmd("nohup flatpak run com.nextcloud.desktopclient.nextcloud --background &")
   -- hl.exec_cmd("syncthing")  -- já iniciado pelo serviço systemd (syncthing.service, --no-browser)
   -- hl.exec_cmd("dunst")  -- notificações agora são do quickshell (modules/Notifications.qml de cada tema)
   hl.exec_cmd("ckb-next -b")
   hl.exec_cmd("/usr/lib/polkit-kde-authentication-agent-1")
-  hl.exec_cmd("swayidle -w before-sleep swaylock")
+  hl.exec_cmd("swayidle -w before-sleep ~/.config/quickshell-bloqueio/bloquear.sh")
+  hl.exec_cmd("~/.config/quickshell-apps/apps.sh iniciar")  -- menu de apps (Super+A)
   -- hl.exec_cmd("waybar")
   -- tema salvo do quickshell (pastas em ~/.config/quickshell; troca com SUPER+SHIFT+T)
   -- sobe depois que a janela do Obsidian aparece (até 15s): carregar o ícone dele faz o quickshell
@@ -58,7 +60,6 @@ end)
 -- Antigo `exec` (roda no início e a cada reload)
 local function on_every_load()
   hl.exec_cmd("sh ~/.config/hypr/scripts/get-last-focused-window.sh")
-  -- hl.exec_cmd("eww daemon")
 end
 hl.on("hyprland.start", on_every_load)
 hl.on("config.reloaded", on_every_load)
@@ -109,6 +110,7 @@ hl.config({
   -- VRR só em tela cheia (jogos): a tela do eDP-1 suporta. Em tudo (1) pode piscar no desktop.
   misc = {
     vrr = 2,
+    allow_session_lock_restore = true,  -- a tela de bloqueio (quickshell-bloqueio) pode subir de novo se cair
   },
 
   animations = {
@@ -118,6 +120,11 @@ hl.config({
 
 -- vidro fosco para quickshell (barra + popups + dock) – catppuccin mocha
 -- hl.layer_rule({ match = { namespace = "quickshell" }, blur = true, ignore_alpha = 0.2 })
+
+-- tema sem papel de parede (Vinho): cor sólida no lugar do fundo padrão do Hyprland
+if c.fundo then
+  hl.config({ misc = { background_color = c.fundo, disable_hyprland_logo = true, disable_splash_rendering = true } })
+end
 
 hl.curve("myBezier", { type = "bezier", points = { { 0.05, 0.9 }, { 0.1, 1.05 } } })
 hl.curve("myBezier2", { type = "bezier", points = { { 0.65, 0 }, { 0.35, 1 } } })
@@ -212,10 +219,8 @@ hl.on("monitor.added", function()
 end)
 
 hl.bind("SUPER + E", hl.dsp.exec_cmd("nautilus"))
-hl.bind("SUPER + U", hl.dsp.exec_cmd("swaylock"))
+hl.bind("SUPER + U", hl.dsp.exec_cmd("~/.config/quickshell-bloqueio/bloquear.sh"))
 hl.bind("SUPER + I", hl.dsp.exec_cmd("codium ~/.config/hypr/"))
-hl.bind("SUPER + V", hl.dsp.exec_cmd("eww open --toggle calendar"))
-hl.bind("SUPER + O", hl.dsp.exec_cmd("eww open --toggle powermenu"))
 hl.bind("SUPER + Tab", hl.dsp.exec_cmd("~/.config/hypr/window-switcher.sh"))
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd("ghostty"))
 hl.bind(mainMod .. " + SHIFT + Q", hl.dsp.window.close())
@@ -226,9 +231,10 @@ hl.bind(mainMod .. " + space", hl.dsp.exec_cmd("~/.config/quickshell/tema.sh ipc
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = "maximized" }))
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
 hl.bind(mainMod .. " + A", hl.dsp.window.move({ workspace = "special:special" }))
+-- menu de apps em tela cheia (~/.config/quickshell-apps); SUPER mesmo, não o mainMod (Alt)
+hl.bind("SUPER + A", hl.dsp.exec_cmd("~/.config/quickshell-apps/apps.sh toggle"))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("~/.config/quickshell/tema.sh ipc launcher power"))
-hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("eww open --toggle overview && eww update selected=_none"))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("~/wofi-emoji/wofi-emoji"))
 hl.bind(mainMod .. " + F10", hl.dsp.pass({ window = [[class:^(com\.obsproject\.Studio)$]] }))
 hl.bind(mainMod .. " + Tab", hl.dsp.window.cycle_next())
@@ -238,7 +244,7 @@ hl.bind("CTRL + SHIFT + Escape", hl.dsp.exec_cmd("flatpak run io.missioncenter.M
 -- hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd([[grim -g "$(slurp)" "$HOME/Pictures/screenshots/$(date +'%s_grim.png')"]]))
 hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd([[grim -g "$(slurp -d)" - | wl-copy]]))
 
--- quickshell: troca de tema (Catppuccin-mocha ⇄ Gruvbox) e modo claro/escuro do Gruvbox
+-- quickshell: troca de tema (Catppuccin-mocha → Gruvbox → Vinho) e modo claro/escuro do Gruvbox
 hl.bind("SUPER + SHIFT + T", hl.dsp.exec_cmd("~/.config/quickshell/tema.sh trocar"))
 hl.bind("SUPER + SHIFT + L", hl.dsp.exec_cmd("~/.config/quickshell/tema.sh ipc gruvbox modo"))
 

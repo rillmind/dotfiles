@@ -3,6 +3,16 @@
 Meus arquivos de configuração do Linux (e alguns do Windows), versionados para montar o mesmo
 ambiente em qualquer máquina.
 
+## Começar num PC novo
+
+Fedora recém-instalado, com o Hyprland já instalado:
+
+```bash
+git clone https://github.com/rillmind/dotfiles ~/dotfiles && ~/dotfiles/.config/vinho/instalar.sh
+```
+
+Passo a passo, atalhos e solução de problemas: [guia do Vinho](.config/vinho/GUIA.md).
+
 ## O que faz
 
 O repositório espelha a minha pasta pessoal (`~`). Os principais conteúdos:
@@ -10,7 +20,7 @@ O repositório espelha a minha pasta pessoal (`~`). Os principais conteúdos:
 - **Shell e terminal**: `.zshrc` (com antigen), `.bashrc`, `.tmux.conf` e `.config/tmux`,
   `starship.toml`, oh-my-posh, Alacritty, Kitty e Ghostty;
 - **Editores**: Neovim, LunarVim, Helix, Zed e VSCodium;
-- **Ambientes gráficos**: Hyprland, Sway, i3, Waybar, Polybar, Rofi, Wofi, Quickshell, Eww,
+- **Ambientes gráficos**: Hyprland, Sway, i3, Waybar, Polybar, Rofi, Wofi, Quickshell,
   Dunst e configurações do COSMIC e do GNOME (`.gnome-extensions`, `.dconf_backup.txt`);
 - **Temas**: quase tudo em Catppuccin (GTK 3/4, btop, Spicetify, Zathura, Yazi, cursores em
   `.icons`, temas em `.themes`) e fontes em `.fonts`;

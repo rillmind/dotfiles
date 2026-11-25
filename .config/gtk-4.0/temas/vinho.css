@@ -1,0 +1,81 @@
+/* Apps GTK4/libadwaita – vinho. Escolhido pelo ~/.config/quickshell/aparencia.sh, que
+   aponta o gtk.css para cá a cada troca de tema (apps abertos pegam ao reabrir). */
+
+@define-color window_bg_color #1c0b12;
+@define-color window_fg_color #e8d5cf;
+@define-color view_bg_color #15070d;
+@define-color view_fg_color #e8d5cf;
+@define-color headerbar_bg_color #28111a;
+@define-color headerbar_fg_color #e8d5cf;
+@define-color headerbar_backdrop_color #1c0b12;
+@define-color sidebar_bg_color #15070d;
+@define-color sidebar_fg_color #e8d5cf;
+@define-color sidebar_backdrop_color #15070d;
+@define-color secondary_sidebar_bg_color #1c0b12;
+@define-color secondary_sidebar_fg_color #e8d5cf;
+@define-color card_bg_color #28111a;
+@define-color card_fg_color #e8d5cf;
+@define-color dialog_bg_color #28111a;
+@define-color dialog_fg_color #e8d5cf;
+@define-color popover_bg_color #28111a;
+@define-color popover_fg_color #e8d5cf;
+@define-color thumbnail_bg_color #28111a;
+@define-color thumbnail_fg_color #e8d5cf;
+@define-color accent_bg_color #c4527a;
+@define-color accent_fg_color #15070d;
+@define-color accent_color #c4527a;
+@define-color destructive_bg_color #e0566f;
+@define-color destructive_fg_color #15070d;
+@define-color destructive_color #e0566f;
+@define-color success_bg_color #a3ad7a;
+@define-color success_fg_color #15070d;
+@define-color success_color #a3ad7a;
+@define-color warning_bg_color #d9a862;
+@define-color warning_fg_color #15070d;
+@define-color warning_color #d9a862;
+@define-color error_bg_color #e0566f;
+@define-color error_fg_color #15070d;
+@define-color error_color #e0566f;
+
+/* libadwaita 1.6+: as mesmas cores como variáveis CSS */
+:root {
+  --window-bg-color: #1c0b12;
+  --window-fg-color: #e8d5cf;
+  --view-bg-color: #15070d;
+  --view-fg-color: #e8d5cf;
+  --headerbar-bg-color: #28111a;
+  --headerbar-fg-color: #e8d5cf;
+  --headerbar-backdrop-color: #1c0b12;
+  --sidebar-bg-color: #15070d;
+  --sidebar-fg-color: #e8d5cf;
+  --sidebar-backdrop-color: #15070d;
+  --secondary-sidebar-bg-color: #1c0b12;
+  --secondary-sidebar-fg-color: #e8d5cf;
+  --card-bg-color: #28111a;
+  --card-fg-color: #e8d5cf;
+  --dialog-bg-color: #28111a;
+  --dialog-fg-color: #e8d5cf;
+  --popover-bg-color: #28111a;
+  --popover-fg-color: #e8d5cf;
+  --thumbnail-bg-color: #28111a;
+  --thumbnail-fg-color: #e8d5cf;
+  --accent-bg-color: #c4527a;
+  --accent-fg-color: #15070d;
+  --accent-color: #c4527a;
+  --destructive-bg-color: #e0566f;
+  --destructive-fg-color: #15070d;
+  --destructive-color: #e0566f;
+  --success-bg-color: #a3ad7a;
+  --success-fg-color: #15070d;
+  --success-color: #a3ad7a;
+  --warning-bg-color: #d9a862;
+  --warning-fg-color: #15070d;
+  --warning-color: #d9a862;
+  --error-bg-color: #e0566f;
+  --error-fg-color: #15070d;
+  --error-color: #e0566f;
+}
+
+/* tudo quadrado neste tema */
+:root { --window-radius: 0px; }
+* { border-radius: 0; }

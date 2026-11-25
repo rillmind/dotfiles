@@ -20,8 +20,8 @@ ShellRoot {
     property color colMauve: "#cba6f7"
     property color colRed: "#f38ba8"
     property color colOverlay0: "#6c7086"
-    // waybar window bg rgba(30,30,46,0.7) → #B31e1e2e
-    property color colBarBg: "#B31e1e2e"
+    // opaca (base do mocha)
+    property color colBarBg: "#1e1e2e"
 
     property string fontFamily: "JetBrainsMono Nerd Font"
     // waybar: 18px → solicitado 19px (OS 22)
@@ -907,7 +907,7 @@ ShellRoot {
                         font.family: root.fontFamily
                         font.pixelSize: root.fontSize
                         font.bold: true
-                        Layout.rightMargin: 12
+                        Layout.rightMargin: 4
                         MouseArea {
                             anchors.fill: parent
                             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
@@ -921,6 +921,16 @@ ShellRoot {
                                 else { root.popupScreen = barWindow.modelData.name; root.notifVisible = !root.notifVisible }
                             }
                         }
+                    }
+                    // " | " entre as notificações e a rede
+                    Text {
+                        text: " | "
+                        color: root.colText
+                        font.family: root.fontFamily
+                        font.pixelSize: root.fontSize
+                        font.bold: true
+                        Layout.rightMargin: 4
+                        opacity: 0.9
                     }
                     Text {
                         id: networkText

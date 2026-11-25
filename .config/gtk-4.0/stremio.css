@@ -1,0 +1,25 @@
+/* Stremio: barra superior (headerbar) praticamente invisível; o Hyprland move e fecha a janela.
+   Copiado para ~/.var/app/com.stremio.Stremio/config/gtk-4.0/gtk.css, e o flatpak do Stremio não
+   recebe o ~/.config/gtk-4.0 do sistema (flatpak override --nofilesystem=xdg-config/gtk-4.0). */
+headerbar,
+.titlebar {
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+  box-shadow: none;
+  background: none;
+}
+headerbar *,
+.titlebar * {
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+  box-shadow: none;
+  background: none;
+  font-size: 1px;
+  -gtk-icon-size: 0;
+  opacity: 0;
+}

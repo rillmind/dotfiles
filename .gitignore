@@ -2,3 +2,6 @@
 .fonts/.uuid*
 .config/nchat/
 .config/rpcs3/
+
+# gerado pelo aparencia.sh (aponta para temas/<paleta>.css)
+.config/gtk-4.0/gtk.css

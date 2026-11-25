@@ -1,0 +1,19 @@
+module qs.modules
+singleton Theme 1.0 Theme.qml
+ControlCenter 1.0 ControlCenter.qml
+CalendarWidget 1.0 CalendarWidget.qml
+SystemMonitor 1.0 SystemMonitor.qml
+VolumeOsd 1.0 VolumeOsd.qml
+DisplayManager 1.0 DisplayManager.qml
+DisplayMenu 1.0 DisplayMenu.qml
+FanManager 1.0 FanManager.qml
+FanMenu 1.0 FanMenu.qml
+BluetoothManager 1.0 BluetoothManager.qml
+BluetoothMenu 1.0 BluetoothMenu.qml
+Launcher 1.0 Launcher.qml
+TrayPopup 1.0 TrayPopup.qml
+AppMenu 1.0 AppMenu.qml
+MediaPanel 1.0 MediaPanel.qml
+Notifications 1.0 Notifications.qml
+NotificationCard 1.0 NotificationCard.qml
+NotificationCenter 1.0 NotificationCenter.qml
