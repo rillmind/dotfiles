@@ -19,7 +19,11 @@
     "calt": true,
   },
   "tab_size": 2,
-  "icon_theme": "Catppuccin Mocha",
+  "icon_theme": {
+    "mode": "light",
+    "light": "Catppuccin Mocha",
+    "dark": "Catppuccin Mocha"
+  },
   "telemetry": {
     "metrics": false,
   },
@@ -27,7 +31,11 @@
   "ui_font_size": 20,
   "buffer_font_family": "JetBrainsMono Nerd Font",
   "buffer_font_size": 21,
-  "theme": "Catppuccin Mocha",
+  "theme": {
+    "mode": "system",
+    "light": "One Light",
+    "dark": "Vinho"
+  },
   "tab_bar": {
     "show": true,
     "show_nav_history_buttons": false,

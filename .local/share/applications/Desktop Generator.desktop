@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Version=1.5
+Name=Desktop Generator
+Exec=/home/raul/dev/desktop-generator/target/release/desktop-generator
+Path=~/
+Terminal=false
